@@ -133,6 +133,17 @@ h1 { max-width: 9ch; margin: 0 0 26px; font-size: clamp(48px, 5.4vw, 72px); line
 .card-name { text-align: center; font-family: Georgia, "Times New Roman", serif; font-size: 32px; letter-spacing: -.02em; }
 .card-caption { margin: 10px 0 36px; text-align: center; color: var(--ink-soft); font-size: 12px; }
 .card-bottom { gap: 15px; padding-top: 18px; border-top: 1px solid var(--card-divider); color: var(--ink-soft); font-size: 11px; }
+.algorithm-portals { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: -38px 0 54px; font-size: inherit; }
+.algorithm-portal { min-height: 112px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 25px 28px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); transition: color .2s, border-color .2s, background .2s, transform .25s cubic-bezier(.22,1,.36,1); }
+.algorithm-portal::after { display: none; }
+.algorithm-portal:hover { border-color: var(--moss); background: var(--sage-deep); transform: translateY(-3px); }
+.algorithm-portal:active { transform: translateY(0); }
+.portal-copy { display: grid; gap: 7px; }
+.portal-copy strong { font-family: Georgia, "Noto Serif SC", "Songti SC", serif; font-size: 23px; line-height: 1.25; font-weight: 500; letter-spacing: -.02em; }
+.portal-copy > span { color: var(--muted); font-size: 13px; line-height: 1.55; }
+.algorithm-portal:hover .portal-copy > span { color: var(--ink-soft); }
+.algorithm-portal svg { width: 27px; height: 27px; flex: 0 0 auto; fill: none; stroke: var(--moss); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; transition: transform .25s cubic-bezier(.22,1,.36,1); }
+.algorithm-portal:hover svg { transform: translateX(4px); }
 .hitokoto-panel { min-width: 0; margin: 0 0 44px; padding: 20px 0 18px; border-block: 1px solid var(--line); }
 .hitokoto-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: .15em; }
 #hitokoto-refresh { width: 44px; height: 44px; display: inline-grid; place-items: center; margin: -11px -10px -11px 0; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--moss); cursor: pointer; transition: color .2s, background .2s, transform .35s cubic-bezier(.22,1,.36,1); }
@@ -183,6 +194,7 @@ h3 { margin: 0 0 10px; font-size: 18px; font-weight: 600; letter-spacing: -.01em
   .wrap { width: calc(100% - 48px); }
   .hero { gap: 42px; min-height: 0; padding: 64px 0 78px; }
   .profile-card { padding: 25px 23px; }
+  .algorithm-portals { margin-top: -28px; }
   .tiles { gap: 18px; }
   .contact-tile { padding-inline: 20px; }
   .hitokoto-panel { display: grid; grid-template-columns: 100px minmax(0, 1fr); gap: 24px; align-items: start; }
@@ -202,6 +214,9 @@ h3 { margin: 0 0 10px; font-size: 18px; font-weight: 600; letter-spacing: -.01em
   .profile-card { width: min(335px, 96%); justify-self: center; transform: rotate(1.5deg); }
   .avatar { margin-top: 24px; }
   .card-caption { margin-bottom: 27px; }
+  .algorithm-portals { grid-template-columns: 1fr; gap: 12px; margin: -18px 0 38px; }
+  .algorithm-portal { min-height: 96px; padding: 21px 22px; }
+  .portal-copy strong { font-size: 21px; }
   .hitokoto-panel { display: block; margin-bottom: 36px; padding-block: 17px; }
   .hitokoto-content blockquote { margin-top: 13px; font-size: 16px; }
   .explore { padding-block: 38px 50px; }

@@ -1,21 +1,30 @@
 (() => {
   const toggle = document.querySelector('#theme-toggle');
-  function apply(theme) {
-    document.documentElement.dataset.theme = theme;
-    document.documentElement.style.colorScheme = theme;
-    const label = theme === 'dark' ? '切换到日间模式' : '切换到夜间模式';
+  function apply(theme, {persist = false} = {}) {
+    const nextTheme = theme === 'dark' ? 'dark' : 'light';
+    document.documentElement.dataset.theme = nextTheme;
+    document.documentElement.style.colorScheme = nextTheme;
+    const label = nextTheme === 'dark' ? '切换到日间模式' : '切换到夜间模式';
     toggle.setAttribute('aria-label', label); toggle.title = label;
-    toggle.setAttribute('aria-pressed', String(theme === 'dark'));
-    document.querySelector('meta[name="theme-color"]').content = theme === 'dark' ? '#15231d' : '#f4f1e8';
+    toggle.setAttribute('aria-pressed', String(nextTheme === 'dark'));
+    document.querySelector('meta[name="theme-color"]').content = nextTheme === 'dark' ? '#15231d' : '#f4f1e8';
+    if (persist) window.YANGJM_THEME?.save(nextTheme);
   }
   apply(document.documentElement.dataset.theme);
   toggle.addEventListener('click', () => {
     const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-    apply(theme); try { localStorage.setItem('yangjm-theme', theme); } catch {}
+    apply(theme, {persist: true});
   });
-  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
-    let saved; try { saved = localStorage.getItem('yangjm-theme'); } catch {}
-    if (!saved) apply(event.matches ? 'dark' : 'light');
+  function syncSharedTheme() {
+    const sharedTheme = window.YANGJM_THEME?.read();
+    if (window.YANGJM_THEME?.valid(sharedTheme) && sharedTheme !== document.documentElement.dataset.theme) {
+      apply(sharedTheme);
+    }
+  }
+  window.addEventListener('pageshow', syncSharedTheme);
+  window.addEventListener('focus', syncSharedTheme);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') syncSharedTheme();
   });
   if (document.body.classList.contains('oi-page')) {
     const ids = ['luogu', 'codeforces', 'atcoder', 'qoj'];

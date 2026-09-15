@@ -7,21 +7,37 @@
   <meta name="theme-color" content="#f4f1e8">
   <script>
     (() => {
-      let saved;
-      try { saved = localStorage.getItem('yangjm-theme'); } catch {}
-      const theme = saved === 'light' || saved === 'dark'
-        ? saved
-        : (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      const key = 'yangjm-theme';
+      const valid = value => value === 'light' || value === 'dark';
+      const readCookie = () => {
+        const item = document.cookie.split('; ').find(row => row.startsWith(`${key}=`));
+        return item ? decodeURIComponent(item.slice(key.length + 1)) : null;
+      };
+      const save = theme => {
+        const sharedDomain = location.hostname === 'yangjm.cn' || location.hostname.endsWith('.yangjm.cn');
+        const domain = sharedDomain ? '; Domain=yangjm.cn' : '';
+        const secure = location.protocol === 'https:' ? '; Secure' : '';
+        document.cookie = `${key}=${theme}; Path=/; Max-Age=31536000; SameSite=Lax${domain}${secure}`;
+        try { localStorage.setItem(key, theme); } catch {}
+      };
+      let legacy;
+      try { legacy = localStorage.getItem(key); } catch {}
+      const cookie = readCookie();
+      const saved = valid(cookie) ? cookie : (valid(legacy) ? legacy : null);
+      if (!valid(cookie) && valid(legacy)) save(legacy);
+      const hour = new Date().getHours();
+      const theme = saved || (hour >= 7 && hour < 19 ? 'light' : 'dark');
       document.documentElement.dataset.theme = theme;
       document.documentElement.style.colorScheme = theme;
       document.querySelector('meta[name="theme-color"]').content = theme === 'dark' ? '#15231d' : '#f4f1e8';
+      window.YANGJM_THEME = { read: readCookie, save, valid };
     })();
   </script>
   <title>yangjm · 个人主页</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/styles.css?v=20260916">
   <script src="/profile.js" defer></script>
-  <script src="/main.js" defer></script>
+  <script src="/main.js?v=20260916" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#about">跳到个人简介</a>
@@ -50,6 +66,16 @@
         <div class="card-bottom"><span>我的互联网小角落</span><span>yangjm.cn</span></div>
       </aside>
     </section>
+    <nav class="algorithm-portals" aria-label="算法页面">
+      <a class="algorithm-portal" href="https://oi.yangjm.cn">
+        <span class="portal-copy"><strong>算法竞赛</strong><span>训练平台、队伍经历与比赛记录</span></span>
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+      </a>
+      <a class="algorithm-portal" href="https://banzi.yangjm.cn">
+        <span class="portal-copy"><strong>算法板子</strong><span>搜索并复制常用算法模板</span></span>
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+      </a>
+    </nav>
     <aside class="hitokoto-panel" aria-labelledby="hitokoto-title">
       <div class="hitokoto-head">
         <span id="hitokoto-title">一言</span>
@@ -63,7 +89,7 @@
       </div>
     </aside>
     <section class="explore" id="next" aria-labelledby="explore-title">
-      <div class="section-heading"><h2 id="explore-title">从这里，慢慢开始。</h2><p><a href="https://oi.yangjm.cn">算法竞赛 ↗</a> · <a href="https://banzi.yangjm.cn">算法板子 ↗</a></p></div>
+      <div class="section-heading"><h2 id="explore-title">从这里，慢慢开始。</h2><p>一点记录，一点创造。</p></div>
       <div class="tiles">
         <article class="tile"><div class="tile-top"><span class="tile-mark" aria-hidden="true">文</span><span class="badge">筹备中</span></div><h3>文字与记录</h3><p>给想法一个落脚的地方。<br>未来会在这里分享博客文章。</p><span class="tile-label">NOTES & THOUGHTS</span></article>
         <article class="tile"><div class="tile-top"><svg class="tile-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m8 6-6 6 6 6m8-12 6 6-6 6m-2-15-4 18"/></svg><span class="badge">筹备中</span></div><h3>小项目与作品</h3><p>把想法做成看得见的东西。<br>后续的小项目会陆续出现在这里。</p><span class="tile-label">IDEAS INTO THINGS</span></article>

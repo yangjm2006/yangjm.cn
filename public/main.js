@@ -2,11 +2,6 @@ const profile = window.SITE_PROFILE || {};
 const themeRoot = document.documentElement;
 const themeToggle = document.getElementById('theme-toggle');
 const themeColor = document.querySelector('meta[name="theme-color"]');
-const colorSchemeQuery = matchMedia('(prefers-color-scheme: dark)');
-
-function savedTheme() {
-  try { return localStorage.getItem('yangjm-theme'); } catch { return null; }
-}
 
 function applyTheme(theme, { persist = false } = {}) {
   const nextTheme = theme === 'dark' ? 'dark' : 'light';
@@ -18,16 +13,24 @@ function applyTheme(theme, { persist = false } = {}) {
   themeToggle.title = dark ? '切换到日间模式' : '切换到夜间模式';
   themeColor.content = dark ? '#15231d' : '#f4f1e8';
   if (persist) {
-    try { localStorage.setItem('yangjm-theme', nextTheme); } catch {}
+    window.YANGJM_THEME?.save(nextTheme);
   }
 }
 
-applyTheme(themeRoot.dataset.theme || (colorSchemeQuery.matches ? 'dark' : 'light'));
+applyTheme(themeRoot.dataset.theme);
 themeToggle.addEventListener('click', () => {
   applyTheme(themeRoot.dataset.theme === 'dark' ? 'light' : 'dark', { persist: true });
 });
-colorSchemeQuery.addEventListener?.('change', event => {
-  if (!savedTheme()) applyTheme(event.matches ? 'dark' : 'light');
+function syncSharedTheme() {
+  const sharedTheme = window.YANGJM_THEME?.read();
+  if (window.YANGJM_THEME?.valid(sharedTheme) && sharedTheme !== themeRoot.dataset.theme) {
+    applyTheme(sharedTheme);
+  }
+}
+window.addEventListener('pageshow', syncSharedTheme);
+window.addEventListener('focus', syncSharedTheme);
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') syncSharedTheme();
 });
 
 if (profile.school && profile.major) {
