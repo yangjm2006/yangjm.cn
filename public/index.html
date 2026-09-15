@@ -4,7 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="yangjm 的个人主页。关于我，以及未来的文字与作品。">
-  <meta name="theme-color" content="#f8f9f6">
+  <meta name="theme-color" content="#f4f1e8">
+  <script>
+    (() => {
+      let saved;
+      try { saved = localStorage.getItem('yangjm-theme'); } catch {}
+      const theme = saved === 'light' || saved === 'dark'
+        ? saved
+        : (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.dataset.theme = theme;
+      document.documentElement.style.colorScheme = theme;
+      document.querySelector('meta[name="theme-color"]').content = theme === 'dark' ? '#15231d' : '#f4f1e8';
+    })();
+  </script>
   <title>yangjm · 个人主页</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/styles.css">
@@ -15,30 +27,47 @@
   <a class="skip-link" href="#about">跳到个人简介</a>
   <header class="site-header wrap">
     <a class="brand" href="/" aria-label="yangjm 首页">y<span>.</span></a>
-    <nav aria-label="主导航"><a href="#about">关于</a><a href="#next">探索</a><a class="github-link" href="https://github.com/yangjm2006" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a></nav>
+    <div class="header-actions">
+      <nav aria-label="主导航"><a href="#about">关于</a><a href="#next">探索</a><a class="github-link" href="https://github.com/yangjm2006" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a></nav>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="切换到夜间模式" aria-pressed="false" title="切换到夜间模式">
+        <svg class="theme-icon moon-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M20.6 15.4A9 9 0 0 1 8.6 3.4 9 9 0 1 0 20.6 15.4Z"/></svg>
+        <svg class="theme-icon sun-icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v2.2M12 19.8V22M4.9 4.9l1.6 1.6m11 11 1.6 1.6M2 12h2.2M19.8 12H22M4.9 19.1l1.6-1.6m11-11 1.6-1.6"/></svg>
+      </button>
+    </div>
   </header>
   <main class="wrap">
     <section class="hero" id="about" aria-labelledby="intro-title">
       <div class="intro">
-        <p class="eyebrow"><span class="status-dot"></span> A LITTLE SPACE ON THE INTERNET</p>
         <h1 id="intro-title">你好，我是<br><span id="profile-name">yangjm</span><span class="title-dot">.</span></h1>
         <p class="intro-text" id="profile-intro">就读于山东大学软件工程专业。这里是我的个人空间，用来分享学习中的思考，和一点点做出来的小项目。</p>
-        <div class="hero-actions"><a class="button github-link" href="https://github.com/yangjm2006" target="_blank" rel="noopener noreferrer">在 GitHub 找到我 <span aria-hidden="true">↗</span></a><a class="text-link" href="#next">逛逛这里 <span aria-hidden="true">↓</span></a></div>
+        <div class="hero-actions"><a class="button github-link" href="https://github.com/yangjm2006" target="_blank" rel="noopener noreferrer">在 GitHub 找到我 <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></svg></a><a class="text-link" href="#next">逛逛这里 <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14m-5-5 5 5 5-5"/></svg></a></div>
       </div>
       <aside class="profile-card" aria-label="个人名片">
-        <div class="card-top"><span>HELLO, WORLD</span><span class="card-spark" aria-hidden="true">✳</span></div>
+        <div class="card-top"><span>HELLO, WORLD</span><svg class="card-spark" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20M5 5l14 14M19 5 5 19"/></svg></div>
         <div class="avatar" aria-hidden="true">Y<span>.</span></div>
         <div class="card-name" id="card-name">yangjm</div>
         <p class="card-caption">山东大学 · 软件工程</p>
         <div class="card-bottom"><span>我的互联网小角落</span><span>yangjm.cn</span></div>
       </aside>
     </section>
+    <aside class="hitokoto-panel" aria-labelledby="hitokoto-title">
+      <div class="hitokoto-head">
+        <span id="hitokoto-title">一言</span>
+        <button id="hitokoto-refresh" type="button" aria-label="换一句" title="换一句">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 6v5h-5M4 18v-5h5M6.1 9A7 7 0 0 1 18 6.7L20 11M4 13l2 4.3A7 7 0 0 0 17.9 15"/></svg>
+        </button>
+      </div>
+      <div class="hitokoto-content" id="hitokoto-content" aria-live="polite" aria-busy="true">
+        <blockquote><a id="hitokoto-text" href="https://hitokoto.cn/" target="_blank" rel="noopener noreferrer">正在遇见一句话……</a></blockquote>
+        <p id="hitokoto-source">来自一言</p>
+      </div>
+    </aside>
     <section class="explore" id="next" aria-labelledby="explore-title">
-      <div class="section-heading"><div><p class="eyebrow">A WORK IN PROGRESS</p><h2 id="explore-title">从这里，慢慢开始。</h2></div><p>一点记录，一点创造。</p></div>
+      <div class="section-heading"><h2 id="explore-title">从这里，慢慢开始。</h2><p>一点记录，一点创造。</p></div>
       <div class="tiles">
-        <article class="tile"><div class="tile-top"><span class="tile-icon" aria-hidden="true">Aa</span><span class="badge">筹备中</span></div><h3>文字与记录</h3><p>给想法一个落脚的地方。<br>未来会在这里分享博客文章。</p><span class="tile-label">NOTES & THOUGHTS</span></article>
-        <article class="tile"><div class="tile-top"><span class="tile-icon code-icon" aria-hidden="true">&lt;/&gt;</span><span class="badge">筹备中</span></div><h3>小项目与作品</h3><p>把想法做成看得见的东西。<br>后续的小项目会陆续出现在这里。</p><span class="tile-label">IDEAS INTO THINGS</span></article>
-        <article class="tile contact-tile"><div class="tile-top"><span class="tile-icon" aria-hidden="true">↗</span><span class="tiny-label">SAY HELLO</span></div><h3>保持联系</h3><p>有想交流的想法，<br>欢迎给我写封邮件。</p><a class="contact-link" id="email-link" href="mailto:1973871746@qq.com">1973871746@qq.com <span aria-hidden="true">↗</span></a></article>
+        <article class="tile"><div class="tile-top"><span class="tile-mark" aria-hidden="true">文</span><span class="badge">筹备中</span></div><h3>文字与记录</h3><p>给想法一个落脚的地方。<br>未来会在这里分享博客文章。</p><span class="tile-label">NOTES & THOUGHTS</span></article>
+        <article class="tile"><div class="tile-top"><svg class="tile-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m8 6-6 6 6 6m8-12 6 6-6 6m-2-15-4 18"/></svg><span class="badge">筹备中</span></div><h3>小项目与作品</h3><p>把想法做成看得见的东西。<br>后续的小项目会陆续出现在这里。</p><span class="tile-label">IDEAS INTO THINGS</span></article>
+        <article class="tile contact-tile"><div class="tile-top"><svg class="tile-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 12h16m-6-6 6 6-6 6"/></svg><span class="tiny-label">SAY HELLO</span></div><h3>保持联系</h3><p>有想交流的想法，<br>欢迎给我写封邮件。</p><a class="contact-link" id="email-link" href="mailto:1973871746@qq.com">1973871746@qq.com</a></article>
       </div>
     </section>
   </main>
