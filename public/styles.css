@@ -128,8 +128,8 @@ h1 { max-width: 9ch; margin: 0 0 26px; font-size: clamp(48px, 5.4vw, 72px); line
 .card-top, .card-bottom { display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 1; }
 .card-top { color: var(--ink-soft); font-size: 11px; font-weight: 600; letter-spacing: .17em; }
 .card-spark { width: 27px; height: 27px; fill: none; stroke: var(--moss); stroke-width: 1.2; stroke-linecap: round; }
-.avatar { width: 108px; height: 108px; margin: 35px auto 20px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--sage-deep); color: var(--ink); font-family: Georgia, "Times New Roman", serif; font-size: 64px; box-shadow: inset 0 1px 0 var(--avatar-shine); transition: background .35s; }
-.avatar span { color: var(--moss); }
+.avatar { width: 116px; height: 116px; margin: 31px auto 18px; padding: 4px; border: 1px solid var(--card-line); border-radius: 50%; background: var(--surface); box-shadow: 0 10px 24px -14px oklch(28% 0.055 155 / .5), inset 0 1px 0 var(--avatar-shine); }
+.avatar img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
 .card-name { text-align: center; font-family: Georgia, "Times New Roman", serif; font-size: 32px; letter-spacing: -.02em; }
 .card-caption { margin: 10px 0 36px; text-align: center; color: var(--ink-soft); font-size: 12px; }
 .card-bottom { gap: 15px; padding-top: 18px; border-top: 1px solid var(--card-divider); color: var(--ink-soft); font-size: 11px; }

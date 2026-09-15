@@ -1,0 +1,16 @@
+[Unit]
+Description=Refresh yangjm public online judge statistics
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+UMask=0022
+ExecStart=/usr/bin/flock -n /var/lib/yangjm-oj-stats/sync.lock /usr/bin/python3 /opt/yangjm-oj-stats/sync-oj-stats.py
+TimeoutStartSec=240
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/yangjm-oj-stats /var/www/yangjm.cn/oi
+

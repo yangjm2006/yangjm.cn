@@ -1,0 +1,11 @@
+[Unit]
+Description=Refresh yangjm online judge statistics every hour
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+AccuracySec=1min
+Unit=yangjm-oj-stats.service
+
+[Install]
+WantedBy=timers.target

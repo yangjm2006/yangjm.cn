@@ -1,0 +1,11 @@
+[Unit]
+Description=Refresh yangjm algorithm notebook every hour
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+AccuracySec=1min
+Unit=yangjm-notebook-sync.service
+
+[Install]
+WantedBy=timers.target

@@ -4,6 +4,7 @@
   "private": true,
   "description": "YangJM 的个人主页",
   "scripts": {
+    "build": "node scripts/build-subsites.mjs",
     "dev": "node scripts/serve.mjs",
     "start": "node scripts/serve.mjs"
   }
