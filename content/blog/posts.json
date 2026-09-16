@@ -1,0 +1,11 @@
+[
+  {
+    "slug": "math-note",
+    "title": "数学笔记",
+    "description": "从多项式与插值出发，整理生成函数、二项式定理、卡特兰数和 Dirichlet 级数等基础内容。",
+    "date": "2026-09-16",
+    "topic": "数学 · 学习笔记",
+    "source": "Math-Note.md",
+    "originalUrl": "https://github.com/yangjm2006/Blog/blob/main/Note/Math-Note.md"
+  }
+]

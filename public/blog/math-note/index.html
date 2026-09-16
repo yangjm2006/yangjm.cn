@@ -1,0 +1,176 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f4f1e8"><meta name="description" content="从多项式与插值出发，整理生成函数、二项式定理、卡特兰数和 Dirichlet 级数等基础内容。"><title>数学笔记 · yangjm</title><script>
+    (() => {
+      const key = 'yangjm-theme';
+      const valid = value => value === 'light' || value === 'dark';
+      const readCookie = () => {
+        const item = document.cookie.split('; ').find(row => row.startsWith(`${key}=`));
+        return item ? decodeURIComponent(item.slice(key.length + 1)) : null;
+      };
+      const save = theme => {
+        const sharedDomain = location.hostname === 'yangjm.cn' || location.hostname.endsWith('.yangjm.cn');
+        const domain = sharedDomain ? '; Domain=yangjm.cn' : '';
+        const secure = location.protocol === 'https:' ? '; Secure' : '';
+        document.cookie = `${key}=${theme}; Path=/; Max-Age=31536000; SameSite=Lax${domain}${secure}`;
+        try { localStorage.setItem(key, theme); } catch {}
+      };
+      let legacy;
+      try { legacy = localStorage.getItem(key); } catch {}
+      const cookie = readCookie();
+      const saved = valid(cookie) ? cookie : (valid(legacy) ? legacy : null);
+      if (!valid(cookie) && valid(legacy)) save(legacy);
+      const hour = new Date().getHours();
+      const theme = saved || (hour >= 7 && hour < 19 ? 'light' : 'dark');
+      document.documentElement.dataset.theme = theme;
+      document.documentElement.style.colorScheme = theme;
+      document.querySelector('meta[name="theme-color"]').content = theme === 'dark' ? '#15231d' : '#f4f1e8';
+      window.YANGJM_THEME = { read: readCookie, save, valid };
+    })();
+  </script><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/styles.css?v=20260916"><link rel="stylesheet" href="/subsites.css?v=20260916"><link rel="stylesheet" href="/blog.css?v=1"><script src="/subsites.js?v=20260916" defer></script><script>window.MathJax={tex:{inlineMath:[["$","$"],["\\(","\\)"]],displayMath:[["$$","$$"],["\\[","\\]"]],packages:{"[+]": ["ams"]},tags:"ams"},options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},chtml:{scale:1}};</script><script defer src="/vendor/mathjax/tex-chtml.js"></script></head><body class="subsite blog-article"><a class="skip-link" href="#content">跳到正文</a><header class="sub-header"><a class="brand" href="https://yangjm.cn" aria-label="yangjm 个人主页">y<span>.</span></a><nav aria-label="主导航"><a href="https://yangjm.cn">主页</a><a href="https://blog.yangjm.cn/" aria-current="page">博客</a><a href="https://oi.yangjm.cn">竞赛</a><a href="https://banzi.yangjm.cn">板子</a></nav><button class="theme-toggle" id="theme-toggle" type="button" aria-label="切换到夜间模式" aria-pressed="false" title="切换到夜间模式">
+        <svg class="theme-icon moon-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M20.6 15.4A9 9 0 0 1 8.6 3.4 9 9 0 1 0 20.6 15.4Z"/></svg>
+        <svg class="theme-icon sun-icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v2.2M12 19.8V22M4.9 4.9l1.6 1.6m11 11 1.6 1.6M2 12h2.2M19.8 12H22M4.9 19.1l1.6-1.6m11-11 1.6-1.6"/></svg>
+      </button></header><main id="content" class="article-shell"><article class="article-page"><nav class="breadcrumb" aria-label="面包屑"><a href="https://blog.yangjm.cn/">文字与记录</a><span aria-hidden="true">/</span><span>数学笔记</span></nav><header class="article-header"><h1>数学笔记</h1><p>从多项式与插值出发，整理生成函数、二项式定理、卡特兰数和 Dirichlet 级数等基础内容。</p><div class="article-meta"><time datetime="2026-09-16">2026年9月16日</time><span>9 分钟阅读</span><span>数学 · 学习笔记</span></div></header><details class="mobile-toc"><summary>文章目录</summary><ol><li class="toc-level-2"><a href="#section-多项式">多项式</a></li><li class="toc-level-3"><a href="#section-插值">插值</a></li><li class="toc-level-3"><a href="#section-范德蒙德行列式">范德蒙德行列式</a></li><li class="toc-level-3"><a href="#section-拉格朗日插值">拉格朗日插值</a></li><li class="toc-level-3"><a href="#section-快速傅里叶变换">快速傅里叶变换</a></li><li class="toc-level-3"><a href="#section-快速数论变换">快速数论变换</a></li><li class="toc-level-2"><a href="#section-生成函数">生成函数</a></li><li class="toc-level-3"><a href="#section-数列卷积">数列卷积</a></li><li class="toc-level-3"><a href="#section-二项式定理扩展">二项式定理扩展</a></li><li class="toc-level-3"><a href="#section-广义牛顿二项式定理">广义牛顿二项式定理</a></li><li class="toc-level-3"><a href="#section-多项式定理">多项式定理</a></li><li class="toc-level-3"><a href="#section-卡特兰数">卡特兰数</a></li><li class="toc-level-3"><a href="#section-指数生成函数">指数生成函数</a></li><li class="toc-level-3"><a href="#section-dirichlet级数生成函数">Dirichlet级数生成函数</a></li></ol></details><div class="article-layout"><aside class="article-toc" aria-label="文章目录"><strong>文章目录</strong><ol><li class="toc-level-2"><a href="#section-多项式">多项式</a></li><li class="toc-level-3"><a href="#section-插值">插值</a></li><li class="toc-level-3"><a href="#section-范德蒙德行列式">范德蒙德行列式</a></li><li class="toc-level-3"><a href="#section-拉格朗日插值">拉格朗日插值</a></li><li class="toc-level-3"><a href="#section-快速傅里叶变换">快速傅里叶变换</a></li><li class="toc-level-3"><a href="#section-快速数论变换">快速数论变换</a></li><li class="toc-level-2"><a href="#section-生成函数">生成函数</a></li><li class="toc-level-3"><a href="#section-数列卷积">数列卷积</a></li><li class="toc-level-3"><a href="#section-二项式定理扩展">二项式定理扩展</a></li><li class="toc-level-3"><a href="#section-广义牛顿二项式定理">广义牛顿二项式定理</a></li><li class="toc-level-3"><a href="#section-多项式定理">多项式定理</a></li><li class="toc-level-3"><a href="#section-卡特兰数">卡特兰数</a></li><li class="toc-level-3"><a href="#section-指数生成函数">指数生成函数</a></li><li class="toc-level-3"><a href="#section-dirichlet级数生成函数">Dirichlet级数生成函数</a></li></ol><a class="source-link" href="https://github.com/yangjm2006/Blog/blob/main/Note/Math-Note.md" target="_blank" rel="noopener noreferrer">查看 Markdown 原文 <span aria-hidden="true">↗</span></a></aside><div class="article-body"><h2 id="section-多项式">多项式<a class="heading-anchor" href="#section-多项式" aria-label="链接到多项式">#</a></h2>
+<div class="math-block">$$最基础的数学对象.$$</div>
+<ul><li>数系（自然数、整数、有理数、实数、复数）</li><li>代数结构（群、环、域、向量空间）</li></ul>
+<p>多项式是连接它们的第一个纽带.</p>
+<h3 id="section-插值">插值<a class="heading-anchor" href="#section-插值" aria-label="链接到插值">#</a></h3>
+<p>给定 <span class="math-inline">$n$</span> 个 <span class="math-inline">$x$</span> 坐标不同的点，恰好可以用唯一的 <span class="math-inline">$n-1$</span> 次多项式穿过.</p>
+<p>相应地，一个 <span class="math-inline">$n-1$</span> 次多项式，可以由 <span class="math-inline">$n$</span> 个 <span class="math-inline">$x$</span> 坐标不同的点确定.</p>
+<h3 id="section-范德蒙德行列式">范德蒙德行列式<a class="heading-anchor" href="#section-范德蒙德行列式" aria-label="链接到范德蒙德行列式">#</a></h3>
+<h3 id="section-拉格朗日插值">拉格朗日插值<a class="heading-anchor" href="#section-拉格朗日插值" aria-label="链接到拉格朗日插值">#</a></h3>
+<h3 id="section-快速傅里叶变换">快速傅里叶变换<a class="heading-anchor" href="#section-快速傅里叶变换" aria-label="链接到快速傅里叶变换">#</a></h3>
+<h3 id="section-快速数论变换">快速数论变换<a class="heading-anchor" href="#section-快速数论变换" aria-label="链接到快速数论变换">#</a></h3>
+<h2 id="section-生成函数">生成函数<a class="heading-anchor" href="#section-生成函数" aria-label="链接到生成函数">#</a></h2>
+<div class="math-block">$$无穷多项的多项式，成为函数与数列之间的桥梁.$$</div>
+<div class="math-block">$$\begin{align}
+f(x)&amp;=a_0+a_1x+a_2x^2+a_3x^3+\cdots \\
+&amp;= \sum_{i=0}^{+\infty} a_ix^i
+\end{align}$$</div>
+<p>等于号的含义：在某个范围内（如 <span class="math-inline">$0&lt;x&lt;1$</span> ），等号左右“要多接近有多接近”.</p>
+<p>当 <span class="math-inline">$a=[1,1,1,\dots]$</span> 时，</p>
+<div class="math-block">$$F(x)=\sum_{i=0}^{+\infty} x^i=\frac{1}{1-x}$$</div>
+<p>又，</p>
+<div class="math-block">$$\frac{1}{1-ax}=\sum_{i=0}^{+\infty} a^ix^i$$</div>
+<p>当 <span class="math-inline">$a=[0,1,1,2,3,5,8,13,\dots]$</span> ，即斐波那契数列时，</p>
+<div class="math-block">$$\begin{align}
+F(x)&amp;=\sum_{i=0}^{+\infty} a_ix^i &amp; (1)\\
+xF(x)&amp;=\sum_{i=0}^{+\infty} a_ix^{i+1} &amp; (2)\\
+x^2F(x)&amp;=\sum_{i=0}^{+\infty} a_ix^{i+2} &amp; (3)
+\end{align}$$</div>
+<p>由 <span class="math-inline">$(1)-(2)-(3)$</span> 得，</p>
+<div class="math-block">$$x=(1-x-x^2)F(x)$$</div>
+<p>即，</p>
+<div class="math-block">$$F(x)=\frac{x}{1-x-x^2}$$</div>
+<p>又，</p>
+<div class="math-block">$$\frac{x}{1-x-x^2}=\frac{1}{\sqrt{5}}\cdot(\frac{1}{1-(\frac{1+\sqrt{5}}{2})x}-\frac{1}{1-(\frac{1-\sqrt{5}}{2})x})$$</div>
+<p>故，</p>
+<div class="math-block">$$a_n=\frac{1}{\sqrt{5}}\cdot[(\frac{1+\sqrt{5}}{2})^n-(\frac{1-\sqrt{5}}{2})^n]$$</div>
+<ul><li><span class="math-inline">$c\cdot f(x) \to$</span> 数列倍增</li><li><span class="math-inline">$x\cdot f(x) \to$</span> 数列右移</li><li><span class="math-inline">$[f(x)-f(0)] \div x \to$</span> 数列左移</li><li><span class="math-inline">$f_1(x)\pm f_2(x) \to$</span> 数列求和/差</li></ul>
+<h3 id="section-数列卷积">数列卷积<a class="heading-anchor" href="#section-数列卷积" aria-label="链接到数列卷积">#</a></h3>
+<div class="math-block">$$F(x)=\sum_{i=0}^{+\infty}a_ix^i ~~~G(x)=\sum_{i=0}^{+\infty}b_ix^i$$</div>
+<div class="math-block">$$F(x)\cdot G(x)=\sum_{k=0}^{+\infty}\sum_{i=0}^{k}a^{i}b^{k-i}x^k$$</div>
+<p>特别地，</p>
+<div class="math-block">$$F(x)=\sum_{i=0}^{+\infty}a_ix^i$$</div>
+<div class="math-block">$$\frac{1}{1-x} \cdot F(x)=\sum_{k=0}^{+\infty}\sum_{i=0}^{k}a_ix^k$$</div>
+<p>即对数列进行前缀和.</p>
+<p>通过 <span class="math-inline">$n-1$</span> 次前缀和，可以得到</p>
+<h3 id="section-二项式定理扩展">二项式定理扩展<a class="heading-anchor" href="#section-二项式定理扩展" aria-label="链接到二项式定理扩展">#</a></h3>
+<div class="math-block">$$(1-x)^{-n}=\sum_{i=0}^{+\infty}\binom{n-1+i}{n-1}x^i$$</div>
+<p>另外还可以这样理解：</p>
+<div class="math-block">$$\begin{align}
+\frac{1}{(1-x)^n}&amp;=\frac{1}{1-x}\cdot\frac{1}{1-x}\cdot\ldots\cdot\frac{1}{1-x}\\
+&amp;=\left(\sum_{e_1\geq0}x^{e_1}\right)\left(\sum_{e_2\geq0}x^{e_2}\right)\dots\left(\sum_{e_n\geq0}x^{e_n}\right)\\
+&amp;=\sum_{e_1+e_2+\dots+e_n=m}x^m\\
+&amp;=\binom{n-1+m}{m}x^m
+\end{align}$$</div>
+<p><span class="math-inline">$x^m$</span> 的系数即为满足 <span class="math-inline">$e_1+e_2+\dots+e_n=m$</span> 的解的个数.</p>
+<p>更一般地，</p>
+<h3 id="section-广义牛顿二项式定理">广义牛顿二项式定理<a class="heading-anchor" href="#section-广义牛顿二项式定理" aria-label="链接到广义牛顿二项式定理">#</a></h3>
+<div class="math-block">$$(x+y)^\alpha=\sum_{i=0}^{+\infty}\binom{\alpha}{i}x^{\alpha-i}y^i$$</div>
+<p>其中，</p>
+<div class="math-block">$$\binom{n}{m}=\frac{n(n-1)\cdots(n-m+1)}{m!}=\frac{(n)_m}{m!}$$</div>
+<h3 id="section-多项式定理">多项式定理<a class="heading-anchor" href="#section-多项式定理" aria-label="链接到多项式定理">#</a></h3>
+<div class="math-block">$$(x_1+x_2+\dots+x_n)^m=\sum_{\alpha_1+\alpha_2+\dots+\alpha_n=k}\frac{m!}{\alpha_1!\alpha_2!\cdots\alpha_n!}x_1^{\alpha_1}x_2^{\alpha_2}\cdots x_n^{\alpha_n}$$</div>
+<p>证明如下：</p>
+<div class="math-block">$$\begin{align}
+(x_1+x_2+\dots+x_n)^m&amp;=\left((x_1+x_2+\cdots+x_{n-1})+x_n\right)^m\\
+&amp;=\sum_{\alpha_n\geq 0}^m\binom{m}{\alpha_n}x_n^{\alpha_n}(x_1+x_2+\cdots+x_{n-1})^{m-\alpha_n}\\
+&amp;=\sum_{\alpha_1+\alpha_2+\cdots+\alpha_n=m}\left.\binom{m}{\alpha_n}\binom{m-\alpha_n}{\alpha_{n-1}}\cdots\binom{m-\alpha_n-\cdots-\alpha_2}{\alpha_1}\right.\\
+&amp;=\sum_{\alpha_1+\alpha_2+\dots+\alpha_n=k}\frac{m!}{\alpha_1!\alpha_2!\cdots\alpha_n!}x_1^{\alpha_1}x_2^{\alpha_2}\cdots x_n^{\alpha_n}
+\end{align}$$</div>
+<h3 id="section-卡特兰数">卡特兰数<a class="heading-anchor" href="#section-卡特兰数" aria-label="链接到卡特兰数">#</a></h3>
+<p>递归定义：</p>
+<div class="math-block">$$C_0=C_1=1\\
+C_n=\sum_{i=0}^{n-1}C_iC_{n-1-i},n\geq2\\$$</div>
+<p>递推公式：</p>
+<div class="math-block">$$C_n=\frac{4n-2}{n+1}C_{n-1}$$</div>
+<p>通项公式：</p>
+<div class="math-block">$$C_n=\frac1{n+1}\binom{2n}{n}=\binom{2n}{n}-\binom{2n}{n-1}=\frac1{n+1}\sum_{i=0}^{n}\binom{n}{i}^2$$</div>
+<p>利用生成函数证明：</p>
+<div class="math-block">$$\binom{2n}{n}=\sum_{i=0}^{n}\binom{n}{i}^2$$</div>
+<p>由二项式定理：</p>
+<div class="math-block">$$\begin{align}
+(1+x)^n&amp;=\sum_{i=0}^{n}\binom{n}{i}x^i\\
+(1+\frac1x)^n&amp;=\sum_{i=0}^{n}\binom{n}{i}x^{-i}
+\end{align}$$</div>
+<p>观察 <span class="math-inline">$(1+x)^n\cdot(1+\frac1x)^n$</span> 中常数项为 <span class="math-inline">$\sum_{i=0}^n\binom{n}{i}^2$</span> .</p>
+<p>又， <span class="math-inline">$(1+x)^n\cdot(1+\frac1x)^n=\frac{(1+x)^{2n}}{x^n}$</span> 中常数项为 <span class="math-inline">$\binom{2n}{n}$</span> .</p>
+<p>故，两者相等.</p>
+<p>利用生成函数证明卡特兰数通项公式：</p>
+<p>设卡特兰数的生成函数为：</p>
+<div class="math-block">$$\begin{align}
+G(x)&amp;=\sum_{i=0}^{+\infty}C_ix^i\\
+&amp;=C_0+C_1x+C_2x^2+\cdots+C_nx^n+\cdots
+\end{align}$$</div>
+<p>那么，</p>
+<div class="math-block">$$\begin{align}
+G^2(x)&amp;=\sum_{k=0}^{+\infty}\sum_{i=0}^{k}C_iC_{k-i}x^k\\
+&amp;=1+C_2x+C_3x^2+\cdots+C_{n+1}x^n+\cdots
+\end{align}$$</div>
+<p>故，</p>
+<div class="math-block">$$xG^2(x)-G(x)+1=0$$</div>
+<p>将其看作关于 <span class="math-inline">$G(x)$</span> 的二次函数，解得：</p>
+<div class="math-block">$$G(x)=\frac{1\pm\sqrt{1-4x}}{2x}$$</div>
+<p>又根据 <span class="math-inline">$G(0)=1$</span> , <span class="math-inline">$\lim_{x\to0}\frac{1-\sqrt{1-4x}}{2x}=1$</span></p>
+<p>故，</p>
+<div class="math-block">$$G(x)=\frac{1-\sqrt{1-4x}}{2x}$$</div>
+<p>由泰勒展开</p>
+<div class="math-block">$$(1+x)^\alpha=1+\sum_{n=1}^{+\infty}\frac{\alpha(\alpha-1)\cdots(\alpha-n+1)}{n!}x^n$$</div>
+<p>得到：</p>
+<div class="math-block">$$\begin{align}
+G(x)&amp;=\frac{1}{2x}\sum_{n=1}^{+\infty}\frac{(-1)^n(\frac12)(1-\frac12)(2-\frac12)\cdots(n-\frac32)}{n!}(-4x)^n\\
+&amp;=\frac1{2x}\sum_{n=1}^{+\infty}\frac{(2n-3)!!}{2^nn!}(4x)^n\\
+&amp;=\frac1{2x}\sum_{n=1}^{+\infty}\frac{(2n-2)!}{2^nn!(2n-2)!!}(4x)^n\\
+&amp;=\frac1{2x}\sum_{n=1}^{+\infty}\frac{(2n-2)!}{n(n-1)!(n-1)!}x^n\\
+&amp;=\frac1{2x}\sum_{n=1}^{+\infty}\frac{1}{n}\binom{2n-2}{n-1}x^n\\
+&amp;=\frac1{2x}\sum_{n=0}^{+\infty}\frac1{n+1}\binom{2n}{n}x^n
+\end{align}$$</div>
+<p>故，</p>
+<div class="math-block">$$C_n=\frac1{n+1}\binom{2n}{n}$$</div>
+<h3 id="section-指数生成函数">指数生成函数<a class="heading-anchor" href="#section-指数生成函数" aria-label="链接到指数生成函数">#</a></h3>
+<div class="math-block">$$f(x)=\sum_{i=0}^{+\infty}a_i\frac{x^i}{i!}$$</div>
+<p>特别地，</p>
+<div class="math-block">$$e^x=\sum_{i=0}^{+\infty}\frac{x^i}{i!}$$</div>
+<p>而该种生成函数的卷积可以将系数乘上组合数：</p>
+<div class="math-block">$$F(x)=\sum_{i=0}^{+\infty}a_i\frac{x^i}{i!}~~~G(x)=\sum_{i=0}^{+\infty}b_i\frac{x^i}{i!}$$</div>
+<div class="math-block">$$\begin{align}
+F(x) \cdot G(x)
+&amp;=\sum_{k=0}^{+\infty}\sum_{i=0}^{k}\frac{k!}{i!(k-i)!}a_ib_{k-i}\frac{x^k}{k!}\\
+&amp;=\sum_{k=0}^{+\infty}\sum_{i=0}^{k}\binom{k}{i}a_ib_{k-i}\frac{x^k}{k!}
+\end{align}$$</div>
+<h3 id="section-dirichlet级数生成函数">Dirichlet级数生成函数<a class="heading-anchor" href="#section-dirichlet级数生成函数" aria-label="链接到Dirichlet级数生成函数">#</a></h3>
+<div class="math-block">$$F(s)=\sum_{i=1}^{+\infty}\frac{a_i}{i^s}$$</div>
+<p>而该种生成函数的卷积在数论方面有重要用途：</p>
+<div class="math-block">$$F(s)=\sum_{i=1}^{+\infty}\frac{a_i}{i^s}~~~G(s)=\sum_{i=1}^{+\infty}\frac{b_i}{i^s}$$</div>
+<div class="math-block">$$F(s)\cdot G(s)=\sum_{k=1}^{+\infty}\frac{\sum_{i|k}a_ib_{k/i}}{k^s}$$</div>
+<p>特别地，</p>
+<div class="math-block">$$F(s)=\sum_{i=1}^{+\infty}\frac{1}{i^s}$$</div>
+<div class="math-block">$$F^2(s)=\sum_{k=1}^{+\infty}\frac{d(k)}{k^s}$$</div>
+<p>其中， <span class="math-inline">$d(k)$</span> 代表 <span class="math-inline">$k$</span> 的约数个数.</p>
+<p>例题：求长度为 <span class="math-inline">$n$</span> 的 <span class="math-inline">$01$</span> 字符串中的不可分解的字符串的个数</p>
+<ul><li>“不可分解”指不能写成两个或多个相同字符串的拼接<ul><li>“100100100” = “100” * 3  可分解</li><li>“1110”  不可分解</li></ul></li></ul>
+<p>设 <span class="math-inline">$f(x)$</span> 代表长度为 <span class="math-inline">$x$</span> 的不可分解的 <span class="math-inline">$01$</span> 字符串的数量.</p>
+<p>因为将任意一个 <span class="math-inline">$01$</span> 字符串分解为一个不可分解的 <span class="math-inline">$01$</span> 字符串的方式唯一.</p>
+<p>故，</p>
+<div class="math-block">$$2^n=\sum_{i|n}f(i)$$</div>
+<p>利用莫比乌斯反演可得，</p>
+<div class="math-block">$$f(n)=\sum_{i|n}\mu (\frac{n}{i})\cdot 2^i$$</div></div></div></article></main><footer class="sub-footer"><span>© 2026 yangjm</span><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">鲁ICP备2026048978号-1 <span aria-hidden="true">↗</span></a></footer></body></html>

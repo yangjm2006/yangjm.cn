@@ -1,6 +1,6 @@
 # yangjm · 个人主页
 
-简洁浅色的静态个人主页，适配手机和电脑。第一版包含个人简介、GitHub 链接，以及博客和作品的筹备说明。
+简洁浅色的静态个人主页，适配手机和电脑。包含个人简介、博客、算法竞赛档案和可搜索的算法板子。
 
 ## 本地预览
 
@@ -16,7 +16,9 @@ npm run dev
 
 - `public/profile.js`：显示名称、个人简介、GitHub 链接、实际 ICP 备案号。
 - `public/index.html`：页面结构和静态文案。改名或简介时建议同步更新 HTML 默认内容，方便搜索引擎及关闭 JavaScript 的访客读取。
-- `public/styles.css`：颜色、字体、布局和移动端适配。
+- `public/styles.css`：主页颜色、字体、布局和移动端适配。
+- `content/blog/`：Markdown 博客文章与文章清单；执行 `npm run build` 后生成到 `public/blog/`。
+- `public/blog.css`：博客列表与文章阅读页面样式。
 
 上线前填写真实 ICP 备案号。公安备案完成后，再按实际提供的备案编号、图标和链接添加页脚信息。
 
@@ -36,9 +38,17 @@ npm run dev
 
 当前仓库没有自动部署配置；推送 GitHub 不会自动修改线上网站。
 
-## 后续扩展
+## 博客
 
-可以在 `public/` 中增加博客和项目子目录，并将首页的筹备说明替换为真实页面链接。文章数量增加后，再考虑引入静态博客生成工具。
+线上地址：<https://blog.yangjm.cn/>。
+
+文章正文以 Markdown 保存在 `content/blog/`，元数据记录在 `content/blog/posts.json`。构建器支持常用 Markdown 结构、行内公式 `$...$` 和块级公式 `$$...$$`，并生成文章目录和静态 HTML。公式由 `public/vendor/mathjax/` 中自托管的 MathJax 渲染；即使脚本不可用，正文与公式源码仍然可读。
+
+新增文章后执行：
+
+```sh
+npm run build
+```
 
 ## 算法竞赛与板子子站
 
