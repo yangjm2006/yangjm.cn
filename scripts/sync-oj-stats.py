@@ -48,7 +48,14 @@ def collect_luogu(args):
     solved = user.get('passedProblemCount', data.get('passedProblemCount'))
     if not isinstance(solved, int):
         raise ValueError('Luogu solved count missing')
-    return {'solved': solved, 'avatarSource': user.get('avatar')}
+    color = user.get('color')
+    ccf_level = user.get('ccfLevel')
+    return {
+        'solved': solved,
+        'color': color if isinstance(color, str) else None,
+        'ccfLevel': ccf_level if isinstance(ccf_level, int) else None,
+        'avatarSource': user.get('avatar'),
+    }
 
 def collect_codeforces(args):
     info = json.loads(fetch(args.cf_info_url, args))['result'][0]
@@ -73,7 +80,14 @@ def collect_atcoder(args):
     solved = info.get('accepted_count')
     if not isinstance(solved, int):
         raise ValueError('AtCoder solved count missing')
-    return {'solved': solved}
+    rating = info.get('rating')
+    if not isinstance(rating, int):
+        profile = fetch(args.atcoder_profile_url, args, limit=5242880).decode('utf-8')
+        match = re.search(r'<th[^>]*>Rating</th>\s*<td>.*?<span[^>]*>([0-9]+)</span>', profile, re.S)
+        rating = int(match.group(1)) if match else None
+    if not isinstance(rating, int):
+        raise ValueError('AtCoder rating missing')
+    return {'solved': solved, 'rating': rating}
 
 def collect_qoj(args):
     body = fetch(args.qoj_url, args, limit=5242880).decode('utf-8')
@@ -179,6 +193,7 @@ if __name__ == '__main__':
     parser.add_argument('--cf-info-url', default='https://codeforces.com/api/user.info?handles=yangjm')
     parser.add_argument('--cf-status-url', default='https://codeforces.com/api/user.status?handle=yangjm&from=1&count=10000')
     parser.add_argument('--atcoder-url', default='https://kenkoooo.com/atcoder/atcoder-api/v2/user_info?user=yangjm')
+    parser.add_argument('--atcoder-profile-url', default='https://atcoder.jp/users/yangjm')
     parser.add_argument('--qoj-url', default='https://qoj.ac/user/profile/yangjm')
     os.umask(0o022)
     main(parser.parse_args())

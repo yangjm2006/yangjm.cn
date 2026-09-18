@@ -27,7 +27,6 @@
     if (document.visibilityState === 'visible') syncSharedTheme();
   });
   if (document.body.classList.contains('oi-page')) {
-    const ids = ['luogu', 'codeforces', 'atcoder', 'qoj'];
     const cards = [...document.querySelectorAll('.platform')];
     const status = document.createElement('p');
     status.className = 'oj-stats-status';
@@ -35,9 +34,8 @@
     status.setAttribute('aria-atomic', 'true');
     status.textContent = '训练数据每小时更新';
     document.querySelector('.platforms').prepend(status);
-    cards.forEach((card, index) => {
-      const id = ids[index];
-      card.dataset.platform = id;
+    cards.forEach(card => {
+      const id = card.dataset.platform;
       const mark = card.querySelector('.platform-mark');
       const avatar = document.createElement('span');
       avatar.className = 'judge-avatar';
@@ -54,7 +52,7 @@
       const solved = document.createElement('div');
       solved.innerHTML = '<dt>已通过</dt><dd data-stat="solved">—</dd>';
       stats.append(solved);
-      if (id === 'codeforces') {
+      if (id === 'codeforces' || id === 'atcoder') {
         const rating = document.createElement('div');
         rating.innerHTML = '<dt>Rating</dt><dd data-stat="rating">—</dd>';
         stats.append(rating);
@@ -73,13 +71,38 @@
         const image = card.querySelector('.judge-avatar img');
         if (item.avatar) image.src = item.avatar;
         card.title = item.lastSuccess ? `数据更新于 ${new Date(item.lastSuccess).toLocaleString('zh-CN')}` : '等待首次成功同步';
+        const handle = card.querySelector('.judge-handle');
+        if (card.dataset.platform === 'luogu') {
+          if (item.color) handle.classList.add('luogu-' + String(item.color).toLowerCase());
+          if (Number.isInteger(item.ccfLevel) && item.ccfLevel > 0) {
+            const badge = document.createElement('span');
+            badge.className = 'luogu-verification';
+            badge.setAttribute('aria-label', `洛谷 ${item.ccfLevel} 级认证`);
+            badge.title = `洛谷 ${item.ccfLevel} 级认证`;
+            badge.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path class="verification-seal" d="m12 1.8 2.3 1.4 2.7-.2 1.2 2.4 2.4 1.2-.2 2.7 1.4 2.3-1.4 2.3.2 2.7-2.4 1.2-1.2 2.4-2.7-.2-2.3 1.4-2.3-1.4-2.7.2-1.2-2.4-2.4-1.2.2-2.7L2.2 12l1.4-2.3-.2-2.7 2.4-1.2L7 3.4l2.7.2Z"/><path class="verification-check" d="m7.4 12.2 3 3 6.4-7"/></svg>';
+            handle.after(badge);
+          }
+        }
         const rating = card.querySelector('[data-stat="rating"]');
         if (rating && Number.isInteger(item.rating)) {
           rating.textContent = item.rating.toLocaleString('zh-CN');
-          rating.className = 'rating rating-' + String(item.rank || '').replaceAll(' ', '-');
-          const rank = document.createElement('small');
-          rank.textContent = item.rank || '';
-          rating.append(rank);
+          let ratingClass = '';
+          let ratingLabel = '';
+          if (card.dataset.platform === 'codeforces') {
+            ratingClass = 'rating-' + String(item.rank || '').replaceAll(' ', '-');
+            ratingLabel = item.rank || '';
+          } else {
+            const atcoderTiers = ['gray', 'brown', 'green', 'cyan', 'blue', 'yellow', 'orange', 'red'];
+            ratingClass = 'atcoder-' + atcoderTiers[Math.min(7, Math.floor(item.rating / 400))];
+            ratingLabel = 'rating';
+          }
+          rating.className = `rating ${ratingClass}`;
+          handle.classList.add(ratingClass);
+          if (ratingLabel) {
+            const rank = document.createElement('small');
+            rank.textContent = ratingLabel;
+            rating.append(rank);
+          }
         }
       });
       const values = Object.values(data.platforms || {});

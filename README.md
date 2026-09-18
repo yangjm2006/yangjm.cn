@@ -89,7 +89,7 @@ journalctl -u yangjm-notebook-sync.service -n 30 --no-pager
 
 - 洛谷：公开资料中的头像和通过题数。
 - Codeforces：官方 `user.info` 与 `user.status`，展示头像、唯一通过题数、rating 和文字等级。
-- AtCoder：AtCoder Problems 的公开统计接口；AtCoder 没有个人头像字段时使用本站常用头像。
+- AtCoder：AtCoder Problems 的公开统计接口提供通过题数，官方个人页提供 rating；AtCoder 没有个人头像字段时使用本站常用头像。
 - QOJ：尝试读取公开个人资料；受登录或 Cloudflare 验证影响时使用上一次缓存。首次没有缓存时显示“待同步”。
 - 每个平台独立更新。某一平台或头像 CDN 失败时，不影响其他平台的数字；已有数据会继续保留。
 
