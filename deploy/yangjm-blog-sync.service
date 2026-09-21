@@ -1,0 +1,15 @@
+[Unit]
+Description=Update yangjm blog posts from GitHub
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+UMask=0022
+ExecStart=/usr/bin/flock -n /var/lib/yangjm-blog/sync.lock /usr/bin/python3 /opt/yangjm-blog/scripts/sync-blog.py
+TimeoutStartSec=180
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/yangjm-blog

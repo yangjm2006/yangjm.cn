@@ -1,0 +1,79 @@
+/* Shared across all five sites. Page-specific styles must not move this header. */
+html { scrollbar-gutter: stable; }
+body { background: var(--canvas); }
+body::before { display: none; }
+#site-navigation {
+  width: min(1080px, calc(100% - 80px));
+  height: 104px;
+  margin: 0 auto;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  align-items: center;
+  gap: 24px;
+  border-bottom: 1px solid var(--line);
+  font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  line-height: 1.6;
+}
+#site-navigation .brand {
+  display: inline-flex;
+  align-items: center;
+  width: 44px;
+  min-width: 44px;
+  height: 52px;
+  margin: 0;
+  padding: 0;
+  font: 700 40px/1 Georgia, "Times New Roman", serif;
+  letter-spacing: -.04em;
+  color: var(--ink);
+}
+#site-navigation nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 28px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+}
+#site-navigation nav a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 4px;
+  border: 0;
+  color: var(--muted);
+  font: 400 14px/1.6 "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  white-space: nowrap;
+  text-decoration: none;
+}
+#site-navigation nav a::after {
+  content: "";
+  position: absolute;
+  inset: auto 4px 3px;
+  height: 2px;
+  background: var(--moss);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform .18s ease-out;
+}
+#site-navigation nav a:hover, #site-navigation nav a[aria-current="page"] { color: var(--ink); }
+#site-navigation nav a:hover::after, #site-navigation nav a[aria-current="page"]::after { transform: scaleX(1); }
+#site-navigation .theme-toggle { width: 44px; height: 44px; margin: 0; padding: 0; }
+#site-navigation a:focus-visible, #site-navigation button:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+@media (max-width: 700px) {
+  #site-navigation { width: calc(100% - 40px); height: 88px; gap: 12px; }
+  #site-navigation .brand { font-size: 32px; }
+  #site-navigation nav { gap: 12px; }
+  #site-navigation nav a { font-size: 13px; padding-inline: 2px; }
+  #site-navigation nav a::after { inset-inline: 2px; }
+}
+@media (max-width: 370px) {
+  #site-navigation { width: calc(100% - 24px); gap: 6px; grid-template-columns: 36px minmax(0, 1fr) 44px; }
+  #site-navigation .brand { min-width: 36px; width: 36px; }
+  #site-navigation nav { gap: 5px; }
+}
+@media (prefers-reduced-motion: reduce) { #site-navigation nav a::after { transition: none; } }

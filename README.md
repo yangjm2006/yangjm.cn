@@ -50,6 +50,8 @@ npm run dev
 npm run build
 ```
 
+线上博客由 `yangjm-blog-sync.timer` 每小时从 `posts.json` 中各文章的 `sourceUrl` 检查 GitHub 更新；内容变化时先在临时目录完成构建与校验，再原子切换到新版本。同步或构建失败时继续提供上一个成功版本。
+
 ## 算法竞赛与板子子站
 
 - `oi.yangjm.cn`：平台链接、队伍经历、奖项占位。内容在 `scripts/build-subsites.mjs` 中维护。

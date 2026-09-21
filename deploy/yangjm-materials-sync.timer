@@ -1,0 +1,11 @@
+[Unit]
+Description=Check OI learning materials every hour
+
+[Timer]
+OnCalendar=hourly
+RandomizedDelaySec=120
+Persistent=true
+Unit=yangjm-materials-sync.service
+
+[Install]
+WantedBy=timers.target

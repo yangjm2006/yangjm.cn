@@ -38,19 +38,14 @@
   <link rel="stylesheet" href="/styles.css?v=20260916">
   <script src="/profile.js" defer></script>
   <script src="/main.js?v=20260916" defer></script>
+<link rel="stylesheet" href="/navigation.css?v=20260921a">
 </head>
 <body>
   <a class="skip-link" href="#about">跳到个人简介</a>
-  <header class="site-header wrap">
-    <a class="brand" href="/" aria-label="yangjm 首页">y<span>.</span></a>
-    <div class="header-actions">
-      <nav aria-label="主导航"><a href="#about">关于</a><a href="https://blog.yangjm.cn/">博客</a><a class="github-link" href="https://github.com/yangjm2006" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a></nav>
-      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="切换到夜间模式" aria-pressed="false" title="切换到夜间模式">
+  <header id="site-navigation" class="site-nav-header"><a class="brand" href="https://yangjm.cn/" aria-label="yangjm 个人主页">y<span>.</span></a><nav aria-label="主导航"><a data-section="home" href="https://yangjm.cn/" aria-current="page">主页</a><a data-section="blog" href="https://blog.yangjm.cn/">博客</a><a data-section="oi" href="https://oi.yangjm.cn/">竞赛</a><a data-section="notebook" href="https://banzi.yangjm.cn/">板子</a><a data-section="materials" href="https://materials.yangjm.cn/">资料</a></nav><button class="theme-toggle" id="theme-toggle" type="button" aria-label="切换到夜间模式" aria-pressed="false" title="切换到夜间模式">
         <svg class="theme-icon moon-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M20.6 15.4A9 9 0 0 1 8.6 3.4 9 9 0 1 0 20.6 15.4Z"/></svg>
         <svg class="theme-icon sun-icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v2.2M12 19.8V22M4.9 4.9l1.6 1.6m11 11 1.6 1.6M2 12h2.2M19.8 12H22M4.9 19.1l1.6-1.6m11-11 1.6-1.6"/></svg>
-      </button>
-    </div>
-  </header>
+      </button></header>
   <main class="wrap">
     <section class="hero" id="about" aria-labelledby="intro-title">
       <div class="intro">

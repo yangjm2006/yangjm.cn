@@ -6,6 +6,17 @@
     "date": "2026-09-16",
     "topic": "数学 · 学习笔记",
     "source": "Math-Note.md",
-    "originalUrl": "https://github.com/yangjm2006/Blog/blob/main/Note/Math-Note.md"
+    "originalUrl": "https://github.com/yangjm2006/Blog/blob/main/Note/Math-Note.md",
+    "sourceUrl": "https://raw.githubusercontent.com/yangjm2006/Blog/main/Note/Math-Note.md"
+  },
+  {
+    "slug": "2026-2027-season",
+    "title": "2026–2027 赛季",
+    "description": "记录 2026–2027 赛季的 ICPC、CCPC 参赛过程、现场决策与赛后复盘。",
+    "date": "2026-09-06",
+    "topic": "算法竞赛 · 赛季记录",
+    "source": "2026-2027赛季.md",
+    "originalUrl": "https://github.com/yangjm2006/Blog/blob/main/Blog/2026-2027%E8%B5%9B%E5%AD%A3.md",
+    "sourceUrl": "https://raw.githubusercontent.com/yangjm2006/Blog/main/Blog/2026-2027%E8%B5%9B%E5%AD%A3.md"
   }
 ]

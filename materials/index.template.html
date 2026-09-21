@@ -1,0 +1,35 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f4f1e8"><meta name="description" content="OI 与 ACM 学习资料、集训课件和国家队论文集。"><title>学习资料 · yangjm</title><script>
+    (() => {
+      const key = 'yangjm-theme';
+      const valid = value => value === 'light' || value === 'dark';
+      const readCookie = () => {
+        const item = document.cookie.split('; ').find(row => row.startsWith(`${key}=`));
+        return item ? decodeURIComponent(item.slice(key.length + 1)) : null;
+      };
+      const save = theme => {
+        const sharedDomain = location.hostname === 'yangjm.cn' || location.hostname.endsWith('.yangjm.cn');
+        const domain = sharedDomain ? '; Domain=yangjm.cn' : '';
+        const secure = location.protocol === 'https:' ? '; Secure' : '';
+        document.cookie = `${key}=${theme}; Path=/; Max-Age=31536000; SameSite=Lax${domain}${secure}`;
+        try { localStorage.setItem(key, theme); } catch {}
+      };
+      let legacy;
+      try { legacy = localStorage.getItem(key); } catch {}
+      const cookie = readCookie();
+      const saved = valid(cookie) ? cookie : (valid(legacy) ? legacy : null);
+      if (!valid(cookie) && valid(legacy)) save(legacy);
+      const hour = new Date().getHours();
+      const theme = saved || (hour >= 7 && hour < 19 ? 'light' : 'dark');
+      document.documentElement.dataset.theme = theme;
+      document.documentElement.style.colorScheme = theme;
+      document.querySelector('meta[name="theme-color"]').content = theme === 'dark' ? '#15231d' : '#f4f1e8';
+      window.YANGJM_THEME = { read: readCookie, save, valid };
+    })();
+  </script><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/styles.css?v=20260916"><link rel="stylesheet" href="/subsites.css?v=20260916"><link rel="stylesheet" href="/materials.css?v=1"><script src="/materials.js?v=1" defer></script><script src="/subsites.js?v=20260916" defer></script><link rel="stylesheet" href="/navigation.css?v=20260921a"></head><body class="subsite materials-page"><a class="skip-link" href="#content">跳到正文</a>{{SITE_HEADER}}<main id="content" class="materials-main">
+<header class="materials-intro"><h1>学习资料</h1><p>学习 OI 与 ACM 时用过的资料：集训课件、国家队论文集，以及专题讲义。</p><p>PDF 可在线查看，课件可下载阅读。<a href="https://github.com/yangjm2006/OI-Material" target="_blank" rel="noopener">查看源仓库</a></p></header>
+<div class="material-tools"><label for="material-search">搜索资料<input id="material-search" type="search" placeholder="标题、算法或年份" autocomplete="off"></label><label for="material-category">资料分类<select id="material-category"><option value="">全部分类</option>{{OPTIONS}}</select></label><button id="material-reset" type="button">重置</button></div>
+<p class="materials-status" id="materials-status" role="status" aria-live="polite">共 {{COUNT}} 份资料</p>
+<div id="materials-empty" class="materials-empty" hidden>没有找到匹配的资料。试试其他关键词，或重置筛选。</div>
+{{ROWS}}
+<p class="materials-note">每小时检查更新 · 最近发布：{{DATE}}</p>
+</main><footer class="sub-footer"><span>© 2026 yangjm</span><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">鲁ICP备2026048978号-1 <span aria-hidden="true">↗</span></a></footer></body></html>
