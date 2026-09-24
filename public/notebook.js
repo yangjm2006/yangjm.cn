@@ -2,10 +2,12 @@
   const search = document.querySelector('#template-search');
   const entries = [...document.querySelectorAll('.template')];
   const links = [...document.querySelectorAll('.template-nav a')];
+  const navGroups = [...document.querySelectorAll('.nav-group')];
   const index = entries.map(el => ({el, text: (el.dataset.category + ' ' + el.textContent).toLocaleLowerCase()}));
   let matches = entries, active;
   const directory = document.querySelector('#directory-toggle');
   document.body.classList.add('reader-ready');
+  navGroups.forEach(group => { group.open = false; });
   function setDirectory(open) {
     directory.setAttribute('aria-expanded', String(open));
     directory.textContent = open ? '收起目录 ↑' : '展开目录 ↓';
@@ -19,6 +21,7 @@
     links.forEach(link => {
       const selected = active && link.hash === '#' + active.id;
       if (selected) link.setAttribute('aria-current', 'true'); else link.removeAttribute('aria-current');
+      if (selected) link.closest('.nav-group').open = true;
     });
     const pos = matches.indexOf(active);
     for (const [selector, offset, label] of [['#previous-template', -1, '← 上一篇'], ['#next-template', 1, '下一篇 →']]) {
@@ -35,7 +38,11 @@
     const query = search.value.trim().toLocaleLowerCase();
     matches = index.filter(item => item.text.includes(query)).map(item => item.el);
     links.forEach(link => { link.hidden = !matches.some(el => '#' + el.id === link.hash); });
-    document.querySelectorAll('.nav-group').forEach(group => { group.hidden = ![...group.querySelectorAll('a')].some(a => !a.hidden); });
+    navGroups.forEach(group => {
+      const hasMatch = [...group.querySelectorAll('a')].some(a => !a.hidden);
+      group.hidden = !hasMatch;
+      if (query && hasMatch) group.open = true;
+    });
     document.querySelector('#search-status').textContent = query ? `找到 ${matches.length} 篇板子` : `共 ${entries.length} 篇板子`;
     show(active?.id || location.hash.slice(1));
   }

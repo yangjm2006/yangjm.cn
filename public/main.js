@@ -61,6 +61,18 @@ if (profile.github) {
   } catch { /* 保留默认 GitHub 链接。 */ }
 }
 document.getElementById('year').textContent = new Date().getFullYear();
+const blogCount = document.getElementById('blog-count');
+fetch('/blog/revision.json', { cache: 'no-store' })
+  .then(response => {
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return response.json();
+  })
+  .then(revision => {
+    if (Number.isSafeInteger(revision.posts) && revision.posts >= 0) {
+      blogCount.textContent = `${revision.posts} 篇文章`;
+    }
+  })
+  .catch(() => { /* 保留构建时的文章数。 */ });
 if (profile.icpNumber) {
   const link = document.getElementById('icp-link');
   link.textContent = profile.icpNumber;
@@ -71,7 +83,7 @@ const hitokotoContent = document.getElementById('hitokoto-content');
 const hitokotoText = document.getElementById('hitokoto-text');
 const hitokotoSource = document.getElementById('hitokoto-source');
 const hitokotoRefresh = document.getElementById('hitokoto-refresh');
-const hitokotoEndpoint = 'https://v1.hitokoto.cn/?c=d&c=e&c=k&encode=json&max_length=32';
+const hitokotoEndpoint = 'https://v1.hitokoto.cn/?c=d&c=i&c=k&encode=json&max_length=32';
 const hitokotoFallback = {
   hitokoto: '今天也向前一点。',
   from: '暂时未连接一言，点击刷新重试',
@@ -84,7 +96,7 @@ function renderHitokoto(data) {
   const author = typeof data.from_who === 'string' ? data.from_who.trim() : '';
   const source = typeof data.from === 'string' ? data.from.trim() : '';
   hitokotoText.textContent = `“${sentence}”`;
-  hitokotoSource.textContent = [author, source].filter(Boolean).join(' · ') || '来自一言';
+  hitokotoSource.textContent = [...new Set([author, source].filter(Boolean))].join(' · ') || '来自一言';
   hitokotoText.href = data.uuid
     ? `https://hitokoto.cn/?uuid=${encodeURIComponent(data.uuid)}`
     : 'https://hitokoto.cn/';
@@ -96,7 +108,7 @@ async function loadHitokoto({ refresh = false } = {}) {
 
   if (!refresh) {
     try {
-      const cached = JSON.parse(sessionStorage.getItem('yangjm-hitokoto'));
+      const cached = JSON.parse(sessionStorage.getItem('yangjm-hitokoto-literary-v1'));
       if (cached?.hitokoto) {
         renderHitokoto(cached);
         hitokotoContent.setAttribute('aria-busy', 'false');
@@ -118,7 +130,7 @@ async function loadHitokoto({ refresh = false } = {}) {
     const data = await response.json();
     renderHitokoto(data);
     try {
-      sessionStorage.setItem('yangjm-hitokoto', JSON.stringify({
+      sessionStorage.setItem('yangjm-hitokoto-literary-v1', JSON.stringify({
         hitokoto: data.hitokoto,
         from: data.from,
         from_who: data.from_who,

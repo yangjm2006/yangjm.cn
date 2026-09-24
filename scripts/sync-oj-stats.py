@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Refresh public OJ statistics, preserving each platform's last good result."""
 import argparse
+import hashlib
 import http.cookiejar
 import json
 import os
@@ -18,6 +19,7 @@ PLATFORMS = {
     'qoj': {'handle': 'yangjm', 'url': 'https://qoj.ac/user/profile/yangjm'},
 }
 ALLOWED_AVATAR_HOSTS = {'cdn.luogu.com.cn', 'userpic.codeforces.org'}
+MANUAL_AVATARS = {'codeforces': 'codeforces-avatar.jpg'}
 
 def now():
     return time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
@@ -72,8 +74,10 @@ def collect_codeforces(args):
     rating = info.get('rating')
     if not isinstance(rating, int):
         raise ValueError('Codeforces rating missing')
+    photos = [urljoin('https://codeforces.com', value) for value in
+              (info.get('titlePhoto'), info.get('avatar')) if value]
     return {'solved': len(solved), 'rating': rating, 'rank': info.get('rank'),
-            'avatarSource': urljoin('https://codeforces.com', info.get('titlePhoto') or info.get('avatar', ''))}
+            'avatarSource': list(dict.fromkeys(photos))}
 
 def collect_atcoder(args):
     info = json.loads(fetch(args.atcoder_url, args))
@@ -112,28 +116,50 @@ def collect_qoj(args):
 def cache_avatar(platform, source, public_dir, args, previous):
     if not source:
         return previous or '/assets/avatar.jpg'
-    host = (urlparse(source).hostname or '').lower()
-    if host not in ALLOWED_AVATAR_HOSTS:
-        return previous or '/assets/avatar.jpg'
-    data = fetch(source, args, limit=2097152)
-    if data.startswith(b'\x89PNG\r\n\x1a\n'):
-        ext = 'png'
-    elif data.startswith(b'\xff\xd8\xff'):
-        ext = 'jpg'
-    elif data.startswith((b'GIF87a', b'GIF89a')):
-        ext = 'gif'
-    elif data.startswith(b'RIFF') and data[8:12] == b'WEBP':
-        ext = 'webp'
-    else:
-        raise ValueError('Unsupported avatar image')
-    avatars = public_dir / 'avatars'
-    avatars.mkdir(parents=True, exist_ok=True)
-    target = avatars / (platform + '.' + ext)
-    temp = avatars / ('.' + platform + '-' + str(os.getpid()))
-    temp.write_bytes(data)
-    os.chmod(str(temp), 0o644)
-    os.replace(str(temp), str(target))
-    return '/oi/avatars/' + target.name
+    sources = source if isinstance(source, list) else [source]
+    errors = []
+    for candidate in sources:
+        host = (urlparse(candidate).hostname or '').lower()
+        if host not in ALLOWED_AVATAR_HOSTS:
+            errors.append('avatar host not allowed: ' + host)
+            continue
+        try:
+            data = fetch(candidate, args, limit=2097152)
+            if data.startswith(b'\x89PNG\r\n\x1a\n'):
+                ext = 'png'
+            elif data.startswith(b'\xff\xd8\xff'):
+                ext = 'jpg'
+            elif data.startswith((b'GIF87a', b'GIF89a')):
+                ext = 'gif'
+            elif data.startswith(b'RIFF') and data[8:12] == b'WEBP':
+                ext = 'webp'
+            else:
+                raise ValueError('Unsupported avatar image')
+            avatars = public_dir / 'avatars'
+            avatars.mkdir(parents=True, exist_ok=True)
+            target = avatars / (platform + '.' + ext)
+            temp = avatars / ('.' + platform + '-' + str(os.getpid()))
+            temp.write_bytes(data)
+            os.chmod(str(temp), 0o644)
+            os.replace(str(temp), str(target))
+            return '/oi/avatars/' + target.name + '?v=' + hashlib.sha256(data).hexdigest()[:12]
+        except Exception as error:
+            detail = ('curl exit ' + str(error.returncode) if isinstance(error, subprocess.CalledProcessError)
+                      else str(error)[:80])
+            errors.append(host + ': ' + detail)
+    raise RuntimeError('; '.join(errors))
+
+def manual_avatar(platform, public_dir):
+    filename = MANUAL_AVATARS.get(platform)
+    if not filename:
+        return None
+    path = public_dir.parent / 'assets' / filename
+    if not path.is_file():
+        return None
+    data = path.read_bytes()
+    if not data.startswith(b'\xff\xd8\xff'):
+        raise ValueError('Manual avatar is not a JPEG image: ' + filename)
+    return '/assets/' + filename + '?v=' + hashlib.sha256(data).hexdigest()[:12]
 
 def main(args):
     state_dir = Path(args.state_dir)
@@ -159,13 +185,19 @@ def main(args):
             fresh = collectors[platform](args)
             avatar_source = fresh.pop('avatarSource', None)
             try:
-                avatar = cache_avatar(platform, avatar_source, public_dir, args, previous.get('avatar'))
-            except Exception:
+                avatar = manual_avatar(platform, public_dir)
+                if avatar:
+                    avatar_note = '/avatar=manual'
+                else:
+                    avatar = cache_avatar(platform, avatar_source, public_dir, args, previous.get('avatar'))
+                    avatar_note = ''
+            except Exception as error:
                 # Profile numbers are still a successful refresh when an image CDN is unavailable.
                 avatar = previous.get('avatar') or '/assets/avatar.jpg'
+                avatar_note = '/avatar=cached(' + str(error)[:180] + ')'
             results[platform] = dict(base, **fresh)
             results[platform].update({'avatar': avatar, 'lastSuccess': now(), 'stale': False})
-            summary.append(platform + '=fresh')
+            summary.append(platform + '=fresh' + avatar_note)
         except Exception as error:
             if previous:
                 previous.update(base)

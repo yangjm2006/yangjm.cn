@@ -75,7 +75,7 @@ def render(files, revision, app, output):
                 group=esc(group), search=esc(item['path'].lower()), url=url,
                 behavior='target="_blank" rel="noopener"' if ext == 'PDF' else 'download="{}"'.format(esc(path.name)),
                 title=esc(path.stem), parent=esc(nested), ext=esc(ext), size=size, preview=preview, filename=esc(path.name)))
-        sections.append('<section class="material-group" aria-labelledby="group-{0}"><h2 id="group-{0}">{1} <span>{2} 份</span></h2><ul>{3}</ul></section>'.format(index, esc(group), len(entries), ''.join(rows)))
+        sections.append('<details class="material-group" open><summary><span class="material-group-title">{0}</span><span class="material-group-count">{1} 份</span><svg class="material-group-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary><ul>{2}</ul></details>'.format(esc(group), len(entries), ''.join(rows)))
     template = (app / 'materials/index.template.html').read_text(encoding='utf-8')
     homepage = (app / 'public/index.html').read_text(encoding='utf-8')
     header = re.search(r'<header id="site-navigation"[\s\S]*?</header>', homepage).group(0)
@@ -124,6 +124,12 @@ def sync(args):
             archive = stage / 'source.zip'
             fetch('https://codeload.github.com/' + REPO + '/zip/' + commit, archive)
             with zipfile.ZipFile(str(archive)) as package:
+                archive_roots = {name.split('/', 1)[0] for name in package.namelist()}
+                if len(archive_roots) != 1:
+                    raise ValueError('Unexpected archive roots')
+                archive_root = archive_roots.pop()
+                if not archive_root.endswith('-' + commit):
+                    raise ValueError('Unexpected archive root: ' + archive_root)
                 for item in files:
                     name = PurePosixPath(item['path']).name
                     folder = objects / item['sha']
@@ -131,7 +137,12 @@ def sync(args):
                     target = folder / name
                     if target.exists() and git_hash(target) == item['sha']:
                         continue
-                    entry = package.getinfo('OI-Material-' + commit + '/' + item['path'])
+                    try:
+                        entry = package.getinfo(archive_root + '/' + item['path'])
+                    except KeyError:
+                        # GitHub's archive can omit a tree blob. The pinned raw
+                        # download below still verifies its size and Git hash.
+                        continue
                     if entry.file_size != item['size']:
                         raise ValueError('Archive size mismatch: ' + item['path'])
                     candidate = stage / 'archive-object'

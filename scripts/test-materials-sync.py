@@ -43,7 +43,8 @@ class SyncTests(unittest.TestCase):
                     target.write_text(json.dumps(tree))
                 elif 'codeload.github.com' in url:
                     with zipfile.ZipFile(str(target), 'w') as z:
-                        z.writestr('OI-Material-' + commit[0] + '/' + entry['path'], sample.read_bytes())
+                        prefix = 'Materials-' if commit[0] == 'c' * 40 else 'OI-Material-'
+                        z.writestr(prefix + commit[0] + '/' + entry['path'], sample.read_bytes())
                 else:
                     downloads.append(url)
                     target.write_bytes(sample.read_bytes())
@@ -82,6 +83,24 @@ class SyncTests(unittest.TestCase):
             m.sync(args)
             self.assertNotEqual(current.resolve(), last_good)
             self.assertEqual(json.loads((current / 'revision.json').read_text())['bytes'], sample.stat().st_size)
+            # A tree entry omitted by the archive is fetched from its pinned raw URL.
+            before_fallback_downloads = len(downloads)
+            commit[0] = 'e' * 40
+            sample.write_bytes(b'%PDF-' + b'y' * (9 * 1048576))
+            entry['sha'], entry['size'] = m.git_hash(sample), sample.stat().st_size
+            old_fetch = m.fetch
+
+            def fetch_without_archive_entry(url, target, limit=0):
+                if 'codeload.github.com' in url:
+                    with zipfile.ZipFile(str(target), 'w') as archive:
+                        archive.writestr('OI-Material-' + commit[0] + '/README.md', b'example')
+                else:
+                    old_fetch(url, target, limit)
+
+            m.fetch = fetch_without_archive_entry
+            m.sync(args)
+            self.assertEqual(len(downloads), before_fallback_downloads + 1)
+            self.assertEqual(json.loads((current / 'revision.json').read_text())['commit'], commit[0])
 
     def test_unsafe_and_empty_trees(self):
         with self.assertRaises(ValueError):

@@ -12,3 +12,18 @@
 @media(max-width:580px){.judge-avatar{flex-basis:54px;width:54px;height:54px}.judge-avatar img{width:46px;height:46px}.judge-stats{margin-left:71px}.judge-stats dd{font-size:16px}}
 
 .template-nav{display:block}.nav-group{display:block}
+
+/* The small code vignette uses syntax colors that remain legible in both themes. */
+.code-art span { font-weight: 600; }
+.code-art .code-keyword { color: #007ca6; }
+.code-art .code-condition { color: #cb3850; }
+.code-art .code-learn { color: #a46600; }
+.code-art .code-solve { color: #078060; }
+.code-art .code-grow { color: #8152c8; }
+:root[data-theme="dark"] .code-art .code-keyword { color: #75cce1; }
+:root[data-theme="dark"] .code-art .code-condition { color: #ee929c; }
+:root[data-theme="dark"] .code-art .code-learn { color: #f5cf6d; }
+:root[data-theme="dark"] .code-art .code-solve { color: #84d4aa; }
+:root[data-theme="dark"] .code-art .code-grow { color: #c7a6ef; }
+
+.award-list{border-top:1px solid var(--line)}.award{display:grid;grid-template-columns:100px minmax(0,1fr) 55px;align-items:baseline;gap:22px;padding:21px 0;border-bottom:1px solid var(--line)}.award time{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}.award h3{font-size:18px;font-weight:600;line-height:1.55;margin:0;overflow-wrap:anywhere}.award-result{font-size:14px;font-weight:650;color:var(--moss);text-align:right;white-space:nowrap}@media(max-width:580px){.award{grid-template-columns:minmax(0,1fr) auto;gap:7px 14px}.award time{grid-column:1/-1}.award h3{font-size:16px}.award-result{align-self:start;padding-top:3px}}

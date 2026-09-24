@@ -12,8 +12,15 @@
 .material-tools :focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
 .materials-status, .materials-note { color: var(--muted); font-size: 14px; }
 .material-group { margin-top: 38px; }
-.material-group h2 { display: flex; align-items: baseline; gap: 16px; font-size: 22px; margin: 0 0 12px; }
-.material-group h2 span { font-size: 13px; color: var(--muted); font-weight: 400; }
+.material-group summary { display: flex; align-items: center; gap: 16px; padding: 5px 0 12px; cursor: pointer; list-style: none; }
+.material-group summary::-webkit-details-marker { display: none; }
+.material-group summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; border-radius: 4px; }
+.material-group-title { font-size: 22px; font-weight: 650; line-height: 1.4; }
+.material-group-count { font-size: 13px; color: var(--muted); }
+.material-group-chevron { width: 18px; height: 18px; margin-left: auto; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; color: var(--muted); transition: transform 180ms ease; }
+.material-group:not([open]) .material-group-chevron { transform: rotate(-90deg); }
+.material-group:not([open]) { border-bottom: 1px solid var(--line); }
+.material-group:not([open]) summary { padding-bottom: 16px; }
 .material-group ul { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
 .material-row { display: grid; grid-template-columns: minmax(0, 1fr) 108px 146px; align-items: center; gap: 24px; padding: 22px 0; border-bottom: 1px solid var(--line); }
 .material-copy { min-width: 0; }
@@ -33,6 +40,6 @@ html { scrollbar-color: var(--line) var(--canvas); }
   .material-row { grid-template-columns: 1fr auto; gap: 8px 16px; padding: 18px 0; }
   .material-copy { grid-column: 1 / -1; }
   .file-actions { gap: 20px; }
-  .material-group h2 { font-size: 20px; }
+  .material-group-title { font-size: 20px; }
   .sub-header nav { gap: 14px; }
 }
