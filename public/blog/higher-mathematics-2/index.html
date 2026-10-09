@@ -1,0 +1,370 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f4f1e8"><meta name="description" content="整理空间解析几何、多元函数微分、重积分、曲线曲面积分与无穷级数。"><title>高等数学（二） · yangjm</title><script>
+    (() => {
+      const key = 'yangjm-theme';
+      const valid = value => value === 'light' || value === 'dark';
+      const readCookie = () => {
+        const item = document.cookie.split('; ').find(row => row.startsWith(`${key}=`));
+        return item ? decodeURIComponent(item.slice(key.length + 1)) : null;
+      };
+      const save = theme => {
+        const sharedDomain = location.hostname === 'yangjm.cn' || location.hostname.endsWith('.yangjm.cn');
+        const domain = sharedDomain ? '; Domain=yangjm.cn' : '';
+        const secure = location.protocol === 'https:' ? '; Secure' : '';
+        document.cookie = `${key}=${theme}; Path=/; Max-Age=31536000; SameSite=Lax${domain}${secure}`;
+        try { localStorage.setItem(key, theme); } catch {}
+      };
+      let legacy;
+      try { legacy = localStorage.getItem(key); } catch {}
+      const cookie = readCookie();
+      const saved = valid(cookie) ? cookie : (valid(legacy) ? legacy : null);
+      if (!valid(cookie) && valid(legacy)) save(legacy);
+      const hour = new Date().getHours();
+      const theme = saved || (hour >= 7 && hour < 19 ? 'light' : 'dark');
+      document.documentElement.dataset.theme = theme;
+      document.documentElement.style.colorScheme = theme;
+      document.querySelector('meta[name="theme-color"]').content = theme === 'dark' ? '#15231d' : '#f4f1e8';
+      window.YANGJM_THEME = { read: readCookie, save, valid };
+    })();
+  </script><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/styles.css?v=20260916"><link rel="stylesheet" href="/subsites.css?v=20260916"><link rel="stylesheet" href="/blog.css?v=20261006b"><script src="/subsites.js?v=20260916" defer></script><script src="/visits.js?v=20260928b" defer></script><script>window.MathJax={tex:{inlineMath:[["$","$"],["\\(","\\)"]],displayMath:[["$$","$$"],["\\[","\\]"]],packages:{"[+]": ["ams"]},tags:"ams"},options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},chtml:{scale:1}};</script><script defer src="/vendor/mathjax/tex-chtml.js"></script><link rel="stylesheet" href="/navigation.css?v=20260921a"></head><body class="subsite blog-article"><a class="skip-link" href="#content">跳到正文</a><header id="site-navigation" class="site-nav-header"><a class="brand" href="https://yangjm.cn/" aria-label="yangjm 个人主页">y<span>.</span></a><nav aria-label="主导航"><a data-section="home" href="https://yangjm.cn/">主页</a><a data-section="blog" aria-current="page" href="https://blog.yangjm.cn/">博客</a><a data-section="oi" href="https://oi.yangjm.cn/">竞赛</a><a data-section="notebook" href="https://banzi.yangjm.cn/">板子</a><a data-section="materials" href="https://materials.yangjm.cn/">资料</a></nav><button class="theme-toggle" id="theme-toggle" type="button" aria-label="切换到夜间模式" aria-pressed="false" title="切换到夜间模式">
+    <svg class="theme-icon moon-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M20.6 15.4A9 9 0 0 1 8.6 3.4 9 9 0 1 0 20.6 15.4Z"/></svg>
+    <svg class="theme-icon sun-icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v2.2M12 19.8V22M4.9 4.9l1.6 1.6m11 11 1.6 1.6M2 12h2.2M19.8 12H22M4.9 19.1l1.6-1.6m11-11 1.6-1.6"/></svg>
+  </button></header><main id="content" class="article-shell"><article class="article-page"><nav class="breadcrumb" aria-label="面包屑"><a href="https://blog.yangjm.cn/">文字与记录</a><span aria-hidden="true">/</span><span>高等数学（二）</span></nav><header class="article-header"><h1>高等数学（二）</h1><p>整理空间解析几何、多元函数微分、重积分、曲线曲面积分与无穷级数。</p><div class="article-meta"><time datetime="2026-04-10">2026年4月10日</time><span>21 分钟阅读</span><span>数学 · 高等数学</span><span data-visit-label>阅读：<span data-visit-current="higher-mathematics-2">…</span></span></div></header><details class="mobile-toc"><summary>文章目录</summary><ol><li class="toc-level-2"><a href="#section-向量代数与空间解析几何">向量代数与空间解析几何</a></li><li class="toc-level-3"><a href="#section-向量积与混合积">向量积与混合积</a></li><li class="toc-level-3"><a href="#section-直线与平面">直线与平面</a></li><li class="toc-level-3"><a href="#section-曲面与投影">曲面与投影</a></li><li class="toc-level-2"><a href="#section-多元函数微分">多元函数微分</a></li><li class="toc-level-3"><a href="#section-多元极限">多元极限</a></li><li class="toc-level-3"><a href="#section-偏导与全微分">偏导与全微分</a></li><li class="toc-level-3"><a href="#section-复合函数求导">复合函数求导</a></li><li class="toc-level-3"><a href="#section-隐函数">隐函数</a></li><li class="toc-level-3"><a href="#section-方向导数与梯度">方向导数与梯度</a></li><li class="toc-level-3"><a href="#section-切线与切平面">切线与切平面</a></li><li class="toc-level-3"><a href="#section-泰勒公式与极值">泰勒公式与极值</a></li><li class="toc-level-3"><a href="#section-条件极值">条件极值</a></li><li class="toc-level-2"><a href="#section-重积分">重积分</a></li><li class="toc-level-3"><a href="#section-化为累次积分">化为累次积分</a></li><li class="toc-level-3"><a href="#section-换元与雅可比">换元与雅可比</a></li><li class="toc-level-3"><a href="#section-对称性">对称性</a></li><li class="toc-level-3"><a href="#section-质量-质心与转动惯量">质量、质心与转动惯量</a></li><li class="toc-level-2"><a href="#section-曲线积分与曲面积分">曲线积分与曲面积分</a></li><li class="toc-level-3"><a href="#section-第一类曲线积分">第一类曲线积分</a></li><li class="toc-level-3"><a href="#section-第二类曲线积分">第二类曲线积分</a></li><li class="toc-level-3"><a href="#section-格林公式">格林公式</a></li><li class="toc-level-3"><a href="#section-路径无关与势函数">路径无关与势函数</a></li><li class="toc-level-3"><a href="#section-第一类曲面积分">第一类曲面积分</a></li><li class="toc-level-3"><a href="#section-第二类曲面积分">第二类曲面积分</a></li><li class="toc-level-3"><a href="#section-高斯公式">高斯公式</a></li><li class="toc-level-3"><a href="#section-斯托克斯公式">斯托克斯公式</a></li><li class="toc-level-2"><a href="#section-无穷级数">无穷级数</a></li><li class="toc-level-3"><a href="#section-收敛与基本限制">收敛与基本限制</a></li><li class="toc-level-3"><a href="#section-正项级数审敛">正项级数审敛</a></li><li class="toc-level-3"><a href="#section-交错级数与绝对收敛">交错级数与绝对收敛</a></li><li class="toc-level-3"><a href="#section-幂级数与收敛半径">幂级数与收敛半径</a></li><li class="toc-level-3"><a href="#section-逐项求导与积分">逐项求导与积分</a></li><li class="toc-level-3"><a href="#section-泰勒级数">泰勒级数</a></li><li class="toc-level-3"><a href="#section-函数项级数的运算边界">函数项级数的运算边界</a></li><li class="toc-level-3"><a href="#section-傅里叶级数">傅里叶级数</a></li></ol></details><div class="article-layout"><aside class="article-toc" aria-label="文章目录"><strong>文章目录</strong><ol><li class="toc-level-2"><a href="#section-向量代数与空间解析几何">向量代数与空间解析几何</a></li><li class="toc-level-3"><a href="#section-向量积与混合积">向量积与混合积</a></li><li class="toc-level-3"><a href="#section-直线与平面">直线与平面</a></li><li class="toc-level-3"><a href="#section-曲面与投影">曲面与投影</a></li><li class="toc-level-2"><a href="#section-多元函数微分">多元函数微分</a></li><li class="toc-level-3"><a href="#section-多元极限">多元极限</a></li><li class="toc-level-3"><a href="#section-偏导与全微分">偏导与全微分</a></li><li class="toc-level-3"><a href="#section-复合函数求导">复合函数求导</a></li><li class="toc-level-3"><a href="#section-隐函数">隐函数</a></li><li class="toc-level-3"><a href="#section-方向导数与梯度">方向导数与梯度</a></li><li class="toc-level-3"><a href="#section-切线与切平面">切线与切平面</a></li><li class="toc-level-3"><a href="#section-泰勒公式与极值">泰勒公式与极值</a></li><li class="toc-level-3"><a href="#section-条件极值">条件极值</a></li><li class="toc-level-2"><a href="#section-重积分">重积分</a></li><li class="toc-level-3"><a href="#section-化为累次积分">化为累次积分</a></li><li class="toc-level-3"><a href="#section-换元与雅可比">换元与雅可比</a></li><li class="toc-level-3"><a href="#section-对称性">对称性</a></li><li class="toc-level-3"><a href="#section-质量-质心与转动惯量">质量、质心与转动惯量</a></li><li class="toc-level-2"><a href="#section-曲线积分与曲面积分">曲线积分与曲面积分</a></li><li class="toc-level-3"><a href="#section-第一类曲线积分">第一类曲线积分</a></li><li class="toc-level-3"><a href="#section-第二类曲线积分">第二类曲线积分</a></li><li class="toc-level-3"><a href="#section-格林公式">格林公式</a></li><li class="toc-level-3"><a href="#section-路径无关与势函数">路径无关与势函数</a></li><li class="toc-level-3"><a href="#section-第一类曲面积分">第一类曲面积分</a></li><li class="toc-level-3"><a href="#section-第二类曲面积分">第二类曲面积分</a></li><li class="toc-level-3"><a href="#section-高斯公式">高斯公式</a></li><li class="toc-level-3"><a href="#section-斯托克斯公式">斯托克斯公式</a></li><li class="toc-level-2"><a href="#section-无穷级数">无穷级数</a></li><li class="toc-level-3"><a href="#section-收敛与基本限制">收敛与基本限制</a></li><li class="toc-level-3"><a href="#section-正项级数审敛">正项级数审敛</a></li><li class="toc-level-3"><a href="#section-交错级数与绝对收敛">交错级数与绝对收敛</a></li><li class="toc-level-3"><a href="#section-幂级数与收敛半径">幂级数与收敛半径</a></li><li class="toc-level-3"><a href="#section-逐项求导与积分">逐项求导与积分</a></li><li class="toc-level-3"><a href="#section-泰勒级数">泰勒级数</a></li><li class="toc-level-3"><a href="#section-函数项级数的运算边界">函数项级数的运算边界</a></li><li class="toc-level-3"><a href="#section-傅里叶级数">傅里叶级数</a></li></ol><a class="source-link" href="https://github.com/yangjm2006/Blog/blob/main/Note/%E9%AB%98%E7%AD%89%E6%95%B0%E5%AD%A6%EF%BC%88%E4%BA%8C%EF%BC%89.md" target="_blank" rel="noopener noreferrer">查看 Markdown 原文 <span aria-hidden="true">↗</span></a></aside><div class="article-body"><h2 id="section-向量代数与空间解析几何">向量代数与空间解析几何<a class="heading-anchor" href="#section-向量代数与空间解析几何" aria-label="链接到向量代数与空间解析几何">#</a></h2>
+<p>用向量描述方向，用方程描述位置.</p>
+<h3 id="section-向量积与混合积">向量积与混合积<a class="heading-anchor" href="#section-向量积与混合积" aria-label="链接到向量积与混合积">#</a></h3>
+<p>设 <span class="math-inline">$\theta$</span> 为两非零向量的夹角，则：</p>
+<div class="math-block">$$\boldsymbol a\cdot\boldsymbol b=|\boldsymbol a||\boldsymbol b|\cos\theta,
+\qquad
+|\boldsymbol a\times\boldsymbol b|=|\boldsymbol a||\boldsymbol b|\sin\theta.$$</div>
+<p>点积描述投影；叉积垂直于两向量，方向由右手定则决定，模长为对应平行四边形面积.</p>
+<div class="math-block">$$[\boldsymbol a,\boldsymbol b,\boldsymbol c]
+=(\boldsymbol a\times\boldsymbol b)\cdot\boldsymbol c
+=\det\begin{pmatrix}a_x&amp;a_y&amp;a_z\\b_x&amp;b_y&amp;b_z\\c_x&amp;c_y&amp;c_z\end{pmatrix}.$$</div>
+<p>混合积的绝对值为平行六面体体积；为 <span class="math-inline">$0$</span> 当且仅当三向量共面，即线性相关.</p>
+<p>叉积不满足结合律，常用恒等式为：</p>
+<div class="math-block">$$\boldsymbol a\times(\boldsymbol b\times\boldsymbol c)
+=(\boldsymbol a\cdot\boldsymbol c)\boldsymbol b
+-(\boldsymbol a\cdot\boldsymbol b)\boldsymbol c.$$</div>
+<h3 id="section-直线与平面">直线与平面<a class="heading-anchor" href="#section-直线与平面" aria-label="链接到直线与平面">#</a></h3>
+<p>过点 <span class="math-inline">$\boldsymbol r_0$</span> ，方向向量为 <span class="math-inline">$\boldsymbol v\ne0$</span> 的直线：</p>
+<div class="math-block">$$\boldsymbol r=\boldsymbol r_0+t\boldsymbol v.$$</div>
+<p>过点 <span class="math-inline">$\boldsymbol r_0$</span> ，法向量为 <span class="math-inline">$\boldsymbol n\ne0$</span> 的平面：</p>
+<div class="math-block">$$\boldsymbol n\cdot(\boldsymbol r-\boldsymbol r_0)=0.$$</div>
+<p>方向向量某分量为 <span class="math-inline">$0$</span> 时，对称式应改写为对应坐标不变，不能出现除以 <span class="math-inline">$0$</span> . 两平面的法向量不平行时，交线方向为 <span class="math-inline">$\boldsymbol n_1\times\boldsymbol n_2$</span> .</p>
+<p>点 <span class="math-inline">$P$</span> 到直线、平面的距离分别为：</p>
+<div class="math-block">$$d_{\text{线}}=\frac{|\overrightarrow{P_0P}\times\boldsymbol v|}{|\boldsymbol v|},
+\qquad
+d_{\text{面}}=\frac{|\boldsymbol n\cdot\overrightarrow{P_0P}|}{|\boldsymbol n|}.$$</div>
+<p>两条不平行直线的最短距离：</p>
+<div class="math-block">$$d=\frac{|\overrightarrow{P_1P_2}\cdot(\boldsymbol v_1\times\boldsymbol v_2)|}
+{|\boldsymbol v_1\times\boldsymbol v_2|}.$$</div>
+<p>平面夹角转为法向量夹角；直线与平面夹角是直线与法向量锐角的余角.</p>
+<h3 id="section-曲面与投影">曲面与投影<a class="heading-anchor" href="#section-曲面与投影" aria-label="链接到曲面与投影">#</a></h3>
+<ul><li>方程缺少某个坐标，通常表示沿该坐标轴方向延伸的柱面，不能仅凭名称认作圆柱面.</li><li>绕 <span class="math-inline">$z$</span> 轴旋转时，母线中的到轴距离换成 <span class="math-inline">$\sqrt{x^2+y^2}$</span> ，同时保留母线的取值限制.</li><li>求投影时消去垂直于投影面的坐标，并保留“存在实数解”给出的不等式范围.</li></ul>
+<p>常见二次曲面，取 <span class="math-inline">$a,b,c&gt;0$</span> ：</p>
+<div class="math-block">$$\begin{aligned}
+\frac{x^2}{a^2}+\frac{y^2}{b^2}+\frac{z^2}{c^2}=1
+&amp;\quad\text{椭球面},\\
+\frac{x^2}{a^2}+\frac{y^2}{b^2}-\frac{z^2}{c^2}=1
+&amp;\quad\text{单叶双曲面},\\
+\frac{z^2}{c^2}-\frac{x^2}{a^2}-\frac{y^2}{b^2}=1
+&amp;\quad\text{双叶双曲面},\\
+z=\frac{x^2}{a^2}+\frac{y^2}{b^2}
+&amp;\quad\text{椭圆抛物面},\\
+z=\frac{x^2}{a^2}-\frac{y^2}{b^2}
+&amp;\quad\text{双曲抛物面},\\
+\frac{x^2}{a^2}+\frac{y^2}{b^2}=\frac{z^2}{c^2}
+&amp;\quad\text{椭圆锥面}.
+\end{aligned}$$</div>
+<p>判断图形时，先看符号与对称轴，再用平面截痕确认.</p>
+<h2 id="section-多元函数微分">多元函数微分<a class="heading-anchor" href="#section-多元函数微分" aria-label="链接到多元函数微分">#</a></h2>
+<p>偏导只考察一个方向；可微要求所有方向上的变化能被同一个线性式控制.</p>
+<h3 id="section-多元极限">多元极限<a class="heading-anchor" href="#section-多元极限" aria-label="链接到多元极限">#</a></h3>
+<div class="math-block">$$\lim_{(x,y)\to(a,b)}f(x,y)=A$$</div>
+<p>要求定义域内的点沿任意方式趋于 <span class="math-inline">$(a,b)$</span> 时，函数值都趋于 <span class="math-inline">$A$</span> .</p>
+<ul><li>找到两条路径给出不同极限，即可证明极限不存在.</li><li>沿所有直线极限相同，仍不足以证明二重极限存在.</li><li>两个累次极限相同，也不足以证明二重极限存在.</li></ul>
+<p>证明存在时，通常令 <span class="math-inline">$r=\sqrt{(x-a)^2+(y-b)^2}$</span> ，建立：</p>
+<div class="math-block">$$|f(x,y)-A|\le\omega(r),\qquad\omega(r)\to0.$$</div>
+<p>极坐标换元后，应控制所有角度，不能只固定 <span class="math-inline">$\theta$</span> 再令 <span class="math-inline">$r\to0$</span> .</p>
+<h3 id="section-偏导与全微分">偏导与全微分<a class="heading-anchor" href="#section-偏导与全微分" aria-label="链接到偏导与全微分">#</a></h3>
+<div class="math-block">$$f_x(a,b)=\lim_{h\to0}\frac{f(a+h,b)-f(a,b)}h.$$</div>
+<p>记 <span class="math-inline">$\rho=\sqrt{(\Delta x)^2+(\Delta y)^2}$</span> . 若：</p>
+<div class="math-block">$$\Delta z=A\Delta x+B\Delta y+o(\rho),$$</div>
+<p>则称 <span class="math-inline">$f$</span> 在该点可微，且：</p>
+<div class="math-block">$$A=f_x,\qquad B=f_y,\qquad dz=f_x\,dx+f_y\,dy.$$</div>
+<p>关系为：</p>
+<div class="math-block">$$\text{偏导在邻域内存在且在该点连续}
+\Rightarrow\text{可微}
+\Rightarrow\begin{cases}\text{连续},\\\text{各偏导存在}.\end{cases}$$</div>
+<p>这些逆推一般不成立；即使连续且各偏导存在，也未必可微.</p>
+<p>直接验证可微时，计算：</p>
+<div class="math-block">$$\frac{f(a+h,b+k)-f(a,b)-f_x(a,b)h-f_y(a,b)k}
+{\sqrt{h^2+k^2}}\to0.$$</div>
+<p>若混合二阶偏导在邻域内连续，则 <span class="math-inline">$f_{xy}=f_{yx}$</span> . 不能只因两者存在就交换次序.</p>
+<h3 id="section-复合函数求导">复合函数求导<a class="heading-anchor" href="#section-复合函数求导" aria-label="链接到复合函数求导">#</a></h3>
+<p>设 <span class="math-inline">$z=f(u,v)$</span> ，<span class="math-inline">$u=u(x,y),v=v(x,y)$</span> ，各层函数可微，则：</p>
+<div class="math-block">$$z_x=f_u u_x+f_v v_x,\qquad z_y=f_u u_y+f_v v_y.$$</div>
+<p>每条依赖路径上的导数相乘，再对所有路径求和.</p>
+<p>若 <span class="math-inline">$z=f(x,y(x))$</span> ，则：</p>
+<div class="math-block">$$\frac{dz}{dx}=f_x+f_y y'.$$</div>
+<p>若 <span class="math-inline">$f$</span> 二阶连续可微、<span class="math-inline">$y$</span> 二阶可导，再求一次得到：</p>
+<div class="math-block">$$\frac{d^2z}{dx^2}=f_{xx}+2f_{xy}y'+f_{yy}(y')^2+f_y y''.$$</div>
+<p>直接依赖与间接依赖都要计算；不能把 <span class="math-inline">$y$</span> 既当独立变量又当常数.</p>
+<h3 id="section-隐函数">隐函数<a class="heading-anchor" href="#section-隐函数" aria-label="链接到隐函数">#</a></h3>
+<p>若 <span class="math-inline">$F(x_0,y_0,z_0)=0$</span> ，<span class="math-inline">$F$</span> 在邻域内有连续偏导，且 <span class="math-inline">$F_z(x_0,y_0,z_0)\ne0$</span> ，则局部可唯一写成 <span class="math-inline">$z=z(x,y)$</span> ，并且：</p>
+<div class="math-block">$$z_x=-\frac{F_x}{F_z},\qquad z_y=-\frac{F_y}{F_z}.$$</div>
+<p>由全微分 <span class="math-inline">$F_xdx+F_ydy+F_zdz=0$</span> 即得.</p>
+<p>隐函数组 <span class="math-inline">$F(x,u,v)=G(x,u,v)=0$</span> 在偏导连续且：</p>
+<div class="math-block">$$\frac{\partial(F,G)}{\partial(u,v)}
+=F_uG_v-F_vG_u\ne0$$</div>
+<p>时，局部确定 <span class="math-inline">$u(x),v(x)$</span> . 对原方程组求导，解线性方程组：</p>
+<div class="math-block">$$\begin{pmatrix}F_u&amp;F_v\\G_u&amp;G_v\end{pmatrix}
+\begin{pmatrix}u'\\v'\end{pmatrix}
+=-\begin{pmatrix}F_x\\G_x\end{pmatrix}.$$</div>
+<p>雅可比为 <span class="math-inline">$0$</span> 时，定理失效，不代表一定不存在隐函数.</p>
+<h3 id="section-方向导数与梯度">方向导数与梯度<a class="heading-anchor" href="#section-方向导数与梯度" aria-label="链接到方向导数与梯度">#</a></h3>
+<p>对单位向量 <span class="math-inline">$\boldsymbol e$</span> ，沿该方向的方向导数定义为：</p>
+<div class="math-block">$$D_{\boldsymbol e}f(\boldsymbol a)
+=\lim_{t\to0^+}\frac{f(\boldsymbol a+t\boldsymbol e)-f(\boldsymbol a)}t.$$</div>
+<p>若 <span class="math-inline">$f$</span> 可微，则：</p>
+<div class="math-block">$$\nabla f=(f_x,f_y,f_z),\qquad
+D_{\boldsymbol e}f=\nabla f\cdot\boldsymbol e.$$</div>
+<p>因为可微展开给出 <span class="math-inline">$f(\boldsymbol a+t\boldsymbol e)-f(\boldsymbol a)=t\nabla f\cdot\boldsymbol e+o(t)$</span> .</p>
+<ul><li>梯度非零时，梯度方向增长最快，最大方向导数为 <span class="math-inline">$|\nabla f|$</span> .</li><li>负梯度方向下降最快，最小方向导数为 <span class="math-inline">$-|\nabla f|$</span> .</li><li>梯度垂直于该点的正则等值面.</li></ul>
+<p>方向向量必须先单位化. 各方向导数存在，仍不保证可微，也不能直接套梯度公式.</p>
+<h3 id="section-切线与切平面">切线与切平面<a class="heading-anchor" href="#section-切线与切平面" aria-label="链接到切线与切平面">#</a></h3>
+<p>正则参数曲线 <span class="math-inline">$\boldsymbol r(t)$</span> 在 <span class="math-inline">$t_0$</span> 处以 <span class="math-inline">$\boldsymbol r'(t_0)\ne0$</span> 为切向量：</p>
+<div class="math-block">$$\boldsymbol r=\boldsymbol r(t_0)+s\boldsymbol r'(t_0).$$</div>
+<p>法平面以同一向量为法向量：</p>
+<div class="math-block">$$\boldsymbol r'(t_0)\cdot[\boldsymbol r-\boldsymbol r(t_0)]=0.$$</div>
+<p>对 <span class="math-inline">$F(x,y,z)=0$</span> ，若 <span class="math-inline">$F$</span> 连续可微且 <span class="math-inline">$\nabla F(P)\ne0$</span> ，切平面为：</p>
+<div class="math-block">$$\nabla F(P)\cdot(\boldsymbol r-\boldsymbol r_P)=0.$$</div>
+<p>法线方向为 <span class="math-inline">$\nabla F(P)$</span> . 对图形 <span class="math-inline">$z=f(x,y)$</span> ，切平面即：</p>
+<div class="math-block">$$z-z_0=f_x(P)(x-x_0)+f_y(P)(y-y_0).$$</div>
+<h3 id="section-泰勒公式与极值">泰勒公式与极值<a class="heading-anchor" href="#section-泰勒公式与极值" aria-label="链接到泰勒公式与极值">#</a></h3>
+<p>若 <span class="math-inline">$f$</span> 在该点附近有连续二阶偏导，则：</p>
+<div class="math-block">$$\begin{aligned}
+f(a+h,b+k)=f(a,b)&amp;+f_xh+f_yk\\
+&amp;+\frac12(f_{xx}h^2+2f_{xy}hk+f_{yy}k^2)+o(h^2+k^2),
+\end{aligned}$$</div>
+<p>右侧各偏导均取在 <span class="math-inline">$(a,b)$</span> . 一般 <span class="math-inline">$n$</span> 阶情形可令 <span class="math-inline">$g(t)=f(a+th,b+tk)$</span> ，转为 <span class="math-inline">$t$</span> 的一元泰勒公式.</p>
+<p>内点可微且取极值，则 <span class="math-inline">$f_x=f_y=0$</span> . 在驻点记：</p>
+<div class="math-block">$$A=f_{xx},\qquad B=f_{xy},\qquad C=f_{yy},\qquad\Delta=AC-B^2.$$</div>
+<ul><li><span class="math-inline">$\Delta&gt;0,A&gt;0$</span> ：严格极小值.</li><li><span class="math-inline">$\Delta&gt;0,A&lt;0$</span> ：严格极大值.</li><li><span class="math-inline">$\Delta&lt;0$</span> ：鞍点，不是极值.</li><li><span class="math-inline">$\Delta=0$</span> ：不能判定，需看高阶项或回到增量符号.</li></ul>
+<p>判别来自二次型 <span class="math-inline">$Ah^2+2Bhk+Ck^2$</span> 的正负性. 求闭有界区域上的连续函数最值，还需检查不可微点与边界.</p>
+<h3 id="section-条件极值">条件极值<a class="heading-anchor" href="#section-条件极值" aria-label="链接到条件极值">#</a></h3>
+<p>在约束 <span class="math-inline">$g(x,y)=0$</span> 下，若极值点处 <span class="math-inline">$\nabla g\ne0$</span> ，且 <span class="math-inline">$f,g$</span> 连续可微，则存在 <span class="math-inline">$\lambda$</span> ，使：</p>
+<div class="math-block">$$\nabla f=\lambda\nabla g,\qquad g=0.$$</div>
+<p>约束曲线的切向变化不应使 <span class="math-inline">$f$</span> 产生一阶增量，因此 <span class="math-inline">$\nabla f$</span> 与约束法向量平行.</p>
+<p>多个约束时：</p>
+<div class="math-block">$$\nabla f=\sum_i\lambda_i\nabla g_i,\qquad g_i=0,$$</div>
+<p>要求约束梯度在候选点线性无关. 乘数法只给候选点；约束奇异点、边界及是否能取到最值，都需另行检查.</p>
+<h2 id="section-重积分">重积分<a class="heading-anchor" href="#section-重积分" aria-label="链接到重积分">#</a></h2>
+<p>把面积或体积上的分布累加.</p>
+<h3 id="section-化为累次积分">化为累次积分<a class="heading-anchor" href="#section-化为累次积分" aria-label="链接到化为累次积分">#</a></h3>
+<p>以下以连续被积函数和分段光滑边界的有界区域为常用前提.</p>
+<p>若 <span class="math-inline">$D=\{(x,y):a\le x\le b,\ \varphi_1(x)\le y\le\varphi_2(x)\}$</span> ：</p>
+<div class="math-block">$$\iint_D f\,dA=\int_a^b\left[\int_{\varphi_1(x)}^{\varphi_2(x)}f(x,y)\,dy\right]dx.$$</div>
+<p>换序时先重新描述同一个区域，再写上下限. 外层范围是区域的投影，内层范围是固定外层变量后的截线；边界表达式变化处需要分段.</p>
+<p>三重积分可先投影到 <span class="math-inline">$xy$</span> 平面：</p>
+<div class="math-block">$$\iiint_\Omega f\,dV
+=\iint_D\left[\int_{z_1(x,y)}^{z_2(x,y)}f(x,y,z)\,dz\right]dA.$$</div>
+<h3 id="section-换元与雅可比">换元与雅可比<a class="heading-anchor" href="#section-换元与雅可比" aria-label="链接到换元与雅可比">#</a></h3>
+<p>若换元在区域内部一一对应、连续可微且雅可比非零，则：</p>
+<div class="math-block">$$\iint_D f(x,y)\,dx\,dy
+=\iint_G f(x(u,v),y(u,v))
+\left|\frac{\partial(x,y)}{\partial(u,v)}\right|du\,dv.$$</div>
+<p>雅可比表示局部面积的伸缩倍数；重积分取绝对值. 三维换元同理，使用三阶行列式. 常用坐标的轴、原点等退化集合可分块处理，不影响通常的体积或面积积分.</p>
+<p>极坐标：</p>
+<div class="math-block">$$x=r\cos\theta,\quad y=r\sin\theta,\quad dA=r\,dr\,d\theta.$$</div>
+<p>柱坐标：</p>
+<div class="math-block">$$x=r\cos\theta,\quad y=r\sin\theta,\quad z=z,\quad dV=r\,dr\,d\theta\,dz.$$</div>
+<p>球坐标取 <span class="math-inline">$\varphi$</span> 为与正 <span class="math-inline">$z$</span> 轴的夹角：</p>
+<div class="math-block">$$\begin{aligned}
+x&amp;=\rho\sin\varphi\cos\theta,\\
+y&amp;=\rho\sin\varphi\sin\theta,\\
+z&amp;=\rho\cos\varphi,
+\end{aligned}
+\qquad
+dV=\rho^2\sin\varphi\,d\rho\,d\varphi\,d\theta.$$</div>
+<p>通常 <span class="math-inline">$r,\rho\ge0,\ 0\le\varphi\le\pi$</span> . 换元必须同时改变被积函数、积分区域与面积或体积元.</p>
+<h3 id="section-对称性">对称性<a class="heading-anchor" href="#section-对称性" aria-label="链接到对称性">#</a></h3>
+<p>若区域关于 <span class="math-inline">$y$</span> 轴对称，则对 <span class="math-inline">$x$</span> 为奇函数的可积函数，积分为 <span class="math-inline">$0$</span> ；偶函数可取半域积分后乘 <span class="math-inline">$2$</span> . 其他反射对称同理.</p>
+<p>若区域在交换 <span class="math-inline">$x,y$</span> 后不变，则：</p>
+<div class="math-block">$$\iint_D f(x,y)\,dA=\iint_D f(y,x)\,dA.$$</div>
+<p>对称性同时依赖区域与被积函数. 不存在通常积分的奇异表达式，不能靠对称性宣布积分为 <span class="math-inline">$0$</span> .</p>
+<h3 id="section-质量-质心与转动惯量">质量、质心与转动惯量<a class="heading-anchor" href="#section-质量-质心与转动惯量" aria-label="链接到质量、质心与转动惯量">#</a></h3>
+<p>设体密度为 <span class="math-inline">$\rho$</span> ，总质量 <span class="math-inline">$M&gt;0$</span> ：</p>
+<div class="math-block">$$M=\iiint_\Omega\rho\,dV,\qquad
+\bar x=\frac1M\iiint_\Omega x\rho\,dV,$$</div>
+<p><span class="math-inline">$\bar y,\bar z$</span> 同理. 面密度情形改用二重积分.</p>
+<p>绕 <span class="math-inline">$z$</span> 轴的转动惯量：</p>
+<div class="math-block">$$I_z=\iiint_\Omega(x^2+y^2)\rho\,dV.$$</div>
+<p>一般形式是“到旋转轴的距离平方乘质量微元”. 只有区域与密度共同对称时，才能用对称性确定质心.</p>
+<h2 id="section-曲线积分与曲面积分">曲线积分与曲面积分<a class="heading-anchor" href="#section-曲线积分与曲面积分" aria-label="链接到曲线积分与曲面积分">#</a></h2>
+<p>第一类累加数量，第二类累加沿指定方向的分量.</p>
+<h3 id="section-第一类曲线积分">第一类曲线积分<a class="heading-anchor" href="#section-第一类曲线积分" aria-label="链接到第一类曲线积分">#</a></h3>
+<p>对分段光滑曲线 <span class="math-inline">$\boldsymbol r(t)$</span> ，<span class="math-inline">$a\le t\le b$</span> ：</p>
+<div class="math-block">$$\int_L f\,ds=\int_a^b f(\boldsymbol r(t))|\boldsymbol r'(t)|\,dt.$$</div>
+<p>其中 <span class="math-inline">$ds$</span> 是弧长微元，非负；改变曲线方向不改变积分. 参数区间应将曲线描出一次.</p>
+<h3 id="section-第二类曲线积分">第二类曲线积分<a class="heading-anchor" href="#section-第二类曲线积分" aria-label="链接到第二类曲线积分">#</a></h3>
+<p>设向量场 <span class="math-inline">$\boldsymbol F=(P,Q,R)$</span> ，曲线按 <span class="math-inline">$t$</span> 增大方向定向，则：</p>
+<div class="math-block">$$\begin{aligned}
+\int_L P\,dx+Q\,dy+R\,dz
+&amp;=\int_L\boldsymbol F\cdot d\boldsymbol r\\
+&amp;=\int_a^b\boldsymbol F(\boldsymbol r(t))\cdot\boldsymbol r'(t)\,dt.
+\end{aligned}$$</div>
+<p>反向后积分变号. 若 <span class="math-inline">$\boldsymbol\tau$</span> 为正向单位切向量，则：</p>
+<div class="math-block">$$\int_L\boldsymbol F\cdot d\boldsymbol r=\int_L\boldsymbol F\cdot\boldsymbol\tau\,ds.$$</div>
+<p>做功属于第二类：力沿运动方向的分量乘弧长.</p>
+<h3 id="section-格林公式">格林公式<a class="heading-anchor" href="#section-格林公式" aria-label="链接到格林公式">#</a></h3>
+<p>设平面区域 <span class="math-inline">$D$</span> 的边界分段光滑，<span class="math-inline">$P,Q$</span> 在包含 <span class="math-inline">$D$</span> 及边界的开集上具有连续一阶偏导，则：</p>
+<div class="math-block">$$\oint_{\partial D}P\,dx+Q\,dy
+=\iint_D\left(Q_x-P_y\right)dA.$$</div>
+<p>边界取正向：沿边界前进，区域位于左侧. 外边界逆时针，孔洞边界顺时针.</p>
+<p>由此可得面积公式：</p>
+<div class="math-block">$$|D|=\frac12\oint_{\partial D}(x\,dy-y\,dx).$$</div>
+<p>开曲线可补成闭曲线再减去补线积分. 区域内存在奇点时，不能直接套公式；可挖去奇点附近的小区域，并保留新增边界的积分.</p>
+<h3 id="section-路径无关与势函数">路径无关与势函数<a class="heading-anchor" href="#section-路径无关与势函数" aria-label="链接到路径无关与势函数">#</a></h3>
+<p>在连通开区域内，对连续向量场，下列性质等价：</p>
+<ul><li>曲线积分只依赖起终点.</li><li>任意闭曲线上的积分为 <span class="math-inline">$0$</span> .</li><li>存在势函数 <span class="math-inline">$u$</span> ，使 <span class="math-inline">$du=P\,dx+Q\,dy+R\,dz$</span> .</li></ul>
+<p>此时：</p>
+<div class="math-block">$$\int_A^B\boldsymbol F\cdot d\boldsymbol r=u(B)-u(A).$$</div>
+<p>平面上，若 <span class="math-inline">$P,Q$</span> 连续可微，<span class="math-inline">$P_y=Q_x$</span> 是必要条件；区域再满足单连通时，也是充分条件. 有孔区域不能只检查偏导相等.</p>
+<p>求势函数时可先写：</p>
+<div class="math-block">$$u(x,y)=\int P(x,y)\,dx+C(y),$$</div>
+<p>再由 <span class="math-inline">$u_y=Q$</span> 确定 <span class="math-inline">$C(y)$</span> . 这里的“积分常数”可以依赖未积分的变量.</p>
+<h3 id="section-第一类曲面积分">第一类曲面积分<a class="heading-anchor" href="#section-第一类曲面积分" aria-label="链接到第一类曲面积分">#</a></h3>
+<p>对正则参数曲面 <span class="math-inline">$\boldsymbol r(u,v)$</span> ：</p>
+<div class="math-block">$$\iint_\Sigma f\,dS
+=\iint_G f(\boldsymbol r(u,v))
+|\boldsymbol r_u\times\boldsymbol r_v|\,du\,dv.$$</div>
+<p>若曲面为 <span class="math-inline">$z=z(x,y)$</span> ，则：</p>
+<div class="math-block">$$dS=\sqrt{1+z_x^2+z_y^2}\,dx\,dy.$$</div>
+<p>第一类与定向无关. 令 <span class="math-inline">$f=1$</span> 得到曲面面积；若一个投影点对应多层曲面，需分片计算.</p>
+<h3 id="section-第二类曲面积分">第二类曲面积分<a class="heading-anchor" href="#section-第二类曲面积分" aria-label="链接到第二类曲面积分">#</a></h3>
+<p>选定单位法向量 <span class="math-inline">$\boldsymbol n$</span> 后，通量为：</p>
+<div class="math-block">$$\iint_\Sigma\boldsymbol F\cdot\boldsymbol n\,dS
+=\iint_\Sigma P\,dy\,dz+Q\,dz\,dx+R\,dx\,dy.$$</div>
+<p>若 <span class="math-inline">$\boldsymbol r_u\times\boldsymbol r_v$</span> 与所选法向一致，则：</p>
+<div class="math-block">$$\iint_\Sigma\boldsymbol F\cdot\boldsymbol n\,dS
+=\iint_G\boldsymbol F(\boldsymbol r(u,v))\cdot
+(\boldsymbol r_u\times\boldsymbol r_v)\,du\,dv.$$</div>
+<p>叉积方向相反时添负号. 对 <span class="math-inline">$z=z(x,y)$</span> 取向上侧：</p>
+<div class="math-block">$$\boldsymbol n\,dS=(-z_x,-z_y,1)\,dx\,dy,$$</div>
+<p>故：</p>
+<div class="math-block">$$\iint_\Sigma\boldsymbol F\cdot\boldsymbol n\,dS
+=\iint_D(-Pz_x-Qz_y+R)\,dx\,dy,$$</div>
+<p>其中 <span class="math-inline">$P,Q,R$</span> 均代入 <span class="math-inline">$z=z(x,y)$</span> . 取向下侧则整体变号. 各分量有方向，不能像重积分换元一样一律取绝对值.</p>
+<h3 id="section-高斯公式">高斯公式<a class="heading-anchor" href="#section-高斯公式" aria-label="链接到高斯公式">#</a></h3>
+<p>若 <span class="math-inline">$\Omega$</span> 为边界分段光滑的有界立体，<span class="math-inline">$\boldsymbol F$</span> 在包含立体及边界的开集上连续可微，则：</p>
+<div class="math-block">$$\iint_{\partial\Omega}\boldsymbol F\cdot\boldsymbol n\,dS
+=\iiint_\Omega\operatorname{div}\boldsymbol F\,dV,$$</div>
+<div class="math-block">$$\operatorname{div}\boldsymbol F=P_x+Q_y+R_z.$$</div>
+<p>闭曲面取外侧；若立体含空腔，空腔边界的外法向指向空腔内部.</p>
+<p>开曲面需补面闭合，再减去补面的通量. 散度为 <span class="math-inline">$0$</span> 只有在整个区域满足条件时，才能推出闭曲面通量为 <span class="math-inline">$0$</span> .</p>
+<h3 id="section-斯托克斯公式">斯托克斯公式<a class="heading-anchor" href="#section-斯托克斯公式" aria-label="链接到斯托克斯公式">#</a></h3>
+<p>设 <span class="math-inline">$\Sigma$</span> 是分片光滑的定向曲面，<span class="math-inline">$\boldsymbol F$</span> 在其邻域连续可微，则：</p>
+<div class="math-block">$$\oint_{\partial\Sigma}\boldsymbol F\cdot d\boldsymbol r
+=\iint_\Sigma(\nabla\times\boldsymbol F)\cdot\boldsymbol n\,dS,$$</div>
+<div class="math-block">$$\nabla\times\boldsymbol F=(R_y-Q_z,\ P_z-R_x,\ Q_x-P_y).$$</div>
+<p>边界方向与法向满足右手规则. 在同一条边界上，可选另一张满足条件、方向相容且更易积分的曲面.</p>
+<p>三条公式都把内部的局部变化累加为边界贡献：格林处理平面环流，高斯处理通量，斯托克斯处理空间环流.</p>
+<h2 id="section-无穷级数">无穷级数<a class="heading-anchor" href="#section-无穷级数" aria-label="链接到无穷级数">#</a></h2>
+<p>无穷求和的含义，是部分和的极限.</p>
+<h3 id="section-收敛与基本限制">收敛与基本限制<a class="heading-anchor" href="#section-收敛与基本限制" aria-label="链接到收敛与基本限制">#</a></h3>
+<div class="math-block">$$S_n=\sum_{k=1}^n u_k,\qquad
+\sum_{n=1}^{\infty}u_n=S\iff S_n\to S\in\mathbb R.$$</div>
+<p>收敛必有 <span class="math-inline">$u_n\to0$</span> ，反之不成立. 修改有限项不改变敛散性，但会改变和.</p>
+<p>对非负项级数，部分和单调递增，因此：</p>
+<div class="math-block">$$\sum u_n\text{ 收敛}\iff\{S_n\}\text{ 有上界}.$$</div>
+<p>收敛级数保持顺序的有限分组不改变和；分组后收敛不能反推原级数收敛. 任意重排还需更强条件.</p>
+<h3 id="section-正项级数审敛">正项级数审敛<a class="heading-anchor" href="#section-正项级数审敛" aria-label="链接到正项级数审敛">#</a></h3>
+<p>以下比较允许忽略有限个首项，设各项非负，作比值时分母为正.</p>
+<p><strong>比较判别</strong>：若 <span class="math-inline">$0\le u_n\le v_n$</span> ，则 <span class="math-inline">$\sum v_n$</span> 收敛推出 <span class="math-inline">$\sum u_n$</span> 收敛；<span class="math-inline">$\sum u_n$</span> 发散推出 <span class="math-inline">$\sum v_n$</span> 发散.</p>
+<p><strong>极限比较</strong>：若 <span class="math-inline">$u_n/v_n\to c\in(0,+\infty)$</span> ，则二者同敛散. 若比值趋于 <span class="math-inline">$0$</span> ，只能由较大者收敛推较小者收敛；趋于 <span class="math-inline">$+\infty$</span> 时反向作相应比较.</p>
+<p>基准级数：</p>
+<div class="math-block">$$\sum_{n=0}^{\infty}q^n\text{ 收敛}\iff |q|&lt;1,\qquad
+\sum_{n=1}^{\infty}\frac1{n^p}\text{ 收敛}\iff p&gt;1.$$</div>
+<p><strong>比值、根值判别</strong>：若极限存在，记：</p>
+<div class="math-block">$$L=\lim\frac{u_{n+1}}{u_n}
+\quad\text{或}\quad
+L=\lim\sqrt[n]{u_n}.$$</div>
+<ul><li><span class="math-inline">$L&lt;1$</span> ：收敛.</li><li><span class="math-inline">$L&gt;1$</span> ，包括 <span class="math-inline">$+\infty$</span> ：发散.</li><li><span class="math-inline">$L=1$</span> ：无法判定.</li></ul>
+<p>比值法适合阶乘、连乘，根值法适合 <span class="math-inline">$n$</span> 次幂. 二者本质上与几何级数比较，不是与 <span class="math-inline">$p$</span> 级数比较.</p>
+<p><strong>积分判别</strong>：若 <span class="math-inline">$f$</span> 在 <span class="math-inline">$[1,+\infty)$</span> 上连续、非负、单调递减，则：</p>
+<div class="math-block">$$\sum_{n=1}^{\infty}f(n)\quad\text{与}\quad\int_1^{+\infty}f(x)\,dx$$</div>
+<p>同敛散. 若收敛，余项还满足：</p>
+<div class="math-block">$$\int_{N+1}^{\infty}f(x)\,dx
+\le\sum_{n=N+1}^{\infty}f(n)
+\le\int_N^{\infty}f(x)\,dx.$$</div>
+<h3 id="section-交错级数与绝对收敛">交错级数与绝对收敛<a class="heading-anchor" href="#section-交错级数与绝对收敛" aria-label="链接到交错级数与绝对收敛">#</a></h3>
+<p>若 <span class="math-inline">$a_n\ge0$</span> 单调递减到 <span class="math-inline">$0$</span> ，则：</p>
+<div class="math-block">$$\sum_{n=1}^{\infty}(-1)^{n-1}a_n$$</div>
+<p>收敛，且 <span class="math-inline">$|S-S_N|\le a_{N+1}$</span> . 若从某项起才单调，则余项估计也从该处以后使用.</p>
+<p>理由：偶数部分和递增，奇数部分和递减，二者之差为趋于 <span class="math-inline">$0$</span> 的一项，因此夹向同一极限.</p>
+<ul><li><span class="math-inline">$\sum|u_n|$</span> 收敛：称为绝对收敛，必有 <span class="math-inline">$\sum u_n$</span> 收敛.</li><li><span class="math-inline">$\sum u_n$</span> 收敛而 <span class="math-inline">$\sum|u_n|$</span> 发散：称为条件收敛.</li></ul>
+<p>变号级数先检查绝对收敛，再根据符号结构判断. 正项级数的比较判别不能直接套在任意变号级数上.</p>
+<p>绝对收敛允许任意重排而不改变和；条件收敛一般不允许. 对绝对收敛级数，柯西乘积满足：</p>
+<div class="math-block">$$\left(\sum_{n=0}^{\infty}a_n\right)
+\left(\sum_{n=0}^{\infty}b_n\right)
+=\sum_{n=0}^{\infty}\left(\sum_{k=0}^n a_kb_{n-k}\right).$$</div>
+<h3 id="section-幂级数与收敛半径">幂级数与收敛半径<a class="heading-anchor" href="#section-幂级数与收敛半径" aria-label="链接到幂级数与收敛半径">#</a></h3>
+<div class="math-block">$$\sum_{n=0}^{\infty}a_n(x-x_0)^n.$$</div>
+<p>存在 <span class="math-inline">$R\in[0,+\infty]$</span> ，使：</p>
+<ul><li><span class="math-inline">$|x-x_0|&lt;R$</span> ：绝对收敛.</li><li><span class="math-inline">$|x-x_0|&gt;R$</span> ：发散.</li><li><span class="math-inline">$|x-x_0|=R$</span> ：有限正半径时，两端点分别代入判定.</li></ul>
+<p>若系数最终非零且比值极限存在：</p>
+<div class="math-block">$$R=\lim_{n\to\infty}\left|\frac{a_n}{a_{n+1}}\right|.$$</div>
+<p>更一般地：</p>
+<div class="math-block">$$\frac1R=\limsup_{n\to\infty}\sqrt[n]{|a_n|},$$</div>
+<p>约定 <span class="math-inline">$1/0=+\infty,\ 1/(+\infty)=0$</span> . 缺项或含 <span class="math-inline">$(x-x_0)^{2n}$</span> 的级数，可先对整个通项做比值或根值判别，不能把指数 <span class="math-inline">$2n$</span> 当作 <span class="math-inline">$n$</span> .</p>
+<p>半径内绝对收敛的原因：若在 <span class="math-inline">$x_1\ne x_0$</span> 处收敛，则 <span class="math-inline">$|a_n(x_1-x_0)^n|$</span> 有界，从而：</p>
+<div class="math-block">$$|a_n(x-x_0)^n|
+\le M\left|\frac{x-x_0}{x_1-x_0}\right|^n.$$</div>
+<p>当 <span class="math-inline">$|x-x_0|&lt;|x_1-x_0|$</span> 时，右侧为可求和的几何控制项.</p>
+<h3 id="section-逐项求导与积分">逐项求导与积分<a class="heading-anchor" href="#section-逐项求导与积分" aria-label="链接到逐项求导与积分">#</a></h3>
+<p>在 <span class="math-inline">$|x-x_0|&lt;R$</span> 内，若 <span class="math-inline">$S(x)=\sum a_n(x-x_0)^n$</span> ：</p>
+<div class="math-block">$$S'(x)=\sum_{n=1}^{\infty}na_n(x-x_0)^{n-1},$$</div>
+<div class="math-block">$$\int_{x_0}^x S(t)\,dt
+=\sum_{n=0}^{\infty}\frac{a_n}{n+1}(x-x_0)^{n+1}.$$</div>
+<p>求导、积分后收敛半径不变，但端点敛散性可能改变，必须重新检查.</p>
+<p>求和时常将 <span class="math-inline">$n,n(n-1)$</span> 转成求导，将 <span class="math-inline">$1/(n+1)$</span> 转成积分，再利用几何级数. 积分后用中心点的值确定常数.</p>
+<h3 id="section-泰勒级数">泰勒级数<a class="heading-anchor" href="#section-泰勒级数" aria-label="链接到泰勒级数">#</a></h3>
+<p>若函数能在 <span class="math-inline">$x_0$</span> 附近展开为幂级数，则系数必为：</p>
+<div class="math-block">$$a_n=\frac{f^{(n)}(x_0)}{n!}.$$</div>
+<p>但无穷次可导并不保证等于其泰勒级数. 还需对所讨论的 <span class="math-inline">$x$</span> 证明泰勒余项 <span class="math-inline">$R_n(x)\to0$</span> .</p>
+<p>常用展开：</p>
+<div class="math-block">$$\begin{aligned}
+\frac1{1-x}&amp;=\sum_{n=0}^{\infty}x^n&amp;&amp;(|x|&lt;1),\\
+e^x&amp;=\sum_{n=0}^{\infty}\frac{x^n}{n!}&amp;&amp;(x\in\mathbb R),\\
+\sin x&amp;=\sum_{n=0}^{\infty}(-1)^n\frac{x^{2n+1}}{(2n+1)!}&amp;&amp;(x\in\mathbb R),\\
+\cos x&amp;=\sum_{n=0}^{\infty}(-1)^n\frac{x^{2n}}{(2n)!}&amp;&amp;(x\in\mathbb R),\\
+\ln(1+x)&amp;=\sum_{n=1}^{\infty}(-1)^{n-1}\frac{x^n}{n}&amp;&amp;(-1&lt;x\le1),\\
+\arctan x&amp;=\sum_{n=0}^{\infty}(-1)^n\frac{x^{2n+1}}{2n+1}&amp;&amp;(-1\le x\le1),\\
+(1+x)^\alpha&amp;=\sum_{n=0}^{\infty}\binom\alpha n x^n&amp;&amp;(|x|&lt;1).
+\end{aligned}$$</div>
+<p>广义二项式的端点需按 <span class="math-inline">$\alpha$</span> 单独判断；<span class="math-inline">$\alpha$</span> 为非负整数时退化为有限多项式，对所有实数成立.</p>
+<p>由几何级数逐项积分得到对数展开；由 <span class="math-inline">$1/(1+x^2)$</span> 的展开积分得到反正切展开. 这样也同时确定了内部收敛范围，端点另作证明.</p>
+<h3 id="section-函数项级数的运算边界">函数项级数的运算边界<a class="heading-anchor" href="#section-函数项级数的运算边界" aria-label="链接到函数项级数的运算边界">#</a></h3>
+<p>一般函数项级数逐点收敛，并不保证可以与积分、求导交换次序.</p>
+<p>一致收敛要求误差对所有 <span class="math-inline">$x$</span> 同时受控：</p>
+<div class="math-block">$$\sup_{x\in D}|S_N(x)-S(x)|\to0.$$</div>
+<p>常用充分条件为 <span class="math-inline">$|u_n(x)|\le M_n$</span> 且 <span class="math-inline">$\sum M_n$</span> 收敛. 幂级数在收敛区间内部的任意闭子区间上一致收敛.</p>
+<p>在闭区间上，连续项的一致收敛级数可逐项积分. 逐项求导还需额外条件，例如各项连续可导、导数级数一致收敛且原级数至少在一点收敛.</p>
+<h3 id="section-傅里叶级数">傅里叶级数<a class="heading-anchor" href="#section-傅里叶级数" aria-label="链接到傅里叶级数">#</a></h3>
+<p>用正交的三角函数，分解周期函数.</p>
+<p>对周期为 <span class="math-inline">$2l$</span> 的函数，写作：</p>
+<div class="math-block">$$f(x)\sim\frac{a_0}{2}+\sum_{n=1}^{\infty}
+\left(a_n\cos\frac{n\pi x}{l}+b_n\sin\frac{n\pi x}{l}\right),$$</div>
+<div class="math-block">$$a_n=\frac1l\int_{-l}^l f(x)\cos\frac{n\pi x}{l}\,dx\quad(n\ge0),$$</div>
+<div class="math-block">$$b_n=\frac1l\int_{-l}^l f(x)\sin\frac{n\pi x}{l}\,dx\quad(n\ge1).$$</div>
+<p>此处 <span class="math-inline">$\sim$</span> 表示“对应的傅里叶级数”，不是等价无穷小，也未先断言处处相等.</p>
+<p>系数来自正交性：与某个正弦或余弦相乘再积分，其他频率的项消失；常数函数的平方积分为 <span class="math-inline">$2l$</span> ，其余基函数为 <span class="math-inline">$l$</span> ，所以常数项写成 <span class="math-inline">$a_0/2$</span> .</p>
+<p>一组常用充分条件是：周期延拓后在一周期内分段 <span class="math-inline">$C^1$</span> ，各分段的函数及导数有有限单侧极限. 此时级数在每点收敛到：</p>
+<div class="math-block">$$\frac{f(x^-)+f(x^+)}2.$$</div>
+<p>连续点处就是 <span class="math-inline">$f(x)$</span> ；跳跃点取左右极限平均. 端点也按周期延拓取左右极限，不能只看区间内的函数值.</p>
+<ul><li>偶函数：<span class="math-inline">$b_n=0$</span> ，只有余弦项.</li><li>奇函数：<span class="math-inline">$a_n=0$</span> ，只有正弦项.</li><li>只给出 <span class="math-inline">$[0,l]$</span> 上的函数时，可作偶延拓得到余弦级数，或作奇延拓得到正弦级数.</li></ul>
+<p>半区间展开的系数相应为：</p>
+<div class="math-block">$$a_n=\frac2l\int_0^l f(x)\cos\frac{n\pi x}{l}\,dx,
+\qquad
+b_n=\frac2l\int_0^l f(x)\sin\frac{n\pi x}{l}\,dx.$$</div>
+<p>两式分别用于偶延拓与奇延拓. 延拓方式决定边界处的跳跃与级数取值.</p></div></div></article></main><footer class="sub-footer"><span>© 2026 yangjm</span><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">鲁ICP备2026048978号-1 <span aria-hidden="true">↗</span></a></footer></body></html>

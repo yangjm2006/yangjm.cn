@@ -1,0 +1,21 @@
+[Unit]
+Description=yangjm.cn visitor counter
+After=network.target
+
+[Service]
+Type=simple
+User=yangjm-visits
+Group=yangjm-visits
+Environment=VISIT_DB=/var/lib/yangjm-visits/visits.sqlite3
+ExecStart=/usr/bin/python3 /opt/yangjm-visits/visit-server.py
+Restart=on-failure
+RestartSec=3
+StateDirectory=yangjm-visits
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/yangjm-visits
+
+[Install]
+WantedBy=multi-user.target

@@ -74,6 +74,32 @@ function renderList(lines, start) {
   return { html: renderLevel(0, items[0].indent).html, next: index };
 }
 
+function tableCells(line) {
+  return line.trim().replace(/^\|/, '').replace(/\|$/, '')
+    .split(/(?<!\\)\|/).map(cell => cell.trim().replace(/\\\|/g, '|'));
+}
+
+function renderTable(lines, start) {
+  if (start + 1 >= lines.length || !lines[start].trim().startsWith('|')) return null;
+  const header = tableCells(lines[start]);
+  const separator = tableCells(lines[start + 1]);
+  if (header.length < 2 || separator.length !== header.length ||
+      !separator.every(cell => /^:?-{3,}:?$/.test(cell))) return null;
+
+  let index = start + 2;
+  const rows = [];
+  while (index < lines.length && lines[index].trim().startsWith('|')) {
+    const cells = tableCells(lines[index]);
+    if (cells.length !== header.length) break;
+    rows.push(`<tr>${cells.map(cell => `<td>${renderInline(cell)}</td>`).join('')}</tr>`);
+    index += 1;
+  }
+  return {
+    html: `<div class="table-scroll"><table><thead><tr>${header.map(cell => `<th scope="col">${renderInline(cell)}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`,
+    next: index,
+  };
+}
+
 export function renderMarkdown(source) {
   const lines = String(source).replace(/\r\n?/g, '\n').split('\n');
   const html = [];
@@ -126,6 +152,14 @@ export function renderMarkdown(source) {
         formula = parts.join('\n');
       }
       html.push(`<div class="math-block">$$${escapeHtml(formula.trim())}$$</div>`);
+      continue;
+    }
+
+    const table = renderTable(lines, index);
+    if (table) {
+      flushParagraph();
+      html.push(table.html);
+      index = table.next;
       continue;
     }
 

@@ -32,11 +32,15 @@ def sync(args):
             if args.local_dir:
                 shutil.copyfile(Path(args.local_dir) / post['source'], target)
             elif source_url:
-                subprocess.run([
+                command = [
                     'curl', '--fail', '--silent', '--show-error', '--location',
                     '--proto', '=https', '--proto-redir', '=https', '--connect-timeout', '10',
-                    '--max-time', '45', '--max-filesize', '5242880', source_url, '--output', str(target)
-                ], check=True, timeout=55)
+                    '--max-time', '45', '--max-filesize', '5242880'
+                ]
+                if source_url.startswith('https://api.github.com/'):
+                    command.extend(['--header', 'Accept: application/vnd.github.raw+json'])
+                command.extend([source_url, '--output', str(target)])
+                subprocess.run(command, check=True, timeout=55)
             else:
                 shutil.copyfile(app / 'content/blog' / post['source'], target)
             data = target.read_bytes()

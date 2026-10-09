@@ -1,0 +1,575 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f4f1e8"><meta name="description" content="整理插值、FFT、NTT、形式幂级数、线性递推与数论变换。"><title>多项式与数论变换 · yangjm</title><script>
+    (() => {
+      const key = 'yangjm-theme';
+      const valid = value => value === 'light' || value === 'dark';
+      const readCookie = () => {
+        const item = document.cookie.split('; ').find(row => row.startsWith(`${key}=`));
+        return item ? decodeURIComponent(item.slice(key.length + 1)) : null;
+      };
+      const save = theme => {
+        const sharedDomain = location.hostname === 'yangjm.cn' || location.hostname.endsWith('.yangjm.cn');
+        const domain = sharedDomain ? '; Domain=yangjm.cn' : '';
+        const secure = location.protocol === 'https:' ? '; Secure' : '';
+        document.cookie = `${key}=${theme}; Path=/; Max-Age=31536000; SameSite=Lax${domain}${secure}`;
+        try { localStorage.setItem(key, theme); } catch {}
+      };
+      let legacy;
+      try { legacy = localStorage.getItem(key); } catch {}
+      const cookie = readCookie();
+      const saved = valid(cookie) ? cookie : (valid(legacy) ? legacy : null);
+      if (!valid(cookie) && valid(legacy)) save(legacy);
+      const hour = new Date().getHours();
+      const theme = saved || (hour >= 7 && hour < 19 ? 'light' : 'dark');
+      document.documentElement.dataset.theme = theme;
+      document.documentElement.style.colorScheme = theme;
+      document.querySelector('meta[name="theme-color"]').content = theme === 'dark' ? '#15231d' : '#f4f1e8';
+      window.YANGJM_THEME = { read: readCookie, save, valid };
+    })();
+  </script><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/styles.css?v=20260916"><link rel="stylesheet" href="/subsites.css?v=20260916"><link rel="stylesheet" href="/blog.css?v=20261006b"><script src="/subsites.js?v=20260916" defer></script><script src="/visits.js?v=20260928b" defer></script><script>window.MathJax={tex:{inlineMath:[["$","$"],["\\(","\\)"]],displayMath:[["$$","$$"],["\\[","\\]"]],packages:{"[+]": ["ams"]},tags:"ams"},options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},chtml:{scale:1}};</script><script defer src="/vendor/mathjax/tex-chtml.js"></script><link rel="stylesheet" href="/navigation.css?v=20260921a"></head><body class="subsite blog-article"><a class="skip-link" href="#content">跳到正文</a><header id="site-navigation" class="site-nav-header"><a class="brand" href="https://yangjm.cn/" aria-label="yangjm 个人主页">y<span>.</span></a><nav aria-label="主导航"><a data-section="home" href="https://yangjm.cn/">主页</a><a data-section="blog" aria-current="page" href="https://blog.yangjm.cn/">博客</a><a data-section="oi" href="https://oi.yangjm.cn/">竞赛</a><a data-section="notebook" href="https://banzi.yangjm.cn/">板子</a><a data-section="materials" href="https://materials.yangjm.cn/">资料</a></nav><button class="theme-toggle" id="theme-toggle" type="button" aria-label="切换到夜间模式" aria-pressed="false" title="切换到夜间模式">
+    <svg class="theme-icon moon-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M20.6 15.4A9 9 0 0 1 8.6 3.4 9 9 0 1 0 20.6 15.4Z"/></svg>
+    <svg class="theme-icon sun-icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v2.2M12 19.8V22M4.9 4.9l1.6 1.6m11 11 1.6 1.6M2 12h2.2M19.8 12H22M4.9 19.1l1.6-1.6m11-11 1.6-1.6"/></svg>
+  </button></header><main id="content" class="article-shell"><article class="article-page"><nav class="breadcrumb" aria-label="面包屑"><a href="https://blog.yangjm.cn/">文字与记录</a><span aria-hidden="true">/</span><span>多项式与数论变换</span></nav><header class="article-header"><h1>多项式与数论变换</h1><p>整理插值、FFT、NTT、形式幂级数、线性递推与数论变换。</p><div class="article-meta"><time datetime="2026-10-06">2026年10月6日</time><span>29 分钟阅读</span><span>数学 · 多项式与数论</span><span data-visit-label>阅读：<span data-visit-current="polynomials-number-theory-transforms">…</span></span></div></header><details class="mobile-toc"><summary>文章目录</summary><ol><li class="toc-level-2"><a href="#section-多项式">多项式</a></li><li class="toc-level-2"><a href="#section-插值">插值</a></li><li class="toc-level-2"><a href="#section-范德蒙德行列式">范德蒙德行列式</a></li><li class="toc-level-2"><a href="#section-拉格朗日插值">拉格朗日插值</a></li><li class="toc-level-2"><a href="#section-快速傅里叶变换">快速傅里叶变换</a></li><li class="toc-level-3"><a href="#section-单位根">单位根</a></li><li class="toc-level-3"><a href="#section-离散傅里叶变换">离散傅里叶变换</a></li><li class="toc-level-3"><a href="#section-逆变换">逆变换</a></li><li class="toc-level-3"><a href="#section-多项式乘法">多项式乘法</a></li><li class="toc-level-2"><a href="#section-快速数论变换">快速数论变换</a></li><li class="toc-level-3"><a href="#section-原根与单位根">原根与单位根</a></li><li class="toc-level-3"><a href="#section-正变换与逆变换">正变换与逆变换</a></li><li class="toc-level-3"><a href="#section-模数的限制">模数的限制</a></li><li class="toc-level-2"><a href="#section-多项式卷积与循环卷积">多项式卷积与循环卷积</a></li><li class="toc-level-2"><a href="#section-形式幂级数">形式幂级数</a></li><li class="toc-level-2"><a href="#section-多项式求逆">多项式求逆</a></li><li class="toc-level-2"><a href="#section-多项式求导与积分">多项式求导与积分</a></li><li class="toc-level-2"><a href="#section-多项式牛顿迭代">多项式牛顿迭代</a></li><li class="toc-level-2"><a href="#section-多项式对数">多项式对数</a></li><li class="toc-level-2"><a href="#section-多项式指数">多项式指数</a></li><li class="toc-level-2"><a href="#section-多项式开方">多项式开方</a></li><li class="toc-level-2"><a href="#section-多项式快速幂">多项式快速幂</a></li><li class="toc-level-2"><a href="#section-多项式除法与取模">多项式除法与取模</a></li><li class="toc-level-2"><a href="#section-多点求值">多点求值</a></li><li class="toc-level-2"><a href="#section-快速插值">快速插值</a></li><li class="toc-level-2"><a href="#section-任意模数卷积">任意模数卷积</a></li><li class="toc-level-3"><a href="#section-中国剩余定理合并">中国剩余定理合并</a></li><li class="toc-level-3"><a href="#section-拆系数">拆系数</a></li><li class="toc-level-2"><a href="#section-分治-fft">分治 FFT</a></li><li class="toc-level-2"><a href="#section-线性递推与多项式取模">线性递推与多项式取模</a></li><li class="toc-level-2"><a href="#section-bostan-mori">Bostan–Mori</a></li><li class="toc-level-2"><a href="#section-快速沃尔什变换">快速沃尔什变换</a></li><li class="toc-level-3"><a href="#section-按位或卷积">按位或卷积</a></li><li class="toc-level-3"><a href="#section-按位与卷积">按位与卷积</a></li><li class="toc-level-3"><a href="#section-按位异或卷积">按位异或卷积</a></li><li class="toc-level-2"><a href="#section-积性函数">积性函数</a></li><li class="toc-level-3"><a href="#section-恒等函数">恒等函数</a></li><li class="toc-level-3"><a href="#section-元函数">元函数</a></li><li class="toc-level-3"><a href="#section-单位函数">单位函数</a></li><li class="toc-level-3"><a href="#section-约数个数函数">约数个数函数</a></li><li class="toc-level-3"><a href="#section-除数函数">除数函数</a></li><li class="toc-level-3"><a href="#section-欧拉函数">欧拉函数</a></li><li class="toc-level-3"><a href="#section-莫比乌斯函数">莫比乌斯函数</a></li><li class="toc-level-2"><a href="#section-莫比乌斯反演">莫比乌斯反演</a></li></ol></details><div class="article-layout"><aside class="article-toc" aria-label="文章目录"><strong>文章目录</strong><ol><li class="toc-level-2"><a href="#section-多项式">多项式</a></li><li class="toc-level-2"><a href="#section-插值">插值</a></li><li class="toc-level-2"><a href="#section-范德蒙德行列式">范德蒙德行列式</a></li><li class="toc-level-2"><a href="#section-拉格朗日插值">拉格朗日插值</a></li><li class="toc-level-2"><a href="#section-快速傅里叶变换">快速傅里叶变换</a></li><li class="toc-level-3"><a href="#section-单位根">单位根</a></li><li class="toc-level-3"><a href="#section-离散傅里叶变换">离散傅里叶变换</a></li><li class="toc-level-3"><a href="#section-逆变换">逆变换</a></li><li class="toc-level-3"><a href="#section-多项式乘法">多项式乘法</a></li><li class="toc-level-2"><a href="#section-快速数论变换">快速数论变换</a></li><li class="toc-level-3"><a href="#section-原根与单位根">原根与单位根</a></li><li class="toc-level-3"><a href="#section-正变换与逆变换">正变换与逆变换</a></li><li class="toc-level-3"><a href="#section-模数的限制">模数的限制</a></li><li class="toc-level-2"><a href="#section-多项式卷积与循环卷积">多项式卷积与循环卷积</a></li><li class="toc-level-2"><a href="#section-形式幂级数">形式幂级数</a></li><li class="toc-level-2"><a href="#section-多项式求逆">多项式求逆</a></li><li class="toc-level-2"><a href="#section-多项式求导与积分">多项式求导与积分</a></li><li class="toc-level-2"><a href="#section-多项式牛顿迭代">多项式牛顿迭代</a></li><li class="toc-level-2"><a href="#section-多项式对数">多项式对数</a></li><li class="toc-level-2"><a href="#section-多项式指数">多项式指数</a></li><li class="toc-level-2"><a href="#section-多项式开方">多项式开方</a></li><li class="toc-level-2"><a href="#section-多项式快速幂">多项式快速幂</a></li><li class="toc-level-2"><a href="#section-多项式除法与取模">多项式除法与取模</a></li><li class="toc-level-2"><a href="#section-多点求值">多点求值</a></li><li class="toc-level-2"><a href="#section-快速插值">快速插值</a></li><li class="toc-level-2"><a href="#section-任意模数卷积">任意模数卷积</a></li><li class="toc-level-3"><a href="#section-中国剩余定理合并">中国剩余定理合并</a></li><li class="toc-level-3"><a href="#section-拆系数">拆系数</a></li><li class="toc-level-2"><a href="#section-分治-fft">分治 FFT</a></li><li class="toc-level-2"><a href="#section-线性递推与多项式取模">线性递推与多项式取模</a></li><li class="toc-level-2"><a href="#section-bostan-mori">Bostan–Mori</a></li><li class="toc-level-2"><a href="#section-快速沃尔什变换">快速沃尔什变换</a></li><li class="toc-level-3"><a href="#section-按位或卷积">按位或卷积</a></li><li class="toc-level-3"><a href="#section-按位与卷积">按位与卷积</a></li><li class="toc-level-3"><a href="#section-按位异或卷积">按位异或卷积</a></li><li class="toc-level-2"><a href="#section-积性函数">积性函数</a></li><li class="toc-level-3"><a href="#section-恒等函数">恒等函数</a></li><li class="toc-level-3"><a href="#section-元函数">元函数</a></li><li class="toc-level-3"><a href="#section-单位函数">单位函数</a></li><li class="toc-level-3"><a href="#section-约数个数函数">约数个数函数</a></li><li class="toc-level-3"><a href="#section-除数函数">除数函数</a></li><li class="toc-level-3"><a href="#section-欧拉函数">欧拉函数</a></li><li class="toc-level-3"><a href="#section-莫比乌斯函数">莫比乌斯函数</a></li><li class="toc-level-2"><a href="#section-莫比乌斯反演">莫比乌斯反演</a></li></ol><a class="source-link" href="https://github.com/yangjm2006/Blog/blob/main/Note/%E5%A4%9A%E9%A1%B9%E5%BC%8F%E4%B8%8E%E6%95%B0%E8%AE%BA%E5%8F%98%E6%8D%A2.md" target="_blank" rel="noopener noreferrer">查看 Markdown 原文 <span aria-hidden="true">↗</span></a></aside><div class="article-body"><h2 id="section-多项式">多项式<a class="heading-anchor" href="#section-多项式" aria-label="链接到多项式">#</a></h2>
+<div class="math-block">$$最基础的数学对象.$$</div>
+<ul><li>数系（自然数、整数、有理数、实数、复数）</li><li>代数结构（群、环、域、向量空间）</li></ul>
+<p>多项式是连接它们的第一个纽带.</p>
+<h2 id="section-插值">插值<a class="heading-anchor" href="#section-插值" aria-label="链接到插值">#</a></h2>
+<p>给定 <span class="math-inline">$n$</span> 个 <span class="math-inline">$x$</span> 坐标不同的点，恰好可以用唯一的 <span class="math-inline">$n-1$</span> 次多项式穿过.</p>
+<p>相应地，一个 <span class="math-inline">$n-1$</span> 次多项式，可以由 <span class="math-inline">$n$</span> 个 <span class="math-inline">$x$</span> 坐标不同的点确定.</p>
+<h2 id="section-范德蒙德行列式">范德蒙德行列式<a class="heading-anchor" href="#section-范德蒙德行列式" aria-label="链接到范德蒙德行列式">#</a></h2>
+<p>形如以下形式的行列式，称为范德蒙德行列式：</p>
+<div class="math-block">$$D_n=
+\begin{vmatrix}
+1&amp;x_0&amp;x_0^2&amp;\cdots&amp;x_0^{n-1}\\
+1&amp;x_1&amp;x_1^2&amp;\cdots&amp;x_1^{n-1}\\
+\vdots&amp;\vdots&amp;\vdots&amp;&amp;\vdots\\
+1&amp;x_{n-1}&amp;x_{n-1}^2&amp;\cdots&amp;x_{n-1}^{n-1}
+\end{vmatrix}
+=\prod_{0\leq i&lt;j&lt;n}(x_j-x_i)$$</div>
+<p>证明如下：</p>
+<p>将 <span class="math-inline">$D_n$</span> 看作关于 <span class="math-inline">$x_{n-1}$</span> 的多项式，其次数不超过 <span class="math-inline">$n-1$</span> .</p>
+<p>当 <span class="math-inline">$x_{n-1}=x_i$</span> ，其中 <span class="math-inline">$0\leq i&lt;n-1$</span> 时，行列式中存在两行相同，故 <span class="math-inline">$D_n=0$</span> .</p>
+<p>因此，</p>
+<div class="math-block">$$D_n=C\prod_{i=0}^{n-2}(x_{n-1}-x_i)$$</div>
+<p>按最后一行展开，<span class="math-inline">$x_{n-1}^{n-1}$</span> 的系数为 <span class="math-inline">$D_{n-1}$</span> ，即 <span class="math-inline">$C=D_{n-1}$</span> .</p>
+<p>又，<span class="math-inline">$D_1=1$</span> ，递推得到：</p>
+<div class="math-block">$$D_n=\prod_{0\leq i&lt;j&lt;n}(x_j-x_i)$$</div>
+<p>特别地，当所有 <span class="math-inline">$x_i$</span> 两两不同时，<span class="math-inline">$D_n\neq0$</span> .</p>
+<p>设，</p>
+<div class="math-block">$$f(x)=\sum_{j=0}^{n-1}a_jx^j$$</div>
+<p>给定 <span class="math-inline">$n$</span> 个横坐标两两不同的点 <span class="math-inline">$(x_i,y_i)$</span> ，求 <span class="math-inline">$f(x_i)=y_i$</span> 等价于求解：</p>
+<div class="math-block">$$\begin{pmatrix}
+1&amp;x_0&amp;\cdots&amp;x_0^{n-1}\\
+1&amp;x_1&amp;\cdots&amp;x_1^{n-1}\\
+\vdots&amp;\vdots&amp;&amp;\vdots\\
+1&amp;x_{n-1}&amp;\cdots&amp;x_{n-1}^{n-1}
+\end{pmatrix}
+\begin{pmatrix}a_0\\a_1\\\vdots\\a_{n-1}\end{pmatrix}
+=\begin{pmatrix}y_0\\y_1\\\vdots\\y_{n-1}\end{pmatrix}$$</div>
+<p>系数矩阵的行列式非零，故方程组有唯一解.</p>
+<p>即，<span class="math-inline">$n$</span> 个横坐标两两不同的点，唯一确定一个次数不超过 <span class="math-inline">$n-1$</span> 的多项式.</p>
+<p>这里的运算在域上进行，如实数域、复数域或模质数 <span class="math-inline">$p$</span> 的有限域. 在有限域中，“不同”指模 <span class="math-inline">$p$</span> 意义下不同.</p>
+<h2 id="section-拉格朗日插值">拉格朗日插值<a class="heading-anchor" href="#section-拉格朗日插值" aria-label="链接到拉格朗日插值">#</a></h2>
+<p>已知 <span class="math-inline">$n$</span> 个点 <span class="math-inline">$(x_i,y_i)$</span> ，其中 <span class="math-inline">$x_i$</span> 两两不同，求次数不超过 <span class="math-inline">$n-1$</span> 的多项式 <span class="math-inline">$f(x)$</span> .</p>
+<p>考虑构造 <span class="math-inline">$n$</span> 个多项式，使第 <span class="math-inline">$i$</span> 个多项式仅在 <span class="math-inline">$x_i$</span> 处取值为 <span class="math-inline">$1$</span> ，在其他给定横坐标处取值为 <span class="math-inline">$0$</span> .</p>
+<p>设，</p>
+<div class="math-block">$$L_i(x)=\prod_{\substack{0\leq j&lt;n\\j\neq i}}\frac{x-x_j}{x_i-x_j}$$</div>
+<p>则，</p>
+<div class="math-block">$$L_i(x_j)=[i=j]$$</div>
+<p>故，</p>
+<div class="math-block">$$f(x)=\sum_{i=0}^{n-1}y_iL_i(x)
+=\sum_{i=0}^{n-1}y_i\prod_{\substack{0\leq j&lt;n\\j\neq i}}\frac{x-x_j}{x_i-x_j}$$</div>
+<p>每一项的次数不超过 <span class="math-inline">$n-1$</span> ，且在 <span class="math-inline">$x_i$</span> 处仅剩下第 <span class="math-inline">$i$</span> 项，其值为 <span class="math-inline">$y_i$</span> . 根据插值唯一性，这就是所求多项式.</p>
+<p>直接代入求某个 <span class="math-inline">$f(k)$</span> ，需要 <span class="math-inline">$O(n^2)$</span> 次域运算. 这里求的是一个点的值，不必展开多项式的所有系数.</p>
+<h4 id="section-连续点值插值">连续点值插值<a class="heading-anchor" href="#section-连续点值插值" aria-label="链接到连续点值插值">#</a></h4>
+<p>特别地，当 <span class="math-inline">$x_i=i$</span> ，即已知 <span class="math-inline">$f(0),f(1),\dots,f(n-1)$</span> 时，</p>
+<div class="math-block">$$\begin{aligned}
+\prod_{\substack{0\leq j&lt;n\\j\neq i}}(i-j)
+&amp;=\left(\prod_{j=0}^{i-1}(i-j)\right)\left(\prod_{j=i+1}^{n-1}(i-j)\right)\\
+&amp;=i!\cdot(-1)^{n-1-i}(n-1-i)!
+\end{aligned}$$</div>
+<p>分子可以利用前缀积和后缀积求出.</p>
+<p>设，</p>
+<div class="math-block">$$P_i=\prod_{j=0}^{i-1}(k-j),\qquad S_i=\prod_{j=i}^{n-1}(k-j)$$</div>
+<p>其中 <span class="math-inline">$P_0=S_n=1$</span> ，则，</p>
+<div class="math-block">$$P_{i+1}=P_i(k-i),\qquad S_i=(k-i)S_{i+1}$$</div>
+<p>故，</p>
+<div class="math-block">$$f(k)=\sum_{i=0}^{n-1}\frac{(-1)^{n-1-i}y_iP_iS_{i+1}}{i!(n-1-i)!}$$</div>
+<p>预处理阶乘及其逆元后，每次求值的时间复杂度为 <span class="math-inline">$O(n)$</span> ，空间复杂度为 <span class="math-inline">$O(n)$</span> .</p>
+<p>在模质数 <span class="math-inline">$p$</span> 意义下：</p>
+<ul><li>要求 <span class="math-inline">$n\leq p$</span> ，保证给定横坐标互不相同，且分母非零.</li><li>除法转化为乘逆元，<span class="math-inline">$a^{-1}\equiv a^{p-2}\pmod p$</span> ，其中 <span class="math-inline">$a\not\equiv0\pmod p$</span> .</li><li>若 <span class="math-inline">$k\equiv i\pmod p$</span> ，其中 <span class="math-inline">$0\leq i&lt;n$</span> ，可以直接返回 <span class="math-inline">$y_i$</span> .</li><li>先求 <span class="math-inline">$(n-1)!$</span> 的逆元，再倒序递推其他阶乘逆元，预处理需要 <span class="math-inline">$O(n+\log p)$</span> 时间.</li></ul>
+<h2 id="section-快速傅里叶变换">快速傅里叶变换<a class="heading-anchor" href="#section-快速傅里叶变换" aria-label="链接到快速傅里叶变换">#</a></h2>
+<p>多项式有两种常用的表示方式：</p>
+<ul><li>系数表示：<span class="math-inline">$f(x)=\sum_{i=0}^{n-1}a_ix^i$</span> .</li><li>点值表示：在 <span class="math-inline">$n$</span> 个不同的横坐标处，记录 <span class="math-inline">$f(x)$</span> 的值.</li></ul>
+<p>系数表示便于加减，点值表示便于乘法.</p>
+<p>设 <span class="math-inline">$C(x)=A(x)B(x)$</span> ，则对任意 <span class="math-inline">$x_k$</span> 均有：</p>
+<div class="math-block">$$C(x_k)=A(x_k)B(x_k)$$</div>
+<p>因此，多项式乘法可以转化为：</p>
+<div class="math-block">$$\text{系数表示}\ \longrightarrow\ \text{点值表示}\ \longrightarrow\ \text{逐点相乘}\ \longrightarrow\ \text{系数表示}$$</div>
+<p>直接求值和插值仍然较慢，需要选择一组具有特殊性质的点.</p>
+<h3 id="section-单位根">单位根<a class="heading-anchor" href="#section-单位根" aria-label="链接到单位根">#</a></h3>
+<p>方程 <span class="math-inline">$x^n=1$</span> 在复数域中有 <span class="math-inline">$n$</span> 个不同的根，称为 <span class="math-inline">$n$</span> 次单位根.</p>
+<p>记，</p>
+<div class="math-block">$$\omega_n=e^{\frac{2\pi\mathrm{i}}n}=\cos\frac{2\pi}n+\mathrm{i}\sin\frac{2\pi}n$$</div>
+<p>其中 <span class="math-inline">$\mathrm{i}^2=-1$</span> ，则所有 <span class="math-inline">$n$</span> 次单位根为：</p>
+<div class="math-block">$$1,\omega_n,\omega_n^2,\dots,\omega_n^{n-1}$$</div>
+<p>具有以下性质：</p>
+<div class="math-block">$$\omega_n^{k+n}=\omega_n^k$$</div>
+<p>当 <span class="math-inline">$n$</span> 为偶数时，</p>
+<div class="math-block">$$\omega_n^{k+n/2}=-\omega_n^k,\qquad \omega_n^{2k}=\omega_{n/2}^k$$</div>
+<p>即，相隔 <span class="math-inline">$n/2$</span> 的两个单位根互为相反数；所有单位根平方后，只剩下 <span class="math-inline">$n/2$</span> 个不同的值.</p>
+<h3 id="section-离散傅里叶变换">离散傅里叶变换<a class="heading-anchor" href="#section-离散傅里叶变换" aria-label="链接到离散傅里叶变换">#</a></h3>
+<p>取 <span class="math-inline">$n$</span> 为 <span class="math-inline">$2$</span> 的幂，设，</p>
+<div class="math-block">$$f(x)=\sum_{j=0}^{n-1}a_jx^j$$</div>
+<p>求出 <span class="math-inline">$f(x)$</span> 在所有 <span class="math-inline">$n$</span> 次单位根处的值：</p>
+<div class="math-block">$$y_k=f(\omega_n^k)=\sum_{j=0}^{n-1}a_j\omega_n^{kj},\qquad 0\leq k&lt;n$$</div>
+<p>这一变换称为离散傅里叶变换，即 DFT . 快速傅里叶变换，即 FFT ，是快速计算 DFT 的算法.</p>
+<p>按系数下标的奇偶性拆分：</p>
+<div class="math-block">$$f_0(x)=\sum_{j=0}^{n/2-1}a_{2j}x^j,\qquad f_1(x)=\sum_{j=0}^{n/2-1}a_{2j+1}x^j$$</div>
+<p>则，</p>
+<div class="math-block">$$f(x)=f_0(x^2)+xf_1(x^2)$$</div>
+<p>对于 <span class="math-inline">$0\leq k&lt;n/2$</span> ，有：</p>
+<div class="math-block">$$\begin{aligned}
+f(\omega_n^k)&amp;=f_0(\omega_{n/2}^k)+\omega_n^kf_1(\omega_{n/2}^k)\\
+f(\omega_n^{k+n/2})&amp;=f_0(\omega_{n/2}^k)-\omega_n^kf_1(\omega_{n/2}^k)
+\end{aligned}$$</div>
+<p>故，只需递归求出两个规模为 <span class="math-inline">$n/2$</span> 的 DFT ，再用 <span class="math-inline">$O(n)$</span> 时间合并.</p>
+<div class="math-block">$$T(n)=2T(n/2)+O(n)=O(n\log n)$$</div>
+<p>当 <span class="math-inline">$n=1$</span> 时，多项式为常数，直接返回该系数.</p>
+<h3 id="section-逆变换">逆变换<a class="heading-anchor" href="#section-逆变换" aria-label="链接到逆变换">#</a></h3>
+<p>单位根满足：</p>
+<div class="math-block">$$\sum_{k=0}^{n-1}\omega_n^{kt}=
+\begin{cases}
+n,&amp;n\mid t,\\
+0,&amp;n\nmid t.
+\end{cases}$$</div>
+<p>当 <span class="math-inline">$n\nmid t$</span> 时，由等比数列求和：</p>
+<div class="math-block">$$\sum_{k=0}^{n-1}\omega_n^{kt}=\frac{1-\omega_n^{nt}}{1-\omega_n^t}=0$$</div>
+<p>因此，对于 <span class="math-inline">$0\leq j&lt;n$</span> ，</p>
+<div class="math-block">$$\begin{aligned}
+\sum_{k=0}^{n-1}y_k\omega_n^{-kj}
+&amp;=\sum_{r=0}^{n-1}a_r\sum_{k=0}^{n-1}\omega_n^{k(r-j)}\\
+&amp;=na_j
+\end{aligned}$$</div>
+<p>即，</p>
+<div class="math-block">$$a_j=\frac1n\sum_{k=0}^{n-1}y_k\omega_n^{-kj}$$</div>
+<p>将单位根替换为其逆元，执行同样的 FFT ，最后将每一项除以 <span class="math-inline">$n$</span> ，即可完成逆变换，即 IFFT .</p>
+<h3 id="section-多项式乘法">多项式乘法<a class="heading-anchor" href="#section-多项式乘法" aria-label="链接到多项式乘法">#</a></h3>
+<p>设 <span class="math-inline">$A(x),B(x)$</span> 分别有 <span class="math-inline">$r,s$</span> 个系数，则乘积有至多 <span class="math-inline">$r+s-1$</span> 个系数.</p>
+<p>取满足 <span class="math-inline">$n\geq r+s-1$</span> 的最小的 <span class="math-inline">$2$</span> 的幂，将两个系数数组补零至长度 <span class="math-inline">$n$</span> .</p>
+<ul><li>分别对两个数组进行 FFT .</li><li>将对应点值相乘，得到乘积多项式的点值.</li><li>进行 IFFT ，取前 <span class="math-inline">$r+s-1$</span> 项，即为乘积的系数.</li></ul>
+<p>时间复杂度为 <span class="math-inline">$O(n\log n)$</span> ，空间复杂度为 <span class="math-inline">$O(n)$</span> .</p>
+<p>需要注意：</p>
+<ul><li>补零长度必须足够，否则得到的是模 <span class="math-inline">$x^n-1$</span> 意义下的乘积，即循环卷积.</li><li>复数 FFT 存在浮点误差. 整数卷积通常将结果四舍五入，但只有误差小于 <span class="math-inline">$1/2$</span> 时才能保证恢复正确整数.</li><li>常见的迭代实现先进行二进制位逆序置换，再按 <span class="math-inline">$2,4,8,\dots,n$</span> 的长度合并，每层使用对应长度的单位根.</li></ul>
+<h2 id="section-快速数论变换">快速数论变换<a class="heading-anchor" href="#section-快速数论变换" aria-label="链接到快速数论变换">#</a></h2>
+<p>FFT 利用复数域中的单位根，NTT 则利用模质数意义下的单位根.</p>
+<p>所有运算均在模 <span class="math-inline">$p$</span> 意义下进行，可以避免浮点误差.</p>
+<h3 id="section-原根与单位根">原根与单位根<a class="heading-anchor" href="#section-原根与单位根" aria-label="链接到原根与单位根">#</a></h3>
+<p>设 <span class="math-inline">$p$</span> 为质数. 若 <span class="math-inline">$g$</span> 的幂能够遍历模 <span class="math-inline">$p$</span> 的所有非零元素，则称 <span class="math-inline">$g$</span> 为模 <span class="math-inline">$p$</span> 的原根.</p>
+<p>即，<span class="math-inline">$g$</span> 的乘法阶为 <span class="math-inline">$p-1$</span> ，满足：</p>
+<div class="math-block">$$g^t\equiv1\pmod p\iff(p-1)\mid t$$</div>
+<p>若 <span class="math-inline">$n\mid(p-1)$</span> ，令，</p>
+<div class="math-block">$$\omega_n=g^{\frac{p-1}{n}}\pmod p$$</div>
+<p>则 <span class="math-inline">$\omega_n$</span> 的阶恰为 <span class="math-inline">$n$</span> . 因为，</p>
+<div class="math-block">$$\omega_n^t\equiv1\pmod p\iff(p-1)\mid\frac{p-1}{n}t\iff n\mid t$$</div>
+<p>故 <span class="math-inline">$1,\omega_n,\dots,\omega_n^{n-1}$</span> 两两不同，可以作为求值点.</p>
+<p>对于奇质数 <span class="math-inline">$p$</span> 和偶数 <span class="math-inline">$n\mid(p-1)$</span> ，同样有：</p>
+<div class="math-block">$$\omega_n^{n/2}\equiv-1\pmod p,\qquad \omega_n^2\equiv\omega_{n/2}\pmod p$$</div>
+<p>因此，FFT 中按奇偶下标拆分、递归求值和合并的过程，在这里仍然成立.</p>
+<h3 id="section-正变换与逆变换">正变换与逆变换<a class="heading-anchor" href="#section-正变换与逆变换" aria-label="链接到正变换与逆变换">#</a></h3>
+<p>正变换为：</p>
+<div class="math-block">$$y_k\equiv\sum_{j=0}^{n-1}a_j\omega_n^{kj}\pmod p$$</div>
+<p>同样利用单位根求和性质，可以得到逆变换：</p>
+<div class="math-block">$$a_j\equiv n^{-1}\sum_{k=0}^{n-1}y_k\omega_n^{-kj}\pmod p$$</div>
+<p>其中，</p>
+<div class="math-block">$$n^{-1}\equiv n^{p-2}\pmod p,\qquad \omega_n^{-1}\equiv\omega_n^{p-2}\pmod p$$</div>
+<p>即，将单位根换为其逆元，执行同样的变换，最后乘上 <span class="math-inline">$n^{-1}$</span> .</p>
+<p>多项式乘法的流程与 FFT 相同：补零、正变换、逐点相乘、逆变换.</p>
+<p>对于长度为 <span class="math-inline">$n$</span> 的变换，时间复杂度为 <span class="math-inline">$O(n\log n)$</span> ，空间复杂度为 <span class="math-inline">$O(n)$</span> .</p>
+<h3 id="section-模数的限制">模数的限制<a class="heading-anchor" href="#section-模数的限制" aria-label="链接到模数的限制">#</a></h3>
+<p>采用按奇偶拆分的算法时，需要 <span class="math-inline">$n=2^k$</span> ，且 <span class="math-inline">$n\mid(p-1)$</span> .</p>
+<p>因此，常选择形如 <span class="math-inline">$p=c\cdot2^s+1$</span> 的质数，使其支持长度不超过 <span class="math-inline">$2^s$</span> 的二次幂变换.</p>
+<p>常用模数为：</p>
+<div class="math-block">$$p=998244353=119\cdot2^{23}+1$$</div>
+<p>其一个原根为 <span class="math-inline">$g=3$</span> ，故支持的最大二次幂变换长度为 <span class="math-inline">$2^{23}$</span> .</p>
+<p>需要注意：</p>
+<ul><li>补零后的长度既要不小于乘积的系数个数，也要满足 <span class="math-inline">$n\mid(p-1)$</span> .</li><li>长度为 <span class="math-inline">$\ell$</span> 的合并使用 <span class="math-inline">$g^{(p-1)/\ell}$</span> 作为单位根，逆变换使用它的逆元.</li><li>NTT 得到的是模 <span class="math-inline">$p$</span> 的卷积结果. 若要求整数卷积，仅用一个模数可能无法恢复原值.</li><li>若目标模数不支持所需长度，不能直接套用该 NTT . 可以在多个合适的质数下计算，再通过中国剩余定理合并；恢复整数后再取目标模数时，所用模数的乘积必须足以唯一确定真实系数.</li><li>模乘使用足够宽的整数类型，模减后将结果调整到 <span class="math-inline">$[0,p)$</span> .</li></ul>
+<h2 id="section-多项式卷积与循环卷积">多项式卷积与循环卷积<a class="heading-anchor" href="#section-多项式卷积与循环卷积" aria-label="链接到多项式卷积与循环卷积">#</a></h2>
+<p>设，</p>
+<div class="math-block">$$A(x)=\sum_{i=0}^{r-1}a_ix^i,\qquad B(x)=\sum_{j=0}^{s-1}b_jx^j$$</div>
+<p>则，</p>
+<div class="math-block">$$C(x)=A(x)B(x)=\sum_{k=0}^{r+s-2}\left(\sum_{i+j=k}a_ib_j\right)x^k$$</div>
+<p>即，普通卷积对应下标相加.</p>
+<p>若只需要前 <span class="math-inline">$n$</span> 项，则计算：</p>
+<div class="math-block">$$C(x)\equiv A(x)B(x)\pmod{x^n}$$</div>
+<p>这里模 <span class="math-inline">$x^n$</span> 表示舍去所有次数不小于 <span class="math-inline">$n$</span> 的项.</p>
+<p>而长度为 <span class="math-inline">$n$</span> 的 DFT 中，求值点均满足 <span class="math-inline">$x^n=1$</span> ，故无法区分 <span class="math-inline">$x^k$</span> 与 <span class="math-inline">$x^{k+n}$</span> .</p>
+<p>正变换、逐点相乘、逆变换后，实际得到：</p>
+<div class="math-block">$$C(x)\equiv A(x)B(x)\pmod{x^n-1}$$</div>
+<p>其系数为：</p>
+<div class="math-block">$$c_k=\sum_{i+j\equiv k\pmod n}a_ib_j$$</div>
+<p>称为循环卷积.</p>
+<p>因此，普通卷积需要补零至不小于 <span class="math-inline">$r+s-1$</span> 的变换长度，保证高次项不会回绕到低次项.</p>
+<p>特别地，即使只保留乘积的前 <span class="math-inline">$n$</span> 项，也不能直接使用长度为 <span class="math-inline">$n$</span> 的循环卷积代替. 一般先计算足够长度的普通卷积，再截断.</p>
+<h2 id="section-形式幂级数">形式幂级数<a class="heading-anchor" href="#section-形式幂级数" aria-label="链接到形式幂级数">#</a></h2>
+<div class="math-block">$$A(x)=\sum_{i=0}^{+\infty}a_ix^i$$</div>
+<p>将 <span class="math-inline">$x$</span> 看作形式符号，只关心每一项的系数，不要求代入某个数后收敛.</p>
+<p>记，</p>
+<div class="math-block">$$[x^k]A(x)=a_k$$</div>
+<p>则两个形式幂级数相等，当且仅当对应系数全部相等.</p>
+<p>乘法定义为：</p>
+<div class="math-block">$$[x^k](A(x)B(x))=\sum_{i=0}^{k}a_ib_{k-i}$$</div>
+<p>每一项只涉及有限次运算，因此不需要讨论无穷求和的收敛性.</p>
+<p>在算法中，通常只计算前 <span class="math-inline">$n$</span> 项，即模 <span class="math-inline">$x^n$</span> 意义下的结果.</p>
+<p>以下将精度为 <span class="math-inline">$n$</span> 理解为已知 <span class="math-inline">$0,1,\dots,n-1$</span> 次项，并记长度为 <span class="math-inline">$n$</span> 量级的多项式乘法复杂度为：</p>
+<div class="math-block">$$M(n)=O(n\log n)$$</div>
+<p>模质数 <span class="math-inline">$p$</span> 运算时，涉及积分、<span class="math-inline">$\ln$</span>、<span class="math-inline">$\exp$</span> 的常规算法取 <span class="math-inline">$n\leq p$</span> ，使 <span class="math-inline">$1,2,\dots,n-1$</span> 均可逆. NTT 的变换长度限制仍需单独满足.</p>
+<h2 id="section-多项式求逆">多项式求逆<a class="heading-anchor" href="#section-多项式求逆" aria-label="链接到多项式求逆">#</a></h2>
+<p>给定 <span class="math-inline">$A(x)$</span> ，求 <span class="math-inline">$B(x)$</span> ，使得：</p>
+<div class="math-block">$$A(x)B(x)\equiv1\pmod{x^n}$$</div>
+<p>存在逆元的充要条件为 <span class="math-inline">$a_0\neq0$</span> . 这里系数在域上运算；一般环上则要求 <span class="math-inline">$a_0$</span> 可逆.</p>
+<p>比较常数项，有：</p>
+<div class="math-block">$$b_0=a_0^{-1}$$</div>
+<p>比较 <span class="math-inline">$k$</span> 次项，有：</p>
+<div class="math-block">$$b_k=-a_0^{-1}\sum_{i=1}^{k}a_ib_{k-i}$$</div>
+<p>故逆元存在且唯一，但逐项计算需要 <span class="math-inline">$O(n^2)$</span> 时间.</p>
+<p>考虑倍增.</p>
+<p>已知 <span class="math-inline">$B(x)$</span> 满足：</p>
+<div class="math-block">$$A(x)B(x)\equiv1\pmod{x^m}$$</div>
+<p>设误差 <span class="math-inline">$E(x)=1-A(x)B(x)$</span> ，则 <span class="math-inline">$x^m\mid E(x)$</span> ，从而 <span class="math-inline">$x^{2m}\mid E(x)^2$</span> .</p>
+<p>取，</p>
+<div class="math-block">$$B_{\mathrm{new}}(x)=B(x)(2-A(x)B(x))$$</div>
+<p>则，</p>
+<div class="math-block">$$\begin{aligned}
+A(x)B_{\mathrm{new}}(x)
+&amp;=A(x)B(x)(2-A(x)B(x))\\
+&amp;=(1-E(x))(1+E(x))\\
+&amp;=1-E(x)^2\\
+&amp;\equiv1\pmod{x^{2m}}
+\end{aligned}$$</div>
+<p>故，</p>
+<div class="math-block">$$B_{\mathrm{new}}\equiv B(2-AB)\pmod{x^{2m}}$$</div>
+<p>从 <span class="math-inline">$B=a_0^{-1}$</span> 开始，每次将精度翻倍，直到达到 <span class="math-inline">$n$</span> .</p>
+<p>时间复杂度为：</p>
+<div class="math-block">$$O(M(1)+M(2)+M(4)+\cdots+M(n))=O(M(n))=O(n\log n)$$</div>
+<p>每次只保留当前所需的系数；最后一次精度取 <span class="math-inline">$\min(2m,n)$</span> 即可.</p>
+<h2 id="section-多项式求导与积分">多项式求导与积分<a class="heading-anchor" href="#section-多项式求导与积分" aria-label="链接到多项式求导与积分">#</a></h2>
+<p>设，</p>
+<div class="math-block">$$A(x)=\sum_{i=0}^{n-1}a_ix^i$$</div>
+<p>则，</p>
+<div class="math-block">$$A'(x)=\sum_{i=1}^{n-1}ia_ix^{i-1}$$</div>
+<p>取积分常数为 <span class="math-inline">$0$</span> ，有：</p>
+<div class="math-block">$$\int A(x)\,\mathrm{d}x=\sum_{i=0}^{n-1}\frac{a_i}{i+1}x^{i+1}$$</div>
+<p>求导将系数乘上下标，再左移一位；积分将系数除以新下标，再右移一位.</p>
+<p>时间复杂度均为 <span class="math-inline">$O(n)$</span> ，积分需要相应整数的逆元.</p>
+<p>模质数 <span class="math-inline">$p$</span> 时，不能除以 <span class="math-inline">$p$</span> 的倍数. 计算结果模 <span class="math-inline">$x^n$</span> 只需积分到 <span class="math-inline">$x^{n-1}$</span> ，因此只需 <span class="math-inline">$1,2,\dots,n-1$</span> 可逆.</p>
+<p>需要注意精度：已知 <span class="math-inline">$A\pmod{x^n}$</span> ，只能确定 <span class="math-inline">$A'\pmod{x^{n-1}}$</span> .</p>
+<h2 id="section-多项式牛顿迭代">多项式牛顿迭代<a class="heading-anchor" href="#section-多项式牛顿迭代" aria-label="链接到多项式牛顿迭代">#</a></h2>
+<p>多项式求逆中的倍增，可以推广到方程求解.</p>
+<p>设要解关于未知级数 <span class="math-inline">$B$</span> 的方程：</p>
+<div class="math-block">$$F(B)=0$$</div>
+<p>已知 <span class="math-inline">$B$</span> 正确到模 <span class="math-inline">$x^m$</span> ，设新的解为 <span class="math-inline">$B+\Delta$</span> ，其中 <span class="math-inline">$x^m\mid\Delta$</span> .</p>
+<p>对于关于 <span class="math-inline">$B$</span> 的多项式 <span class="math-inline">$F$</span> ，展开得到：</p>
+<div class="math-block">$$F(B+\Delta)\equiv F(B)+F'(B)\Delta\pmod{x^{2m}}$$</div>
+<p>因为所有含 <span class="math-inline">$\Delta^2$</span> 的项均为 <span class="math-inline">$x^{2m}$</span> 的倍数.</p>
+<p>若 <span class="math-inline">$F'(B)$</span> 可逆，则，</p>
+<div class="math-block">$$\Delta\equiv-\frac{F(B)}{F'(B)}\pmod{x^{2m}}$$</div>
+<p>故，</p>
+<div class="math-block">$$B_{\mathrm{new}}\equiv B-\frac{F(B)}{F'(B)}\pmod{x^{2m}}$$</div>
+<p>其中 <span class="math-inline">$F'(B)$</span> 是对未知量 <span class="math-inline">$B$</span> 求导，不是对 <span class="math-inline">$x$</span> 求导. 对适用的形式幂级数函数，也可以在相应系数可除的截断精度内使用这一展开.</p>
+<p>每次迭代能否进行，取决于初始解是否正确，以及 <span class="math-inline">$F'(B)$</span> 的常数项是否可逆.</p>
+<h2 id="section-多项式对数">多项式对数<a class="heading-anchor" href="#section-多项式对数" aria-label="链接到多项式对数">#</a></h2>
+<p>给定 <span class="math-inline">$A(x)$</span> ，其中 <span class="math-inline">$A(0)=1$</span> ，求：</p>
+<div class="math-block">$$B(x)=\ln A(x)\pmod{x^n}$$</div>
+<p>其常数项取 <span class="math-inline">$B(0)=0$</span> .</p>
+<p>由，</p>
+<div class="math-block">$$(\ln A(x))'=\frac{A'(x)}{A(x)}$$</div>
+<p>得到：</p>
+<div class="math-block">$$\ln A(x)\equiv\int\frac{A'(x)}{A(x)}\,\mathrm{d}x\pmod{x^n}$$</div>
+<p>因此，依次进行求导、求逆、相乘、积分即可.</p>
+<p>其中 <span class="math-inline">$A'/A$</span> 只需要保留到模 <span class="math-inline">$x^{n-1}$</span> .</p>
+<p>时间复杂度为 <span class="math-inline">$O(M(n))=O(n\log n)$</span> .</p>
+<p>要求 <span class="math-inline">$A(0)=1$</span> ，是为了使用常数项为 <span class="math-inline">$0$</span> 的形式对数；在有限域中不能直接对任意非零常数取普通实数意义下的对数.</p>
+<h2 id="section-多项式指数">多项式指数<a class="heading-anchor" href="#section-多项式指数" aria-label="链接到多项式指数">#</a></h2>
+<p>给定 <span class="math-inline">$A(x)$</span> ，其中 <span class="math-inline">$A(0)=0$</span> ，求：</p>
+<div class="math-block">$$B(x)=\exp A(x)\pmod{x^n}$$</div>
+<p>则 <span class="math-inline">$B(0)=1$</span> ，且，</p>
+<div class="math-block">$$\ln B(x)=A(x)$$</div>
+<p>令 <span class="math-inline">$F(B)=\ln B-A$</span> ，则 <span class="math-inline">$F'(B)=B^{-1}$</span> .</p>
+<p>由牛顿迭代：</p>
+<div class="math-block">$$\begin{aligned}
+B_{\mathrm{new}}
+&amp;\equiv B-\frac{\ln B-A}{B^{-1}}\\
+&amp;\equiv B(1+A-\ln B)\pmod{x^{2m}}
+\end{aligned}$$</div>
+<p>从 <span class="math-inline">$B=1$</span> 开始，每次将精度翻倍.</p>
+<p>每轮求一次当前精度的 <span class="math-inline">$\ln B$</span> ，再进行乘法，故总时间复杂度为 <span class="math-inline">$O(M(n))=O(n\log n)$</span> .</p>
+<p>特别地，每轮都只计算当前精度；若每轮均按最终长度计算，会多出不必要的开销.</p>
+<h2 id="section-多项式开方">多项式开方<a class="heading-anchor" href="#section-多项式开方" aria-label="链接到多项式开方">#</a></h2>
+<p>先考虑 <span class="math-inline">$A(0)\neq0$</span> ，求：</p>
+<div class="math-block">$$B(x)^2\equiv A(x)\pmod{x^n}$$</div>
+<p>初始值需要满足 <span class="math-inline">$b_0^2=a_0$</span> . 模奇质数 <span class="math-inline">$p$</span> 时，先求常数项的模平方根；若不存在，则多项式也不存在平方根.</p>
+<p>令 <span class="math-inline">$F(B)=B^2-A$</span> ，则 <span class="math-inline">$F'(B)=2B$</span> .</p>
+<p>故，</p>
+<div class="math-block">$$B_{\mathrm{new}}\equiv\frac12\left(B+\frac AB\right)\pmod{x^{2m}}$$</div>
+<p>选定非零的 <span class="math-inline">$b_0$</span> 后，逐次倍增，得到对应的唯一分支.</p>
+<p>除求常数项模平方根外，时间复杂度为 <span class="math-inline">$O(M(n))$</span> .</p>
+<p>若 <span class="math-inline">$A(0)=0$</span> ，设 <span class="math-inline">$t&lt;n$</span> 为第一个非零系数的下标：</p>
+<div class="math-block">$$A(x)=x^tC(x),\qquad C(0)\neq0$$</div>
+<ul><li>若 <span class="math-inline">$t$</span> 为奇数，则无解，因为平方后第一个非零项的次数必为偶数.</li><li>若 <span class="math-inline">$t=2s$</span> ，则先求 <span class="math-inline">$D^2\equiv C\pmod{x^{n-2s}}$</span> ，再取 <span class="math-inline">$B=x^sD$</span> .</li><li>在模 <span class="math-inline">$x^n$</span> 的条件下，<span class="math-inline">$B$</span> 的 <span class="math-inline">$n-s$</span> 次至 <span class="math-inline">$n-1$</span> 次项不受约束，可以取 <span class="math-inline">$0$</span> ，因此此时解不一定只有两个.</li><li>若 <span class="math-inline">$A\equiv0\pmod{x^n}$</span> ，可以直接取 <span class="math-inline">$B=0$</span> .</li></ul>
+<p>上述迭代要求 <span class="math-inline">$2$</span> 可逆，不适用于特征为 <span class="math-inline">$2$</span> 的情形.</p>
+<h2 id="section-多项式快速幂">多项式快速幂<a class="heading-anchor" href="#section-多项式快速幂" aria-label="链接到多项式快速幂">#</a></h2>
+<p>给定非负整数 <span class="math-inline">$k$</span> ，求：</p>
+<div class="math-block">$$B(x)\equiv A(x)^k\pmod{x^n}$$</div>
+<p>当 <span class="math-inline">$A(0)=1$</span> 时，</p>
+<div class="math-block">$$A(x)^k=\exp(k\ln A(x))$$</div>
+<p>一般地，设 <span class="math-inline">$t$</span> 为 <span class="math-inline">$A$</span> 的第一个非零系数下标，<span class="math-inline">$c=a_t\neq0$</span> ，则，</p>
+<div class="math-block">$$A(x)=cx^tD(x),\qquad D(0)=1$$</div>
+<p>故，</p>
+<div class="math-block">$$A(x)^k=c^kx^{tk}\exp(k\ln D(x))$$</div>
+<p>处理顺序为：</p>
+<ul><li>若 <span class="math-inline">$k=0$</span> ，结果取 <span class="math-inline">$1$</span> .</li><li>若 <span class="math-inline">$k&gt;0$</span> 且 <span class="math-inline">$A\equiv0\pmod{x^n}$</span> ，结果为 <span class="math-inline">$0$</span> .</li><li>若 <span class="math-inline">$tk\geq n$</span> ，结果为 <span class="math-inline">$0$</span> .</li><li>否则只需计算 <span class="math-inline">$\exp(k\ln D)$</span> 的前 <span class="math-inline">$n-tk$</span> 项，乘 <span class="math-inline">$c^k$</span> 后右移 <span class="math-inline">$tk$</span> 位.</li></ul>
+<p>时间复杂度为 <span class="math-inline">$O(M(n)+\log k)$</span> ，其中 <span class="math-inline">$\log k$</span> 来自常数项快速幂.</p>
+<p>模质数 <span class="math-inline">$p$</span> 时，需要区分：</p>
+<ul><li>乘在 <span class="math-inline">$\ln D$</span> 前的 <span class="math-inline">$k$</span> ，使用 <span class="math-inline">$k\bmod p$</span> .</li><li>非零常数的幂 <span class="math-inline">$c^k$</span> ，可以使用 <span class="math-inline">$k\bmod(p-1)$</span> .</li><li>判断 <span class="math-inline">$tk\geq n$</span> 时，需要原指数的大小信息，不能使用取模后的指数.</li></ul>
+<p>以上 <span class="math-inline">$\ln/\exp$</span> 方法沿用 <span class="math-inline">$n\leq p$</span> 的条件. 普通的多项式二进制快速幂不依赖这一条件，复杂度为 <span class="math-inline">$O(M(n)\log k)$</span> .</p>
+<h2 id="section-多项式除法与取模">多项式除法与取模<a class="heading-anchor" href="#section-多项式除法与取模" aria-label="链接到多项式除法与取模">#</a></h2>
+<p>给定非零多项式 <span class="math-inline">$B(x)$</span> ，求唯一的 <span class="math-inline">$Q(x),R(x)$</span> ，使得：</p>
+<div class="math-block">$$A(x)=B(x)Q(x)+R(x),\qquad\deg R&lt;\deg B$$</div>
+<p>设 <span class="math-inline">$\deg A=n,\deg B=m$</span> . 若 <span class="math-inline">$n&lt;m$</span> ，则 <span class="math-inline">$Q=0,R=A$</span> .</p>
+<p>否则，记 <span class="math-inline">$k=n-m+1$</span> ，定义按指定次数翻转：</p>
+<div class="math-block">$$A^R(x)=x^nA(x^{-1}),\quad B^R(x)=x^mB(x^{-1}),\quad Q^R(x)=x^{n-m}Q(x^{-1})$$</div>
+<p>则，</p>
+<div class="math-block">$$A^R(x)=B^R(x)Q^R(x)+x^nR(x^{-1})$$</div>
+<p>因为 <span class="math-inline">$\deg R\leq m-1$</span> ，所以 <span class="math-inline">$x^nR(x^{-1})$</span> 的最低次数至少为 <span class="math-inline">$n-m+1=k$</span> .</p>
+<p>故，</p>
+<div class="math-block">$$Q^R(x)\equiv A^R(x)(B^R(x))^{-1}\pmod{x^k}$$</div>
+<p>将得到的 <span class="math-inline">$Q^R$</span> 按长度 <span class="math-inline">$k$</span> 翻转，即得 <span class="math-inline">$Q$</span> ，再计算：</p>
+<div class="math-block">$$R=A-BQ$$</div>
+<p>由于 <span class="math-inline">$B^R(0)$</span> 是 <span class="math-inline">$B$</span> 的最高次非零系数，故在域上一定可逆.</p>
+<p>时间复杂度为 <span class="math-inline">$O(M(n+1))$</span> .</p>
+<p>实现时先去除 <span class="math-inline">$A,B$</span> 的高位零系数，确定实际次数；但恢复 <span class="math-inline">$Q$</span> 时必须按指定长度 <span class="math-inline">$k$</span> 翻转，不能随意删除占位的零.</p>
+<h2 id="section-多点求值">多点求值<a class="heading-anchor" href="#section-多点求值" aria-label="链接到多点求值">#</a></h2>
+<p>给定次数小于 <span class="math-inline">$n$</span> 的多项式 <span class="math-inline">$A(x)$</span> 和 <span class="math-inline">$n$</span> 个点 <span class="math-inline">$x_0,x_1,\dots,x_{n-1}$</span> ，求所有 <span class="math-inline">$A(x_i)$</span> .</p>
+<p>直接代入需要 <span class="math-inline">$O(n^2)$</span> 时间，考虑分治.</p>
+<p>对区间 <span class="math-inline">$[l,r)$</span> 定义：</p>
+<div class="math-block">$$P_{l,r}(x)=\prod_{i=l}^{r-1}(x-x_i)$$</div>
+<p>叶子为 <span class="math-inline">$P_{i,i+1}=x-x_i$</span> ，内部节点由左右子节点相乘得到，称为乘积树.</p>
+<p>在每个节点维护：</p>
+<div class="math-block">$$R_{l,r}(x)=A(x)\bmod P_{l,r}(x)$$</div>
+<p>因为子节点的多项式整除父节点的多项式，所以可以直接将父节点的余式继续对两个子节点取模.</p>
+<p>到达叶子时，</p>
+<div class="math-block">$$R_{i,i+1}(x)=A(x)\bmod(x-x_i)=A(x_i)$$</div>
+<p>即得到对应点值.</p>
+<p>每层总规模为 <span class="math-inline">$O(n)$</span> ，共有 <span class="math-inline">$O(\log n)$</span> 层，故时间复杂度为 <span class="math-inline">$O(M(n)\log n)=O(n\log^2 n)$</span> .</p>
+<p>存储整棵乘积树需要 <span class="math-inline">$O(n\log n)$</span> 空间. 多点求值允许横坐标重复；只有插值时才要求横坐标两两不同.</p>
+<h2 id="section-快速插值">快速插值<a class="heading-anchor" href="#section-快速插值" aria-label="链接到快速插值">#</a></h2>
+<p>给定 <span class="math-inline">$n$</span> 个横坐标两两不同的点 <span class="math-inline">$(x_i,y_i)$</span> ，求次数小于 <span class="math-inline">$n$</span> 的多项式 <span class="math-inline">$A(x)$</span> .</p>
+<p>设，</p>
+<div class="math-block">$$P(x)=\prod_{i=0}^{n-1}(x-x_i)$$</div>
+<p>则，</p>
+<div class="math-block">$$P'(x_i)=\prod_{j\neq i}(x_i-x_j)$$</div>
+<p>由拉格朗日插值：</p>
+<div class="math-block">$$A(x)=\sum_{i=0}^{n-1}\frac{y_i}{P'(x_i)}\cdot\frac{P(x)}{x-x_i}$$</div>
+<p>先建立乘积树，求出 <span class="math-inline">$P'$</span> ，再通过多点求值得到所有 <span class="math-inline">$P'(x_i)$</span> .</p>
+<p>记，</p>
+<div class="math-block">$$w_i=\frac{y_i}{P'(x_i)}$$</div>
+<p>在区间 <span class="math-inline">$[l,r)$</span> 维护：</p>
+<div class="math-block">$$F_{l,r}(x)=\sum_{i=l}^{r-1}w_i\prod_{\substack{l\leq j&lt;r\\j\neq i}}(x-x_j)$$</div>
+<p>叶子为 <span class="math-inline">$F_{i,i+1}=w_i$</span> . 设中点为 <span class="math-inline">$m$</span> ，则：</p>
+<div class="math-block">$$F_{l,r}=F_{l,m}P_{m,r}+F_{m,r}P_{l,m}$$</div>
+<p>因为左半部分每一项还缺少右半部分的所有因子，右半部分同理.</p>
+<p>递归合并后，根节点即为 <span class="math-inline">$A(x)$</span> .</p>
+<p>时间复杂度为 <span class="math-inline">$O(M(n)\log n)=O(n\log^2 n)$</span> ，存储乘积树需要 <span class="math-inline">$O(n\log n)$</span> 空间.</p>
+<p>所有 <span class="math-inline">$P'(x_i)$</span> 非零，可以利用前缀积和一次求逆，在线性次域运算内批量求出它们的逆元；无需对每个点分别快速幂.</p>
+<h2 id="section-任意模数卷积">任意模数卷积<a class="heading-anchor" href="#section-任意模数卷积" aria-label="链接到任意模数卷积">#</a></h2>
+<p>若目标模数 <span class="math-inline">$q$</span> 不适合 NTT ，可以在多个适合 NTT 的质数下分别计算，再合并答案.</p>
+<p>这里 <span class="math-inline">$q$</span> 可以是合数，卷积本身不需要除法.</p>
+<p>先将输入系数规范到 <span class="math-inline">$[0,q)$</span> . 若两个数组长度分别为 <span class="math-inline">$r,s$</span> ，则真实整数卷积系数满足：</p>
+<div class="math-block">$$0\leq c_k\leq\min(r,s)(q-1)^2$$</div>
+<p>选取不同的 NTT 质数 <span class="math-inline">$p_1,p_2,\dots,p_t$</span> ，令，</p>
+<div class="math-block">$$P=\prod_{i=1}^{t}p_i$$</div>
+<p>分别求出 <span class="math-inline">$c_k\bmod p_i$</span> . 若 <span class="math-inline">$P&gt;\min(r,s)(q-1)^2$</span> ，则这些余数能唯一确定真实整数 <span class="math-inline">$c_k$</span> .</p>
+<p>再对 <span class="math-inline">$q$</span> 取模，即得答案.</p>
+<h3 id="section-中国剩余定理合并">中国剩余定理合并<a class="heading-anchor" href="#section-中国剩余定理合并" aria-label="链接到中国剩余定理合并">#</a></h3>
+<p>以三个质数为例，设某个系数的余数为 <span class="math-inline">$r_1,r_2,r_3$</span> ，依次计算：</p>
+<div class="math-block">$$t_1=r_1$$</div>
+<div class="math-block">$$t_2\equiv(r_2-t_1)p_1^{-1}\pmod{p_2}$$</div>
+<div class="math-block">$$t_3\equiv(r_3-t_1-p_1t_2)(p_1p_2)^{-1}\pmod{p_3}$$</div>
+<p>其中 <span class="math-inline">$0\leq t_2&lt;p_2,0\leq t_3&lt;p_3$</span> .</p>
+<p>则区间 <span class="math-inline">$[0,P)$</span> 中唯一的解为：</p>
+<div class="math-block">$$c=t_1+p_1t_2+p_1p_2t_3$$</div>
+<p>求 <span class="math-inline">$c\bmod q$</span> 时，可以将各项直接在模 <span class="math-inline">$q$</span> 意义下合并，避免显式保存完整的 <span class="math-inline">$c$</span> .</p>
+<p>需要注意：</p>
+<ul><li>每个 <span class="math-inline">$p_i$</span> 都必须支持所需的变换长度.</li><li>“使用三个模数”本身不能保证正确，仍需检查模数乘积与系数上界.</li><li>若只确定了 <span class="math-inline">$c\bmod P$</span> ，而真实系数可能超过 <span class="math-inline">$P$</span> ，通常不能据此确定 <span class="math-inline">$c\bmod q$</span> .</li><li>若恢复有正有负、绝对值不超过 <span class="math-inline">$B$</span> 的整数系数，需 <span class="math-inline">$P&gt;2B$</span> ，并将结果还原到对称区间.</li><li>合并过程中的模乘仍需足够宽的整数类型，即使最终答案只对较小的 <span class="math-inline">$q$</span> 取模.</li></ul>
+<p>固定使用常数个模数时，时间复杂度为 <span class="math-inline">$O(n\log n)$</span> ，其中 <span class="math-inline">$n$</span> 为补零后的变换长度.</p>
+<h3 id="section-拆系数">拆系数<a class="heading-anchor" href="#section-拆系数" aria-label="链接到拆系数">#</a></h3>
+<p>若系数过大，可以取基数 <span class="math-inline">$B$</span> ，写成：</p>
+<div class="math-block">$$a_i=a_{i,0}+Ba_{i,1},\qquad b_i=b_{i,0}+Bb_{i,1}$$</div>
+<p>则，</p>
+<div class="math-block">$$a*b=a_0*b_0+B(a_0*b_1+a_1*b_0)+B^2(a_1*b_1)$$</div>
+<p>将一次大系数卷积转化为若干次小系数卷积，再合并结果.</p>
+<p>不够时继续拆成更多位. 使用复数 FFT 仍需控制误差；使用多模 NTT 则对拆分后每次卷积检查整数系数上界.</p>
+<h2 id="section-分治-fft">分治 FFT<a class="heading-anchor" href="#section-分治-fft" aria-label="链接到分治 FFT">#</a></h2>
+<p>考虑形如以下形式的递推：</p>
+<div class="math-block">$$f_i=h_i+\sum_{j=0}^{i-1}f_jg_{i-j}$$</div>
+<p>其中 <span class="math-inline">$h_i,g_i$</span> 已知，<span class="math-inline">$f_i$</span> 需要按顺序求出.</p>
+<p>虽然右侧是卷积形式，但 <span class="math-inline">$f$</span> 尚未全部确定，不能一开始直接对完整的 <span class="math-inline">$f$</span> 做卷积.</p>
+<p>考虑求解区间 <span class="math-inline">$[l,r)$</span> ，取 <span class="math-inline">$m=\lfloor(l+r)/2\rfloor$</span> ：</p>
+<ul><li>先递归求出 <span class="math-inline">$f_l,\dots,f_{m-1}$</span> .</li><li>利用一次卷积，计算左半部分对右半部分的贡献.</li><li>将贡献累加到右半部分，再递归求出 <span class="math-inline">$f_m,\dots,f_{r-1}$</span> .</li></ul>
+<p>具体地，令：</p>
+<div class="math-block">$$U_t=f_{l+t},\qquad 0\leq t&lt;m-l$$</div>
+<div class="math-block">$$V_t=g_t,\qquad 0\leq t&lt;r-l$$</div>
+<p>其中取 <span class="math-inline">$g_0=0$</span> . 计算 <span class="math-inline">$W=U*V$</span> ，则对于 <span class="math-inline">$m\leq i&lt;r$</span> ：</p>
+<div class="math-block">$$W_{i-l}=\sum_{j=l}^{m-1}f_jg_{i-j}$$</div>
+<p>只将这些下标的结果累加到右半部分.</p>
+<p>初始时令所有 <span class="math-inline">$f_i=h_i$</span> . 递归过程中，进入某个区间前，更早区间对它的贡献已经累加；到达叶子时，该项即为最终值.</p>
+<p>对于每一对 <span class="math-inline">$j&lt;i$</span> ，它们恰好在一个分治节点中分别属于左右两侧，故贡献不会遗漏，也不会重复.</p>
+<p>每层卷积总开销为 <span class="math-inline">$O(n\log n)$</span> ，共 <span class="math-inline">$O(\log n)$</span> 层，故时间复杂度为 <span class="math-inline">$O(n\log^2 n)$</span> .</p>
+<p>临时数组用后释放或复用时，额外空间可以控制为 <span class="math-inline">$O(n)$</span> . 使用 NTT 计算卷积时，也常称为分治 NTT .</p>
+<p>特别地，上述最简单的固定卷积核递推，还可以直接使用生成函数：</p>
+<div class="math-block">$$F=H+FG\quad\Longrightarrow\quad F=\frac{H}{1-G}$$</div>
+<p>其中 <span class="math-inline">$G(0)=0$</span> ，利用多项式求逆即可做到 <span class="math-inline">$O(n\log n)$</span> . 分治方法更适合需要按顺序确定状态，且跨区间贡献仍可写成卷积的递推.</p>
+<h2 id="section-线性递推与多项式取模">线性递推与多项式取模<a class="heading-anchor" href="#section-线性递推与多项式取模" aria-label="链接到线性递推与多项式取模">#</a></h2>
+<p>已知 <span class="math-inline">$d$</span> 阶线性递推：</p>
+<div class="math-block">$$f_n=c_1f_{n-1}+c_2f_{n-2}+\cdots+c_df_{n-d},\qquad n\geq d$$</div>
+<p>以及初值 <span class="math-inline">$f_0,f_1,\dots,f_{d-1}$</span> ，求 <span class="math-inline">$f_N$</span> .</p>
+<p>构造特征多项式：</p>
+<div class="math-block">$$C(x)=x^d-c_1x^{d-1}-c_2x^{d-2}-\cdots-c_d$$</div>
+<p>在模 <span class="math-inline">$C(x)$</span> 意义下，</p>
+<div class="math-block">$$x^d\equiv c_1x^{d-1}+c_2x^{d-2}+\cdots+c_d$$</div>
+<p>其降幂规则与数列递推完全相同.</p>
+<p>设，</p>
+<div class="math-block">$$x^N\equiv R(x)=\sum_{i=0}^{d-1}r_ix^i\pmod{C(x)}$$</div>
+<p>则，</p>
+<div class="math-block">$$f_N=\sum_{i=0}^{d-1}r_if_i$$</div>
+<p>证明如下：</p>
+<p>定义线性映射 <span class="math-inline">$L(x^i)=f_i$</span> . 对任意 <span class="math-inline">$t\geq0$</span> ，由递推式：</p>
+<div class="math-block">$$L(x^tC(x))=f_{t+d}-\sum_{j=1}^{d}c_jf_{t+d-j}=0$$</div>
+<p>又，<span class="math-inline">$x^N-R$</span> 是 <span class="math-inline">$C$</span> 的倍数，因此 <span class="math-inline">$L(x^N-R)=0$</span> ，即得结论.</p>
+<p>利用二进制快速幂计算 <span class="math-inline">$x^N\bmod C$</span> ，每次乘法后立即取模，使次数保持小于 <span class="math-inline">$d$</span> .</p>
+<ul><li>朴素乘法与降幂：<span class="math-inline">$O(d^2\log(N+1))$</span> .</li><li>快速乘法与快速取模：<span class="math-inline">$O(M(d)\log(N+1))$</span> .</li></ul>
+<p>当 <span class="math-inline">$N=0$</span> 时直接返回 <span class="math-inline">$f_0$</span> . 固定模多项式 <span class="math-inline">$C$</span> 后，可以预处理翻转多项式的逆元，供每次取模复用.</p>
+<p>若只有数列前若干项而未知递推式，还需要先寻找递推关系；这与已知递推式后求第 <span class="math-inline">$N$</span> 项是两个不同的问题.</p>
+<h2 id="section-bostan-mori">Bostan–Mori<a class="heading-anchor" href="#section-bostan-mori" aria-label="链接到Bostan–Mori">#</a></h2>
+<p>给定有理生成函数：</p>
+<div class="math-block">$$F(x)=\frac{P(x)}{Q(x)},\qquad Q(0)\neq0$$</div>
+<p>求 <span class="math-inline">$[x^N]F(x)$</span> . 先考虑 <span class="math-inline">$\deg P&lt;d,\deg Q\leq d$</span> ，系数在奇特征的域上运算.</p>
+<p>分子分母同乘 <span class="math-inline">$Q(-x)$</span> ：</p>
+<div class="math-block">$$\frac{P(x)}{Q(x)}=\frac{P(x)Q(-x)}{Q(x)Q(-x)}$$</div>
+<p>记，</p>
+<div class="math-block">$$U(x)=P(x)Q(-x),\qquad V(x)=Q(x)Q(-x)$$</div>
+<p>由于 <span class="math-inline">$V(-x)=V(x)$</span> ，所以 <span class="math-inline">$V$</span> 只含偶次项.</p>
+<p>设，</p>
+<div class="math-block">$$U(x)=U_0(x^2)+xU_1(x^2),\qquad V(x)=V_0(x^2)$$</div>
+<p>则，</p>
+<div class="math-block">$$[x^N]\frac{P(x)}{Q(x)}=
+\begin{cases}
+[x^{N/2}]\dfrac{U_0(x)}{V_0(x)},&amp;N\text{ 为偶数},\\
+[x^{(N-1)/2}]\dfrac{U_1(x)}{V_0(x)},&amp;N\text{ 为奇数}.
+\end{cases}$$</div>
+<p>即，每轮进行：</p>
+<ul><li>计算 <span class="math-inline">$U=PQ(-x)$</span> 和 <span class="math-inline">$V=QQ(-x)$</span> .</li><li>根据 <span class="math-inline">$N$</span> 的奇偶性，保留 <span class="math-inline">$U$</span> 的偶数下标项或奇数下标项，并将下标压缩一半.</li><li>保留 <span class="math-inline">$V$</span> 的偶数下标项，并将下标压缩一半.</li><li>令 <span class="math-inline">$N\leftarrow\lfloor N/2\rfloor$</span> .</li></ul>
+<p>每轮分母次数仍不超过 <span class="math-inline">$d$</span> ，分子次数仍小于 <span class="math-inline">$d$</span> ，而 <span class="math-inline">$N$</span> 缩小一半.</p>
+<p>当 <span class="math-inline">$N=0$</span> 时，答案为：</p>
+<div class="math-block">$$\frac{P(0)}{Q(0)}$$</div>
+<p>故时间复杂度为 <span class="math-inline">$O(M(d)\log(N+1))$</span> ，额外空间为 <span class="math-inline">$O(d)$</span> .</p>
+<p>这里的奇偶指系数下标的奇偶；构造 <span class="math-inline">$Q(-x)$</span> 时，仅将奇数次项的系数取负. 可以对照 <a href="https://emthrm.github.io/cp-library/test/math/formal_power_series/bostan-mori.test.cpp" target="_blank" rel="noopener noreferrer">Bostan–Mori 的实现</a>核对这一轮变换.</p>
+<h4 id="section-用于线性递推">用于线性递推<a class="heading-anchor" href="#section-用于线性递推" aria-label="链接到用于线性递推">#</a></h4>
+<p>对于，</p>
+<div class="math-block">$$f_n=\sum_{i=1}^{d}c_if_{n-i}$$</div>
+<p>令，</p>
+<div class="math-block">$$Q(x)=1-c_1x-c_2x^2-\cdots-c_dx^d$$</div>
+<div class="math-block">$$P(x)\equiv Q(x)\left(\sum_{i=0}^{d-1}f_ix^i\right)\pmod{x^d}$$</div>
+<p>则，</p>
+<div class="math-block">$$\sum_{i=0}^{+\infty}f_ix^i=\frac{P(x)}{Q(x)}$$</div>
+<p>因为 <span class="math-inline">$QF$</span> 的所有 <span class="math-inline">$d$</span> 次及以上系数都由递推式抵消，而低于 <span class="math-inline">$d$</span> 次的部分恰好为 <span class="math-inline">$P$</span> .</p>
+<p>故可以直接用 Bostan–Mori 求第 <span class="math-inline">$N$</span> 项.</p>
+<p>特征多项式 <span class="math-inline">$C(x)$</span> 与生成函数分母 <span class="math-inline">$Q(x)$</span> 满足：</p>
+<div class="math-block">$$C(x)=x^dQ(x^{-1})$$</div>
+<p>两种算法使用的系数顺序不同，需要区分.</p>
+<h2 id="section-快速沃尔什变换">快速沃尔什变换<a class="heading-anchor" href="#section-快速沃尔什变换" aria-label="链接到快速沃尔什变换">#</a></h2>
+<p>普通卷积要求 <span class="math-inline">$i+j=k$</span> . 若将下标运算替换为按位或、按位与、按位异或，则得到三种位运算卷积：</p>
+<div class="math-block">$$c_k=\sum_{i\mathbin{\mathrm{op}}j=k}a_ib_j$$</div>
+<p>设数组长度为 <span class="math-inline">$n=2^m$</span> ，下标均在 <span class="math-inline">$[0,n)$</span> .</p>
+<p>OI 中常将这三类快速变换统称为 FWT . 其中 XOR 使用 Walsh–Hadamard 变换，OR、AND 分别对应子集、超集上的 Zeta 变换.</p>
+<p>它们的共同流程仍然是：变换、逐点相乘、逆变换.</p>
+<h3 id="section-按位或卷积">按位或卷积<a class="heading-anchor" href="#section-按位或卷积" aria-label="链接到按位或卷积">#</a></h3>
+<p>将下标看作二进制集合，定义：</p>
+<div class="math-block">$$\widehat a_S=\sum_{T\subseteq S}a_T$$</div>
+<p>则，</p>
+<div class="math-block">$$\begin{aligned}
+\widehat c_S
+&amp;=\sum_{K\subseteq S}\sum_{I\cup J=K}a_Ib_J\\
+&amp;=\sum_{I\subseteq S}\sum_{J\subseteq S}a_Ib_J\\
+&amp;=\widehat a_S\widehat b_S
+\end{aligned}$$</div>
+<p>因为 <span class="math-inline">$I\cup J\subseteq S$</span> 当且仅当 <span class="math-inline">$I\subseteq S$</span> 且 <span class="math-inline">$J\subseteq S$</span> .</p>
+<p>逐位处理时，设一对下标只在当前位不同，对应值为 <span class="math-inline">$(u,v)$</span> ，其中 <span class="math-inline">$u$</span> 的当前位为 <span class="math-inline">$0$</span> ，<span class="math-inline">$v$</span> 的当前位为 <span class="math-inline">$1$</span> .</p>
+<p>正变换：</p>
+<div class="math-block">$$(u,v)\longrightarrow(u,u+v)$$</div>
+<p>逆变换：</p>
+<div class="math-block">$$(u,v)\longrightarrow(u,v-u)$$</div>
+<p>对每一位都执行一次，即得到子集和及其逆变换.</p>
+<h3 id="section-按位与卷积">按位与卷积<a class="heading-anchor" href="#section-按位与卷积" aria-label="链接到按位与卷积">#</a></h3>
+<p>定义超集和：</p>
+<div class="math-block">$$\widehat a_S=\sum_{T\supseteq S}a_T$$</div>
+<p>因为 <span class="math-inline">$I\cap J\supseteq S$</span> 当且仅当 <span class="math-inline">$I\supseteq S$</span> 且 <span class="math-inline">$J\supseteq S$</span> ，故同样有：</p>
+<div class="math-block">$$\widehat c_S=\widehat a_S\widehat b_S$$</div>
+<p>正变换：</p>
+<div class="math-block">$$(u,v)\longrightarrow(u+v,v)$$</div>
+<p>逆变换：</p>
+<div class="math-block">$$(u,v)\longrightarrow(u-v,v)$$</div>
+<h3 id="section-按位异或卷积">按位异或卷积<a class="heading-anchor" href="#section-按位异或卷积" aria-label="链接到按位异或卷积">#</a></h3>
+<p>先考虑一位下标：</p>
+<div class="math-block">$$c_0=a_0b_0+a_1b_1,\qquad c_1=a_0b_1+a_1b_0$$</div>
+<p>则，</p>
+<div class="math-block">$$c_0+c_1=(a_0+a_1)(b_0+b_1)$$</div>
+<div class="math-block">$$c_0-c_1=(a_0-a_1)(b_0-b_1)$$</div>
+<p>因此正变换取：</p>
+<div class="math-block">$$(u,v)\longrightarrow(u+v,u-v)$$</div>
+<p>再做一次同样的变换，得到 <span class="math-inline">$(2u,2v)$</span> ，故单层逆变换为：</p>
+<div class="math-block">$$(u,v)\longrightarrow\left(\frac{u+v}{2},\frac{u-v}{2}\right)$$</div>
+<p>多位时对每一位分别处理. 也可以逆变换时不逐层除以 <span class="math-inline">$2$</span> ，而在全部变换后统一除以 <span class="math-inline">$n$</span> . 这一实现方式可对照 <a href="https://suisen-cp.github.io/cp-library-cpp/library/convolution/xor_convolution.hpp.html" target="_blank" rel="noopener noreferrer">XOR 卷积与 Walsh–Hadamard 变换</a>.</p>
+<p>更一般地，定义：</p>
+<div class="math-block">$$\widehat a_S=\sum_T(-1)^{\operatorname{popcount}(S\mathbin{\&amp;}T)}a_T$$</div>
+<p>其中 <span class="math-inline">$\operatorname{popcount}$</span> 表示二进制中 <span class="math-inline">$1$</span> 的个数. 由于符号满足：</p>
+<div class="math-block">$$(-1)^{\operatorname{popcount}(S\mathbin{\&amp;}(I\oplus J))}
+=(-1)^{\operatorname{popcount}(S\mathbin{\&amp;}I)}(-1)^{\operatorname{popcount}(S\mathbin{\&amp;}J)}$$</div>
+<p>故异或卷积也被转化为逐点相乘.</p>
+<p>三种变换的时间复杂度均为 <span class="math-inline">$O(n\log n)$</span> ，可原地完成变换；保存输入和结果共需 <span class="math-inline">$O(n)$</span> 空间.</p>
+<p>需要注意：</p>
+<ul><li>数组长度只需覆盖所有下标，并补齐到 <span class="math-inline">$2$</span> 的幂；位运算后的下标仍在 <span class="math-inline">$[0,n)$</span> ，不需要按普通卷积补到两倍长度.</li><li>OR、AND 的变换与逆变换仅用加减，不要求模数为质数.</li><li>XOR 的上述逆变换要求 <span class="math-inline">$2$</span> 可逆. 模奇数时可以使用，模偶数时不能直接套用.</li><li>单层运算的两个新值都由旧的 <span class="math-inline">$(u,v)$</span> 计算，原地修改时需要暂存.</li><li>FWT 不需要单位根，也不需要 FFT 中的二进制位逆序置换.</li><li>OR 卷积允许两个集合相交；要求两个集合互不相交的子集卷积，不能直接用一次 OR 卷积代替.</li></ul>
+<h2 id="section-积性函数">积性函数<a class="heading-anchor" href="#section-积性函数" aria-label="链接到积性函数">#</a></h2>
+<p>若 <span class="math-inline">$\text{gcd}(a,b)=1$</span> ，时有 <span class="math-inline">$f(ab)=f(a)f(b)$</span> ，则 <span class="math-inline">$f$</span> 为积性函数.</p>
+<p>若对于任意正整数 <span class="math-inline">$a,b$</span> 总有 <span class="math-inline">$f(ab)=f(a)f(b)$</span> ，则 <span class="math-inline">$f$</span> 为完全积性函数.</p>
+<p>对于任意积性函数均有以下性质：</p>
+<ul><li><span class="math-inline">$f(1)=1$</span></li><li><span class="math-inline">$n=\prod{p_i^{e^i}},f(n)=\prod{{f(p_i^{e^i})}}$</span></li></ul>
+<p>特别地，对于完全积性函数有：</p>
+<p><span class="math-inline">$n=\prod{p_i^{e^i}},f(n)=\prod{{f(p_i)}^{e^i}}$</span></p>
+<p>以下讨论几种常见的积性函数及其特有性质：</p>
+<h3 id="section-恒等函数">恒等函数<a class="heading-anchor" href="#section-恒等函数" aria-label="链接到恒等函数">#</a></h3>
+<p>恒等函数是完全积性函数，定义为： <span class="math-inline">$\text{I}(x)=1$</span></p>
+<h3 id="section-元函数">元函数<a class="heading-anchor" href="#section-元函数" aria-label="链接到元函数">#</a></h3>
+<p>元函数是完全积性函数，定义为： <span class="math-inline">$\text{e}(x)=[x=1]$</span></p>
+<h3 id="section-单位函数">单位函数<a class="heading-anchor" href="#section-单位函数" aria-label="链接到单位函数">#</a></h3>
+<p>单位函数是完全积性函数，定义为： <span class="math-inline">$\text{id}(x)=x$</span></p>
+<h3 id="section-约数个数函数">约数个数函数<a class="heading-anchor" href="#section-约数个数函数" aria-label="链接到约数个数函数">#</a></h3>
+<p>约数个数函数是积性函数，定义为： <span class="math-inline">$\text{d}(x)=\sum_{i|x}1$</span></p>
+<h3 id="section-除数函数">除数函数<a class="heading-anchor" href="#section-除数函数" aria-label="链接到除数函数">#</a></h3>
+<p>除数函数是积性函数，定义为：</p>
+<div class="math-block">$$\sigma_k(x)=\sum_{i|x}i^k$$</div>
+<h3 id="section-欧拉函数">欧拉函数<a class="heading-anchor" href="#section-欧拉函数" aria-label="链接到欧拉函数">#</a></h3>
+<h3 id="section-莫比乌斯函数">莫比乌斯函数<a class="heading-anchor" href="#section-莫比乌斯函数" aria-label="链接到莫比乌斯函数">#</a></h3>
+<p>莫比乌斯函数定义为：</p>
+<div class="math-block">$$\mu(x)=
+\begin{cases}
+1, &amp; n=1,\\
+0, &amp; n \text{ is divisible by a square &gt; 1},\\
+(-1)^k, &amp; n \text{ is the product of } k \text{ distinct primes}.
+\end{cases}$$</div>
+<p>性质：</p>
+<div class="math-block">$$\sum_{d|n}\mu(d)=[n=1]$$</div>
+<p>证明：</p>
+<div class="math-block">$$n=\prod_{i=1}^{k}{p_i^{e_i}},n'=\prod_{i=1}^k{p_i}$$</div>
+<div class="math-block">$$\sum_{d|n}\mu(d)=\sum_{d|n'}\mu(d)=\sum_{i=0}^k\binom{k}{i}(-1)^i=(1-1)^{k}=[k=0]=[n=1]$$</div>
+<h2 id="section-莫比乌斯反演">莫比乌斯反演<a class="heading-anchor" href="#section-莫比乌斯反演" aria-label="链接到莫比乌斯反演">#</a></h2></div></div></article></main><footer class="sub-footer"><span>© 2026 yangjm</span><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">鲁ICP备2026048978号-1 <span aria-hidden="true">↗</span></a></footer></body></html>

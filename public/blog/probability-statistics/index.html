@@ -1,0 +1,333 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f4f1e8"><meta name="description" content="整理条件概率、随机变量、数字特征、极限定理、参数估计与假设检验。"><title>概率论与数理统计 · yangjm</title><script>
+    (() => {
+      const key = 'yangjm-theme';
+      const valid = value => value === 'light' || value === 'dark';
+      const readCookie = () => {
+        const item = document.cookie.split('; ').find(row => row.startsWith(`${key}=`));
+        return item ? decodeURIComponent(item.slice(key.length + 1)) : null;
+      };
+      const save = theme => {
+        const sharedDomain = location.hostname === 'yangjm.cn' || location.hostname.endsWith('.yangjm.cn');
+        const domain = sharedDomain ? '; Domain=yangjm.cn' : '';
+        const secure = location.protocol === 'https:' ? '; Secure' : '';
+        document.cookie = `${key}=${theme}; Path=/; Max-Age=31536000; SameSite=Lax${domain}${secure}`;
+        try { localStorage.setItem(key, theme); } catch {}
+      };
+      let legacy;
+      try { legacy = localStorage.getItem(key); } catch {}
+      const cookie = readCookie();
+      const saved = valid(cookie) ? cookie : (valid(legacy) ? legacy : null);
+      if (!valid(cookie) && valid(legacy)) save(legacy);
+      const hour = new Date().getHours();
+      const theme = saved || (hour >= 7 && hour < 19 ? 'light' : 'dark');
+      document.documentElement.dataset.theme = theme;
+      document.documentElement.style.colorScheme = theme;
+      document.querySelector('meta[name="theme-color"]').content = theme === 'dark' ? '#15231d' : '#f4f1e8';
+      window.YANGJM_THEME = { read: readCookie, save, valid };
+    })();
+  </script><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/styles.css?v=20260916"><link rel="stylesheet" href="/subsites.css?v=20260916"><link rel="stylesheet" href="/blog.css?v=20261006b"><script src="/subsites.js?v=20260916" defer></script><script src="/visits.js?v=20260928b" defer></script><script>window.MathJax={tex:{inlineMath:[["$","$"],["\\(","\\)"]],displayMath:[["$$","$$"],["\\[","\\]"]],packages:{"[+]": ["ams"]},tags:"ams"},options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},chtml:{scale:1}};</script><script defer src="/vendor/mathjax/tex-chtml.js"></script><link rel="stylesheet" href="/navigation.css?v=20260921a"></head><body class="subsite blog-article"><a class="skip-link" href="#content">跳到正文</a><header id="site-navigation" class="site-nav-header"><a class="brand" href="https://yangjm.cn/" aria-label="yangjm 个人主页">y<span>.</span></a><nav aria-label="主导航"><a data-section="home" href="https://yangjm.cn/">主页</a><a data-section="blog" aria-current="page" href="https://blog.yangjm.cn/">博客</a><a data-section="oi" href="https://oi.yangjm.cn/">竞赛</a><a data-section="notebook" href="https://banzi.yangjm.cn/">板子</a><a data-section="materials" href="https://materials.yangjm.cn/">资料</a></nav><button class="theme-toggle" id="theme-toggle" type="button" aria-label="切换到夜间模式" aria-pressed="false" title="切换到夜间模式">
+    <svg class="theme-icon moon-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M20.6 15.4A9 9 0 0 1 8.6 3.4 9 9 0 1 0 20.6 15.4Z"/></svg>
+    <svg class="theme-icon sun-icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v2.2M12 19.8V22M4.9 4.9l1.6 1.6m11 11 1.6 1.6M2 12h2.2M19.8 12H22M4.9 19.1l1.6-1.6m11-11 1.6-1.6"/></svg>
+  </button></header><main id="content" class="article-shell"><article class="article-page"><nav class="breadcrumb" aria-label="面包屑"><a href="https://blog.yangjm.cn/">文字与记录</a><span aria-hidden="true">/</span><span>概率论与数理统计</span></nav><header class="article-header"><h1>概率论与数理统计</h1><p>整理条件概率、随机变量、数字特征、极限定理、参数估计与假设检验。</p><div class="article-meta"><time datetime="2026-10-07">2026年10月7日</time><span>19 分钟阅读</span><span>数学 · 概率与统计</span><span data-visit-label>阅读：<span data-visit-current="probability-statistics">…</span></span></div></header><details class="mobile-toc"><summary>文章目录</summary><ol><li class="toc-level-2"><a href="#section-概率与条件概率">概率与条件概率</a></li><li class="toc-level-3"><a href="#section-模型与概率">模型与概率</a></li><li class="toc-level-3"><a href="#section-条件概率与乘法">条件概率与乘法</a></li><li class="toc-level-3"><a href="#section-全概率与贝叶斯公式">全概率与贝叶斯公式</a></li><li class="toc-level-3"><a href="#section-独立性">独立性</a></li><li class="toc-level-2"><a href="#section-随机变量与分布">随机变量与分布</a></li><li class="toc-level-3"><a href="#section-分布函数">分布函数</a></li><li class="toc-level-3"><a href="#section-常用离散分布">常用离散分布</a></li><li class="toc-level-3"><a href="#section-常用连续分布">常用连续分布</a></li><li class="toc-level-3"><a href="#section-随机变量函数的分布">随机变量函数的分布</a></li><li class="toc-level-2"><a href="#section-多维分布与数字特征">多维分布与数字特征</a></li><li class="toc-level-3"><a href="#section-联合-边缘与条件分布">联合、边缘与条件分布</a></li><li class="toc-level-3"><a href="#section-和-最大值与最小值">和、最大值与最小值</a></li><li class="toc-level-3"><a href="#section-期望与方差">期望与方差</a></li><li class="toc-level-3"><a href="#section-协方差与相关系数">协方差与相关系数</a></li><li class="toc-level-3"><a href="#section-条件期望与方差分解">条件期望与方差分解</a></li><li class="toc-level-2"><a href="#section-大数定律与中心极限定理">大数定律与中心极限定理</a></li><li class="toc-level-3"><a href="#section-概率界">概率界</a></li><li class="toc-level-3"><a href="#section-大数定律">大数定律</a></li><li class="toc-level-3"><a href="#section-中心极限定理">中心极限定理</a></li><li class="toc-level-2"><a href="#section-样本与抽样分布">样本与抽样分布</a></li><li class="toc-level-3"><a href="#section-统计量">统计量</a></li><li class="toc-level-3"><a href="#section-三个常用抽样分布">三个常用抽样分布</a></li><li class="toc-level-3"><a href="#section-正态总体的精确结论">正态总体的精确结论</a></li><li class="toc-level-2"><a href="#section-参数估计">参数估计</a></li><li class="toc-level-3"><a href="#section-矩估计">矩估计</a></li><li class="toc-level-3"><a href="#section-最大似然估计">最大似然估计</a></li><li class="toc-level-3"><a href="#section-估计量的评价">估计量的评价</a></li><li class="toc-level-3"><a href="#section-置信区间与分位数约定">置信区间与分位数约定</a></li><li class="toc-level-3"><a href="#section-单个正态总体的区间">单个正态总体的区间</a></li><li class="toc-level-2"><a href="#section-假设检验">假设检验</a></li><li class="toc-level-3"><a href="#section-两类错误与功效">两类错误与功效</a></li><li class="toc-level-3"><a href="#section-检验步骤与-p-值">检验步骤与 p 值</a></li><li class="toc-level-3"><a href="#section-单个正态总体的检验">单个正态总体的检验</a></li><li class="toc-level-3"><a href="#section-两总体比较">两总体比较</a></li><li class="toc-level-3"><a href="#section-卡方拟合优度">卡方拟合优度</a></li><li class="toc-level-2"><a href="#section-方差分析与回归">方差分析与回归</a></li><li class="toc-level-3"><a href="#section-单因素方差分析">单因素方差分析</a></li><li class="toc-level-3"><a href="#section-一元线性回归">一元线性回归</a></li><li class="toc-level-2"><a href="#section-选学内容提要">选学内容提要</a></li><li class="toc-level-3"><a href="#section-非参数方法与-bootstrap">非参数方法与 bootstrap</a></li><li class="toc-level-3"><a href="#section-随机过程与泊松过程">随机过程与泊松过程</a></li><li class="toc-level-3"><a href="#section-马尔可夫链">马尔可夫链</a></li><li class="toc-level-3"><a href="#section-平稳与各态历经">平稳与各态历经</a></li></ol></details><div class="article-layout"><aside class="article-toc" aria-label="文章目录"><strong>文章目录</strong><ol><li class="toc-level-2"><a href="#section-概率与条件概率">概率与条件概率</a></li><li class="toc-level-3"><a href="#section-模型与概率">模型与概率</a></li><li class="toc-level-3"><a href="#section-条件概率与乘法">条件概率与乘法</a></li><li class="toc-level-3"><a href="#section-全概率与贝叶斯公式">全概率与贝叶斯公式</a></li><li class="toc-level-3"><a href="#section-独立性">独立性</a></li><li class="toc-level-2"><a href="#section-随机变量与分布">随机变量与分布</a></li><li class="toc-level-3"><a href="#section-分布函数">分布函数</a></li><li class="toc-level-3"><a href="#section-常用离散分布">常用离散分布</a></li><li class="toc-level-3"><a href="#section-常用连续分布">常用连续分布</a></li><li class="toc-level-3"><a href="#section-随机变量函数的分布">随机变量函数的分布</a></li><li class="toc-level-2"><a href="#section-多维分布与数字特征">多维分布与数字特征</a></li><li class="toc-level-3"><a href="#section-联合-边缘与条件分布">联合、边缘与条件分布</a></li><li class="toc-level-3"><a href="#section-和-最大值与最小值">和、最大值与最小值</a></li><li class="toc-level-3"><a href="#section-期望与方差">期望与方差</a></li><li class="toc-level-3"><a href="#section-协方差与相关系数">协方差与相关系数</a></li><li class="toc-level-3"><a href="#section-条件期望与方差分解">条件期望与方差分解</a></li><li class="toc-level-2"><a href="#section-大数定律与中心极限定理">大数定律与中心极限定理</a></li><li class="toc-level-3"><a href="#section-概率界">概率界</a></li><li class="toc-level-3"><a href="#section-大数定律">大数定律</a></li><li class="toc-level-3"><a href="#section-中心极限定理">中心极限定理</a></li><li class="toc-level-2"><a href="#section-样本与抽样分布">样本与抽样分布</a></li><li class="toc-level-3"><a href="#section-统计量">统计量</a></li><li class="toc-level-3"><a href="#section-三个常用抽样分布">三个常用抽样分布</a></li><li class="toc-level-3"><a href="#section-正态总体的精确结论">正态总体的精确结论</a></li><li class="toc-level-2"><a href="#section-参数估计">参数估计</a></li><li class="toc-level-3"><a href="#section-矩估计">矩估计</a></li><li class="toc-level-3"><a href="#section-最大似然估计">最大似然估计</a></li><li class="toc-level-3"><a href="#section-估计量的评价">估计量的评价</a></li><li class="toc-level-3"><a href="#section-置信区间与分位数约定">置信区间与分位数约定</a></li><li class="toc-level-3"><a href="#section-单个正态总体的区间">单个正态总体的区间</a></li><li class="toc-level-2"><a href="#section-假设检验">假设检验</a></li><li class="toc-level-3"><a href="#section-两类错误与功效">两类错误与功效</a></li><li class="toc-level-3"><a href="#section-检验步骤与-p-值">检验步骤与 p 值</a></li><li class="toc-level-3"><a href="#section-单个正态总体的检验">单个正态总体的检验</a></li><li class="toc-level-3"><a href="#section-两总体比较">两总体比较</a></li><li class="toc-level-3"><a href="#section-卡方拟合优度">卡方拟合优度</a></li><li class="toc-level-2"><a href="#section-方差分析与回归">方差分析与回归</a></li><li class="toc-level-3"><a href="#section-单因素方差分析">单因素方差分析</a></li><li class="toc-level-3"><a href="#section-一元线性回归">一元线性回归</a></li><li class="toc-level-2"><a href="#section-选学内容提要">选学内容提要</a></li><li class="toc-level-3"><a href="#section-非参数方法与-bootstrap">非参数方法与 bootstrap</a></li><li class="toc-level-3"><a href="#section-随机过程与泊松过程">随机过程与泊松过程</a></li><li class="toc-level-3"><a href="#section-马尔可夫链">马尔可夫链</a></li><li class="toc-level-3"><a href="#section-平稳与各态历经">平稳与各态历经</a></li></ol><a class="source-link" href="https://github.com/yangjm2006/Blog/blob/main/Note/%E6%A6%82%E7%8E%87%E8%AE%BA%E4%B8%8E%E6%95%B0%E7%90%86%E7%BB%9F%E8%AE%A1.md" target="_blank" rel="noopener noreferrer">查看 Markdown 原文 <span aria-hidden="true">↗</span></a></aside><div class="article-body"><div class="math-block">$$概率论从模型推出结果的分布；数理统计由观测反推模型中的未知部分.$$</div>
+<h2 id="section-概率与条件概率">概率与条件概率<a class="heading-anchor" href="#section-概率与条件概率" aria-label="链接到概率与条件概率">#</a></h2>
+<h3 id="section-模型与概率">模型与概率<a class="heading-anchor" href="#section-模型与概率" aria-label="链接到模型与概率">#</a></h3>
+<p>样本空间 <span class="math-inline">$\Omega$</span> 描述可能结果，事件是其中可测的集合，概率 <span class="math-inline">$P$</span> 满足非负性、规范性与可列可加性.</p>
+<p>古典概型要求基本结果<strong>有限且等可能</strong>，才有 <span class="math-inline">$P(A)=|A|/|\Omega|$</span> . 几何概型还要求在给定区域内按相应长度、面积或体积均匀取点.</p>
+<p>概率为 <span class="math-inline">$0$</span> 不等于事件不可能；概率为 <span class="math-inline">$1$</span> 称几乎必然，允许零概率的例外.</p>
+<h3 id="section-条件概率与乘法">条件概率与乘法<a class="heading-anchor" href="#section-条件概率与乘法" aria-label="链接到条件概率与乘法">#</a></h3>
+<p>若 <span class="math-inline">$P(B)&gt;0$</span> ：</p>
+<div class="math-block">$$P(A\mid B)=\frac{P(A\cap B)}{P(B)}.$$</div>
+<p>条件改变了考察范围与归一化尺度. 对各分母为正的情形：</p>
+<div class="math-block">$$P\left(\bigcap_{i=1}^n A_i\right)
+=P(A_1)\prod_{i=2}^nP\left(A_i\mid\bigcap_{j&lt;i}A_j\right).$$</div>
+<p>不要把有条件的概率直接替换为无条件概率.</p>
+<h3 id="section-全概率与贝叶斯公式">全概率与贝叶斯公式<a class="heading-anchor" href="#section-全概率与贝叶斯公式" aria-label="链接到全概率与贝叶斯公式">#</a></h3>
+<p>设 <span class="math-inline">$B_i$</span> 两两互斥、构成样本空间的划分，且 <span class="math-inline">$P(B_i)&gt;0$</span> ：</p>
+<div class="math-block">$$P(A)=\sum_iP(B_i)P(A\mid B_i).$$</div>
+<p>若再有 <span class="math-inline">$P(A)&gt;0$</span> ：</p>
+<div class="math-block">$$P(B_j\mid A)=\frac{P(B_j)P(A\mid B_j)}{\sum_iP(B_i)P(A\mid B_i)}.$$</div>
+<p>全概率按原因分类累加；贝叶斯由结果更新原因的权重. 后验同时依赖先验与似然，不能只比较 <span class="math-inline">$P(A\mid B_j)$</span> .</p>
+<h3 id="section-独立性">独立性<a class="heading-anchor" href="#section-独立性" aria-label="链接到独立性">#</a></h3>
+<p><span class="math-inline">$A,B$</span> 独立定义为 <span class="math-inline">$P(A\cap B)=P(A)P(B)$</span> . 多事件相互独立要求任意有限子组的交事件概率都等于各自概率的乘积.</p>
+<p>两两独立不等于相互独立. 互斥且概率均为正的事件不独立；互斥描述不能同时发生，独立描述条件信息不改变概率.</p>
+<h2 id="section-随机变量与分布">随机变量与分布<a class="heading-anchor" href="#section-随机变量与分布" aria-label="链接到随机变量与分布">#</a></h2>
+<h3 id="section-分布函数">分布函数<a class="heading-anchor" href="#section-分布函数" aria-label="链接到分布函数">#</a></h3>
+<p>随机变量把试验结果映射为实数. 分布函数：</p>
+<div class="math-block">$$F_X(x)=P(X\le x).$$</div>
+<p>它单调不减、右连续，并满足 <span class="math-inline">$F_X(-\infty)=0,F_X(+\infty)=1$</span> .</p>
+<div class="math-block">$$P(a&lt;X\le b)=F_X(b)-F_X(a),\qquad
+P(X=x)=F_X(x)-F_X(x^-).$$</div>
+<p>端点是否包含，在离散或混合分布中会影响结果.</p>
+<p>离散型用概率质量 <span class="math-inline">$p_k=P(X=x_k)$</span> 描述. 若存在密度 <span class="math-inline">$f_X$</span> ，则：</p>
+<div class="math-block">$$F_X(x)=\int_{-\infty}^x f_X(t)\,dt.$$</div>
+<p>密度值不是点概率，可以大于 <span class="math-inline">$1$</span> ；单点概率为 <span class="math-inline">$0$</span> . 以下称连续型时均指具有密度的情形.</p>
+<h3 id="section-常用离散分布">常用离散分布<a class="heading-anchor" href="#section-常用离散分布" aria-label="链接到常用离散分布">#</a></h3>
+<p>记 <span class="math-inline">$q=1-p$</span> ，下列参数取值保证分布有意义，几何分布取 <span class="math-inline">$0&lt;p\le1$</span> .</p>
+<div class="table-scroll"><table><thead><tr><th scope="col">分布</th><th scope="col">概率质量与取值</th><th scope="col">期望</th><th scope="col">方差</th></tr></thead><tbody><tr><td>伯努利 <span class="math-inline">$B(1,p)$</span></td><td><span class="math-inline">$P(X=1)=p,P(X=0)=q$</span></td><td><span class="math-inline">$p$</span></td><td><span class="math-inline">$pq$</span></td></tr><tr><td>二项 <span class="math-inline">$B(n,p)$</span></td><td><span class="math-inline">$\binom nkp^kq^{n-k},\ k=0,\ldots,n$</span></td><td><span class="math-inline">$np$</span></td><td><span class="math-inline">$npq$</span></td></tr><tr><td>泊松 <span class="math-inline">$P(\lambda)$</span></td><td><span class="math-inline">$e^{-\lambda}\lambda^k/k!,\ k\ge0,\lambda&gt;0$</span></td><td><span class="math-inline">$\lambda$</span></td><td><span class="math-inline">$\lambda$</span></td></tr><tr><td>几何</td><td><span class="math-inline">$P(X=k)=q^{k-1}p,\ k\ge1$</span></td><td><span class="math-inline">$1/p$</span></td><td><span class="math-inline">$q/p^2$</span></td></tr><tr><td>超几何</td><td><span class="math-inline">$\binom Mk\binom{N-M}{n-k}/\binom Nn$</span> ，取可行整数 <span class="math-inline">$k$</span></td><td><span class="math-inline">$nM/N$</span></td><td><span class="math-inline">$n\frac MN(1-\frac MN)\frac{N-n}{N-1}$</span></td></tr></tbody></table></div>
+<p>超几何对应从 <span class="math-inline">$N$</span> 个对象中不放回取 <span class="math-inline">$n$</span> 个，其中 <span class="math-inline">$M$</span> 个为目标对象，方差式取 <span class="math-inline">$N&gt;1$</span> . 二项要求各次独立且成功概率相同.</p>
+<p>几何分布也有从 <span class="math-inline">$0$</span> 开始计失败次数的约定，使用公式前先确认随机变量的含义.</p>
+<h3 id="section-常用连续分布">常用连续分布<a class="heading-anchor" href="#section-常用连续分布" aria-label="链接到常用连续分布">#</a></h3>
+<p>均匀分布 <span class="math-inline">$U(a,b)$</span> ，<span class="math-inline">$a&lt;b$</span> ：</p>
+<div class="math-block">$$f(x)=\frac1{b-a}\quad(a&lt;x&lt;b),\qquad
+E(X)=\frac{a+b}{2},\quad\operatorname{Var}(X)=\frac{(b-a)^2}{12}.$$</div>
+<p>指数分布按速率 <span class="math-inline">$\lambda&gt;0$</span> 参数化：</p>
+<div class="math-block">$$f(x)=\lambda e^{-\lambda x}\quad(x\ge0),\qquad
+E(X)=\frac1\lambda,\quad\operatorname{Var}(X)=\frac1{\lambda^2}.$$</div>
+<p>其无记忆性为：</p>
+<div class="math-block">$$P(X&gt;s+t\mid X&gt;s)=P(X&gt;t),\qquad s,t\ge0.$$</div>
+<p>几何分布在离散时间也有无记忆性. 上述密度在未列出的范围内均为 <span class="math-inline">$0$</span> .</p>
+<p>正态分布 <span class="math-inline">$N(\mu,\sigma^2)$</span> ，<span class="math-inline">$\sigma&gt;0$</span> ：</p>
+<div class="math-block">$$f(x)=\frac1{\sqrt{2\pi}\sigma}
+\exp\left[-\frac{(x-\mu)^2}{2\sigma^2}\right].$$</div>
+<p>标准化后：</p>
+<div class="math-block">$$Z=\frac{X-\mu}{\sigma}\sim N(0,1),\qquad
+P(a&lt;X\le b)=\Phi\left(\frac{b-\mu}{\sigma}\right)-\Phi\left(\frac{a-\mu}{\sigma}\right).$$</div>
+<p><span class="math-inline">$N(\mu,\sigma^2)$</span> 的第二参数是方差，不是标准差.</p>
+<h3 id="section-随机变量函数的分布">随机变量函数的分布<a class="heading-anchor" href="#section-随机变量函数的分布" aria-label="链接到随机变量函数的分布">#</a></h3>
+<p>对 <span class="math-inline">$Y=g(X)$</span> ，先用分布函数法：</p>
+<div class="math-block">$$F_Y(y)=P(g(X)\le y).$$</div>
+<p>若 <span class="math-inline">$g$</span> 严格单调且可微，逆函数为 <span class="math-inline">$h$</span> ，在适用的值域内部：</p>
+<div class="math-block">$$f_Y(y)=f_X(h(y))|h'(y)|.$$</div>
+<p>一般分段单调时，对满足 <span class="math-inline">$g(x_i)=y$</span> 的所有正常分支求和：</p>
+<div class="math-block">$$f_Y(y)=\sum_i\frac{f_X(x_i)}{|g'(x_i)|}.$$</div>
+<p>先确定值域，再确定逆像；不能漏掉分支，离散点质量也不能用密度公式处理.</p>
+<h2 id="section-多维分布与数字特征">多维分布与数字特征<a class="heading-anchor" href="#section-多维分布与数字特征" aria-label="链接到多维分布与数字特征">#</a></h2>
+<h3 id="section-联合-边缘与条件分布">联合、边缘与条件分布<a class="heading-anchor" href="#section-联合-边缘与条件分布" aria-label="链接到联合、边缘与条件分布">#</a></h3>
+<p>联合密度存在时：</p>
+<div class="math-block">$$f_X(x)=\int_{-\infty}^{\infty}f_{X,Y}(x,y)\,dy,
+\qquad
+f_{Y\mid X}(y\mid x)=\frac{f_{X,Y}(x,y)}{f_X(x)}\quad(f_X(x)&gt;0).$$</div>
+<p>边缘积分范围由联合分布的支撑集决定，可能依赖于未积分的变量. 离散情形将积分换成求和.</p>
+<p>连续情形的 <span class="math-inline">$P(X=x)=0$</span> ，条件密度不是把这个零概率事件直接代入事件条件概率公式，而是通过密度比构造.</p>
+<p><span class="math-inline">$X,Y$</span> 独立当且仅当：</p>
+<div class="math-block">$$F_{X,Y}(x,y)=F_X(x)F_Y(y)\quad\text{对所有 }x,y.$$</div>
+<p>有联合密度时等价于 <span class="math-inline">$f_{X,Y}=f_Xf_Y$</span> 几乎处处成立. 只看密度表达式可分离还不够，支撑范围也须与乘积分布相容.</p>
+<h3 id="section-和-最大值与最小值">和、最大值与最小值<a class="heading-anchor" href="#section-和-最大值与最小值" aria-label="链接到和、最大值与最小值">#</a></h3>
+<p>独立且具有密度时，和的密度由卷积给出：</p>
+<div class="math-block">$$f_{X+Y}(z)=\int_{-\infty}^{\infty}f_X(x)f_Y(z-x)\,dx.$$</div>
+<p>若 <span class="math-inline">$X_1,\ldots,X_n$</span> 独立同分布，分布函数为 <span class="math-inline">$F$</span> ：</p>
+<div class="math-block">$$F_{\max X_i}(x)=F(x)^n,\qquad
+F_{\min X_i}(x)=1-[1-F(x)]^n.$$</div>
+<p>因为“最大值不超过 <span class="math-inline">$x$</span> ”要求每个变量都不超过 <span class="math-inline">$x$</span> ；最小值则先计算“所有变量均大于 <span class="math-inline">$x$</span> ”.</p>
+<p>独立二项变量在成功概率相同时相加仍为二项；独立泊松变量相加参数相加；独立正态变量的线性组合仍正态，均值线性组合、方差按系数平方相加.</p>
+<h3 id="section-期望与方差">期望与方差<a class="heading-anchor" href="#section-期望与方差" aria-label="链接到期望与方差">#</a></h3>
+<p>若相应绝对可积条件成立：</p>
+<div class="math-block">$$E[g(X)]=\sum_k g(x_k)p_k
+\quad\text{或}\quad
+\int g(x)f_X(x)\,dx.$$</div>
+<p>不必先求 <span class="math-inline">$g(X)$</span> 的分布. 多维情形直接对联合分布求和或积分.</p>
+<div class="math-block">$$\operatorname{Var}(X)=E[(X-E X)^2]=E(X^2)-(E X)^2.$$</div>
+<p>期望线性不要求独立；方差相加需要协方差项为 <span class="math-inline">$0$</span> . 一般 <span class="math-inline">$E[g(X)]\ne g(E X)$</span> .</p>
+<p>指标变量 <span class="math-inline">$I_A=\mathbf1_A$</span> 满足 <span class="math-inline">$E(I_A)=P(A)$</span> ，故计数变量可拆成指标变量求期望，无须先求完整分布.</p>
+<h3 id="section-协方差与相关系数">协方差与相关系数<a class="heading-anchor" href="#section-协方差与相关系数" aria-label="链接到协方差与相关系数">#</a></h3>
+<p>设二阶矩有限，则：</p>
+<div class="math-block">$$\operatorname{Cov}(X,Y)=E(XY)-E(X)E(Y),$$</div>
+<div class="math-block">$$\operatorname{Var}\left(\sum_i a_iX_i\right)
+=\sum_i a_i^2\operatorname{Var}(X_i)
++2\sum_{i&lt;j}a_ia_j\operatorname{Cov}(X_i,X_j).$$</div>
+<p>若两方差均为正：</p>
+<div class="math-block">$$\rho_{X,Y}=\frac{\operatorname{Cov}(X,Y)}{\sigma_X\sigma_Y},\qquad |\rho_{X,Y}|\le1.$$</div>
+<ul><li>独立推出不相关，反之一般不成立.</li><li>联合为二元正态时，不相关等价于独立；只有各自边缘正态仍不够.</li><li><span class="math-inline">$|\rho|=1$</span> 当且仅当存在常数 <span class="math-inline">$a\ne0,b$</span> ，使 <span class="math-inline">$Y=aX+b$</span> 几乎必然成立.</li></ul>
+<p>相关系数主要衡量线性关系，<span class="math-inline">$\rho=0$</span> 不表示没有依赖关系.</p>
+<h3 id="section-条件期望与方差分解">条件期望与方差分解<a class="heading-anchor" href="#section-条件期望与方差分解" aria-label="链接到条件期望与方差分解">#</a></h3>
+<p>若 <span class="math-inline">$E|X|&lt;\infty$</span> ，则：</p>
+<div class="math-block">$$E(X)=E[E(X\mid Y)].$$</div>
+<p>二阶矩有限时：</p>
+<div class="math-block">$$\operatorname{Var}(X)
+=E[\operatorname{Var}(X\mid Y)]+\operatorname{Var}[E(X\mid Y)].$$</div>
+<p>将 <span class="math-inline">$X-E X$</span> 拆为：</p>
+<div class="math-block">$$X-E X=(X-E[X\mid Y])+(E[X\mid Y]-E X).$$</div>
+<p>第一项在给定 <span class="math-inline">$Y$</span> 后条件期望为 <span class="math-inline">$0$</span> ，交叉项的期望因此为 <span class="math-inline">$0$</span> . 总波动分成组内波动与组间均值波动.</p>
+<h2 id="section-大数定律与中心极限定理">大数定律与中心极限定理<a class="heading-anchor" href="#section-大数定律与中心极限定理" aria-label="链接到大数定律与中心极限定理">#</a></h2>
+<h3 id="section-概率界">概率界<a class="heading-anchor" href="#section-概率界" aria-label="链接到概率界">#</a></h3>
+<p>非负随机变量且期望有限时，对 <span class="math-inline">$a&gt;0$</span> ：</p>
+<div class="math-block">$$P(X\ge a)\le\frac{E X}{a}.$$</div>
+<p>由 <span class="math-inline">$X\ge a\mathbf1_{\{X\ge a\}}$</span> 取期望即得. 对 <span class="math-inline">$(X-\mu)^2$</span> 使用此式，得到切比雪夫不等式：</p>
+<div class="math-block">$$P(|X-\mu|\ge\varepsilon)\le\frac{\sigma^2}{\varepsilon^2}.$$</div>
+<p>不依赖具体分布，代价是通常较粗.</p>
+<h3 id="section-大数定律">大数定律<a class="heading-anchor" href="#section-大数定律" aria-label="链接到大数定律">#</a></h3>
+<p>记样本均值 <span class="math-inline">$\overline X_n=n^{-1}\sum_{i=1}^nX_i$</span> . 若 <span class="math-inline">$X_i$</span> 独立同分布，均值 <span class="math-inline">$\mu$</span> 、方差 <span class="math-inline">$\sigma^2&lt;\infty$</span> ，则：</p>
+<div class="math-block">$$P(|\overline X_n-\mu|\ge\varepsilon)
+\le\frac{\sigma^2}{n\varepsilon^2}\to0.$$</div>
+<p>即 <span class="math-inline">$\overline X_n\xrightarrow{P}\mu$</span> . 独立同分布且 <span class="math-inline">$E|X_1|&lt;\infty$</span> 时也有此结论，不必要求有限方差.</p>
+<p>大数定律说明均值趋于稳定，不保证每次偏差都缩小，也不表示过去的偏差必须在未来被补偿.</p>
+<h3 id="section-中心极限定理">中心极限定理<a class="heading-anchor" href="#section-中心极限定理" aria-label="链接到中心极限定理">#</a></h3>
+<p>若 <span class="math-inline">$X_i$</span> 独立同分布，<span class="math-inline">$E X_i=\mu$</span> 、<span class="math-inline">$0&lt;\sigma^2&lt;\infty$</span> ，则：</p>
+<div class="math-block">$$\frac{\sum_{i=1}^nX_i-n\mu}{\sigma\sqrt n}
+=\frac{\overline X_n-\mu}{\sigma/\sqrt n}
+\xrightarrow{d}N(0,1).$$</div>
+<p>大数定律控制平均值的稳定位置；中心极限定理描述 <span class="math-inline">$1/\sqrt n$</span> 尺度上的波动形状. 有限样本通常只是近似，不能把任意分布在任意 <span class="math-inline">$n$</span> 下当作正态.</p>
+<p>对二项变量，当 <span class="math-inline">$np,n(1-p)$</span> 足够大时，可作正态近似. 整数区间可用连续性修正：</p>
+<div class="math-block">$$P(a\le X\le b)\approx
+\Phi\left(\frac{b+1/2-np}{\sqrt{np(1-p)}}\right)
+-\Phi\left(\frac{a-1/2-np}{\sqrt{np(1-p)}}\right).$$</div>
+<p>另有稀有事件极限：<span class="math-inline">$n\to\infty,p_n\to0,np_n\to\lambda&gt;0$</span> 时，<span class="math-inline">$B(n,p_n)$</span> 趋于 <span class="math-inline">$P(\lambda)$</span> .</p>
+<h2 id="section-样本与抽样分布">样本与抽样分布<a class="heading-anchor" href="#section-样本与抽样分布" aria-label="链接到样本与抽样分布">#</a></h2>
+<p>总体分布含未知参数；样本是来自总体的独立同分布随机变量，观测值是它们的一次实现.</p>
+<h3 id="section-统计量">统计量<a class="heading-anchor" href="#section-统计量" aria-label="链接到统计量">#</a></h3>
+<p>统计量是样本的函数，其表达式不含未知参数. 常用：</p>
+<div class="math-block">$$\overline X=\frac1n\sum_iX_i,\qquad
+S^2=\frac1{n-1}\sum_i(X_i-\overline X)^2\quad(n\ge2).$$</div>
+<p>若总体均值为 <span class="math-inline">$\mu$</span> 、方差有限，则：</p>
+<div class="math-block">$$E\overline X=\mu,\qquad\operatorname{Var}(\overline X)=\frac{\sigma^2}{n},\qquad E S^2=\sigma^2.$$</div>
+<p>分母 <span class="math-inline">$n-1$</span> 来自恒等式：</p>
+<div class="math-block">$$\sum_i(X_i-\overline X)^2
+=\sum_i(X_i-\mu)^2-n(\overline X-\mu)^2,$$</div>
+<p>两边取期望得 <span class="math-inline">$(n-1)\sigma^2$</span> .</p>
+<h3 id="section-三个常用抽样分布">三个常用抽样分布<a class="heading-anchor" href="#section-三个常用抽样分布" aria-label="链接到三个常用抽样分布">#</a></h3>
+<p>设 <span class="math-inline">$Z_i$</span> 独立且均为 <span class="math-inline">$N(0,1)$</span> ：</p>
+<div class="math-block">$$U=\sum_{i=1}^{\nu}Z_i^2\sim\chi^2(\nu),\qquad
+E U=\nu,\quad\operatorname{Var}(U)=2\nu.$$</div>
+<p>若 <span class="math-inline">$Z\sim N(0,1)$</span> 与 <span class="math-inline">$U\sim\chi^2(\nu)$</span> 独立：</p>
+<div class="math-block">$$T=\frac{Z}{\sqrt{U/\nu}}\sim t(\nu).$$</div>
+<p>若 <span class="math-inline">$U\sim\chi^2(\nu_1)$</span> 与 <span class="math-inline">$V\sim\chi^2(\nu_2)$</span> 独立：</p>
+<div class="math-block">$$F=\frac{U/\nu_1}{V/\nu_2}\sim F(\nu_1,\nu_2).$$</div>
+<p>自由度及独立性是构造分布的一部分；<span class="math-inline">$1/F\sim F(\nu_2,\nu_1)$</span> ，不能忘记交换自由度.</p>
+<h3 id="section-正态总体的精确结论">正态总体的精确结论<a class="heading-anchor" href="#section-正态总体的精确结论" aria-label="链接到正态总体的精确结论">#</a></h3>
+<p>若样本来自 <span class="math-inline">$N(\mu,\sigma^2)$</span> ：</p>
+<div class="math-block">$$\overline X\sim N\left(\mu,\frac{\sigma^2}{n}\right),\qquad
+\frac{(n-1)S^2}{\sigma^2}\sim\chi^2(n-1),$$</div>
+<p>且 <span class="math-inline">$\overline X$</span> 与 <span class="math-inline">$S^2$</span> 独立，因此：</p>
+<div class="math-block">$$\frac{\overline X-\mu}{S/\sqrt n}\sim t(n-1).$$</div>
+<p>这些是正态总体下的有限样本精确分布. 一般总体不能仅靠将 <span class="math-inline">$\sigma$</span> 换成 <span class="math-inline">$S$</span> ，就声称统计量精确服从 <span class="math-inline">$t$</span> 分布.</p>
+<h2 id="section-参数估计">参数估计<a class="heading-anchor" href="#section-参数估计" aria-label="链接到参数估计">#</a></h2>
+<h3 id="section-矩估计">矩估计<a class="heading-anchor" href="#section-矩估计" aria-label="链接到矩估计">#</a></h3>
+<p>用样本矩替换总体矩，联立求未知参数：</p>
+<div class="math-block">$$E_\theta(X^k)\approx\frac1n\sum_iX_i^k.$$</div>
+<p>有几个参数，通常取相应数量的矩方程. 求解后还应检查是否唯一、是否落在参数空间内.</p>
+<h3 id="section-最大似然估计">最大似然估计<a class="heading-anchor" href="#section-最大似然估计" aria-label="链接到最大似然估计">#</a></h3>
+<p>独立样本的似然：</p>
+<div class="math-block">$$L(\theta;\boldsymbol x)=\prod_{i=1}^n f_\theta(x_i),\qquad
+\widehat\theta=\arg\max_{\theta\in\Theta}L(\theta;\boldsymbol x).$$</div>
+<p>离散模型将密度换为概率质量. 数据固定，参数变化；似然本身不是参数的概率分布.</p>
+<p>通常取对数再求极值，但要同时检查边界、支撑集对参数的限制，以及极值是否取得. 导数为 <span class="math-inline">$0$</span> 只能给候选点.</p>
+<p>最大似然具有变换不变性：估计 <span class="math-inline">$g(\theta)$</span> 时，可取 <span class="math-inline">$g(\widehat\theta)$</span> .</p>
+<h3 id="section-估计量的评价">估计量的评价<a class="heading-anchor" href="#section-估计量的评价" aria-label="链接到估计量的评价">#</a></h3>
+<ul><li><strong>无偏</strong>：<span class="math-inline">$E_\theta\widehat\theta=\theta$</span> .</li><li><strong>相合</strong>：<span class="math-inline">$\widehat\theta_n\xrightarrow{P}\theta$</span> .</li><li><strong>均方误差</strong>：同时衡量方差与偏差.</li></ul>
+<div class="math-block">$$E_\theta[(\widehat\theta-\theta)^2]
+=\operatorname{Var}_\theta(\widehat\theta)
++[E_\theta\widehat\theta-\theta]^2.$$</div>
+<p>无偏不保证相合，也不保证均方误差更小. “有效性”须明确比较范围与准则，不能只凭样本量大就断言有效.</p>
+<h3 id="section-置信区间与分位数约定">置信区间与分位数约定<a class="heading-anchor" href="#section-置信区间与分位数约定" aria-label="链接到置信区间与分位数约定">#</a></h3>
+<p>下文统一用<strong>左尾分位数</strong>：</p>
+<div class="math-block">$$P(Z\le z_p)=p,\quad
+P(T_\nu\le t_{p,\nu})=p,\quad
+P(U_\nu\le\chi^2_{p,\nu})=p.$$</div>
+<p>置信度 <span class="math-inline">$1-\alpha$</span> 描述区间构造方法的覆盖率：</p>
+<div class="math-block">$$P_\theta\{L(\boldsymbol X)\le\theta\le U(\boldsymbol X)\}=1-\alpha.$$</div>
+<p>频率学派中参数固定、区间随机. 数据已经观测后，不能把此式解释为固定区间内参数仍有 <span class="math-inline">$1-\alpha$</span> 的概率.</p>
+<p>构造方法：找到分布不含未知参数的枢轴量，先取概率区间，再反解参数.</p>
+<h3 id="section-单个正态总体的区间">单个正态总体的区间<a class="heading-anchor" href="#section-单个正态总体的区间" aria-label="链接到单个正态总体的区间">#</a></h3>
+<p>均值 <span class="math-inline">$\mu$</span> ，<span class="math-inline">$\sigma$</span> 已知：</p>
+<div class="math-block">$$\overline X\pm z_{1-\alpha/2}\frac{\sigma}{\sqrt n}.$$</div>
+<p><span class="math-inline">$\sigma$</span> 未知：</p>
+<div class="math-block">$$\overline X\pm t_{1-\alpha/2,n-1}\frac S{\sqrt n}.$$</div>
+<p>方差 <span class="math-inline">$\sigma^2$</span> ，均值未知：</p>
+<div class="math-block">$$\left[
+\frac{(n-1)S^2}{\chi^2_{1-\alpha/2,n-1}},
+\frac{(n-1)S^2}{\chi^2_{\alpha/2,n-1}}
+\right].$$</div>
+<p>方差区间通常不对称；反解时分母的大小与端点方向相反. 标准差区间对两端开平方.</p>
+<h2 id="section-假设检验">假设检验<a class="heading-anchor" href="#section-假设检验" aria-label="链接到假设检验">#</a></h2>
+<p>在 <span class="math-inline">$H_0$</span> 给定的模型下，判断观测是否落入预先规定的异常区域.</p>
+<h3 id="section-两类错误与功效">两类错误与功效<a class="heading-anchor" href="#section-两类错误与功效" aria-label="链接到两类错误与功效">#</a></h3>
+<ul><li>第一类错误：<span class="math-inline">$H_0$</span> 为真却拒绝，概率由显著性水平 <span class="math-inline">$\alpha$</span> 控制.</li><li>第二类错误：<span class="math-inline">$H_0$</span> 为假却未拒绝，概率为 <span class="math-inline">$\beta(\theta)$</span> .</li><li>功效：<span class="math-inline">$1-\beta(\theta)$</span> ，随具体备择参数变化.</li></ul>
+<p>复合原假设下通常要求所有 <span class="math-inline">$\theta\in\Theta_0$</span> 的拒绝概率不超过 <span class="math-inline">$\alpha$</span> . 固定样本量时，收紧拒绝域通常降低第一类错误，却增加第二类错误.</p>
+<p>“未拒绝”说明证据不足，不能直接宣布原假设已被证明.</p>
+<h3 id="section-检验步骤与-p-值">检验步骤与 p 值<a class="heading-anchor" href="#section-检验步骤与-p-值" aria-label="链接到检验步骤与 p 值">#</a></h3>
+<p>先确定原假设、备择假设与显著性水平，再选统计量，求其在 <span class="math-inline">$H_0$</span> 下的分布，最后计算并判断.</p>
+<p>p 值是在原假设模型下，出现与观测同样或更极端结果的概率，“极端”方向由备择假设和统计量决定. 常按 <span class="math-inline">$p\le\alpha$</span> 拒绝 <span class="math-inline">$H_0$</span> .</p>
+<p>p 值不是 <span class="math-inline">$H_0$</span> 为真的概率，也不是结果由偶然造成的概率. 不应观察数据后再选择单侧方向.</p>
+<h3 id="section-单个正态总体的检验">单个正态总体的检验<a class="heading-anchor" href="#section-单个正态总体的检验" aria-label="链接到单个正态总体的检验">#</a></h3>
+<p>检验 <span class="math-inline">$H_0:\mu=\mu_0$</span> ：</p>
+<div class="math-block">$$Z=\frac{\overline X-\mu_0}{\sigma/\sqrt n}\sim N(0,1)
+\quad(\sigma\text{ 已知}),$$</div>
+<div class="math-block">$$T=\frac{\overline X-\mu_0}{S/\sqrt n}\sim t(n-1)
+\quad(\sigma\text{ 未知}).$$</div>
+<p>双侧备择分别在 <span class="math-inline">$|Z|&gt;z_{1-\alpha/2}$</span> 或 <span class="math-inline">$|T|&gt;t_{1-\alpha/2,n-1}$</span> 时拒绝；右侧备择用右尾临界值，左侧相应使用左尾.</p>
+<p>检验 <span class="math-inline">$H_0:\sigma^2=\sigma_0^2$</span> ，均值未知时：</p>
+<div class="math-block">$$U=\frac{(n-1)S^2}{\sigma_0^2}\sim\chi^2(n-1).$$</div>
+<p>双侧等尾检验在 <span class="math-inline">$U&lt;\chi^2_{\alpha/2,n-1}$</span> 或 <span class="math-inline">$U&gt;\chi^2_{1-\alpha/2,n-1}$</span> 时拒绝. 不是用绝对值构造对称拒绝域.</p>
+<h3 id="section-两总体比较">两总体比较<a class="heading-anchor" href="#section-两总体比较" aria-label="链接到两总体比较">#</a></h3>
+<p>以下两样本相互独立，且分别来自正态总体，样本量为 <span class="math-inline">$n_1,n_2$</span> .</p>
+<p>方差已知时，均值差标准误为：</p>
+<div class="math-block">$$\operatorname{SE}(\overline X-\overline Y)
+=\sqrt{\frac{\sigma_1^2}{n_1}+\frac{\sigma_2^2}{n_2}}.$$</div>
+<p>方差未知但相等时，令：</p>
+<div class="math-block">$$S_p^2=\frac{(n_1-1)S_1^2+(n_2-1)S_2^2}{n_1+n_2-2},$$</div>
+<div class="math-block">$$T=\frac{(\overline X-\overline Y)-\delta_0}
+{S_p\sqrt{1/n_1+1/n_2}}\sim t(n_1+n_2-2)
+\quad(H_0:\mu_1-\mu_2=\delta_0).$$</div>
+<p>方差不等时，不能直接合并方差；可用 Welch 方法及近似自由度. 配对数据应先对每对求差，再按单样本处理.</p>
+<p>检验方差比 <span class="math-inline">$H_0:\sigma_1^2/\sigma_2^2=c$</span> ：</p>
+<div class="math-block">$$F=\frac{S_1^2}{cS_2^2}\sim F(n_1-1,n_2-1).$$</div>
+<p>对同一检验体系，置信区间可由所有未被拒绝的参数值反演得到；单侧、双侧及尾概率的分配必须一致.</p>
+<h3 id="section-卡方拟合优度">卡方拟合优度<a class="heading-anchor" href="#section-卡方拟合优度" aria-label="链接到卡方拟合优度">#</a></h3>
+<p>设分类次数为 <span class="math-inline">$O_i$</span> ，原假设概率为 <span class="math-inline">$p_i&gt;0$</span> ，期望次数 <span class="math-inline">$E_i=np_i$</span> ：</p>
+<div class="math-block">$$Q=\sum_{i=1}^k\frac{(O_i-E_i)^2}{E_i}
+\approx\chi^2(k-1-r).$$</div>
+<p><span class="math-inline">$r$</span> 是由同一数据估计的独立参数个数，需满足通常的正则性与估计条件. 期望次数太小应合理合并类别后重新计自由度；不能因公式形式相同就忽略近似条件.</p>
+<h2 id="section-方差分析与回归">方差分析与回归<a class="heading-anchor" href="#section-方差分析与回归" aria-label="链接到方差分析与回归">#</a></h2>
+<h3 id="section-单因素方差分析">单因素方差分析<a class="heading-anchor" href="#section-单因素方差分析" aria-label="链接到单因素方差分析">#</a></h3>
+<p>设 <span class="math-inline">$k$</span> 组相互独立，各组数据独立服从 <span class="math-inline">$N(\mu_i,\sigma^2)$</span> ，共 <span class="math-inline">$N&gt;k$</span> 个观测. 检验 <span class="math-inline">$H_0:\mu_1=\cdots=\mu_k$</span> .</p>
+<div class="math-block">$$\begin{aligned}
+SS_T&amp;=\sum_{i,j}(X_{ij}-\overline X)^2,\\
+SS_B&amp;=\sum_i n_i(\overline X_i-\overline X)^2,\\
+SS_E&amp;=\sum_{i,j}(X_{ij}-\overline X_i)^2.
+\end{aligned}$$</div>
+<p>由组内偏差之和为 <span class="math-inline">$0$</span> ：</p>
+<div class="math-block">$$SS_T=SS_B+SS_E.$$</div>
+<p>原假设下：</p>
+<div class="math-block">$$F=\frac{SS_B/(k-1)}{SS_E/(N-k)}\sim F(k-1,N-k).$$</div>
+<p>大的 <span class="math-inline">$F$</span> 表示组间差异相对组内波动过大. 拒绝后只说明至少一组均值不同，不能据此直接指定哪两组不同.</p>
+<h3 id="section-一元线性回归">一元线性回归<a class="heading-anchor" href="#section-一元线性回归" aria-label="链接到一元线性回归">#</a></h3>
+<p>模型：</p>
+<div class="math-block">$$Y_i=\beta_0+\beta_1x_i+\varepsilon_i,$$</div>
+<p><span class="math-inline">$x_i$</span> 为给定值且不全相同. 通常设误差独立、均值为 <span class="math-inline">$0$</span> 、方差相同；精确 <span class="math-inline">$t,F$</span> 推断再要求误差正态.</p>
+<p>记：</p>
+<div class="math-block">$$S_{xx}=\sum_i(x_i-\overline x)^2,\qquad
+S_{xy}=\sum_i(x_i-\overline x)(Y_i-\overline Y).$$</div>
+<p>最小二乘给出：</p>
+<div class="math-block">$$\widehat\beta_1=\frac{S_{xy}}{S_{xx}},\qquad
+\widehat\beta_0=\overline Y-\widehat\beta_1\overline x.$$</div>
+<p>因为对残差平方和求导，得到 <span class="math-inline">$\sum e_i=0,\sum x_ie_i=0$</span> ，即残差与拟合空间正交.</p>
+<div class="math-block">$$SSE=\sum_i(Y_i-\widehat Y_i)^2,\qquad
+s^2=\frac{SSE}{n-2}\quad(n&gt;2).$$</div>
+<p>正态误差下检验斜率：</p>
+<div class="math-block">$$\frac{\widehat\beta_1-\beta_{1,0}}{s/\sqrt{S_{xx}}}\sim t(n-2).$$</div>
+<p>在 <span class="math-inline">$x_0$</span> 处，均值估计与新个体预测的标准误分别为：</p>
+<div class="math-block">$$\operatorname{SE}_{\text{均值}}
+=s\sqrt{\frac1n+\frac{(x_0-\overline x)^2}{S_{xx}}},$$</div>
+<div class="math-block">$$\operatorname{SE}_{\text{预测}}
+=s\sqrt{1+\frac1n+\frac{(x_0-\overline x)^2}{S_{xx}}}.$$</div>
+<p>预测多了新观测自身的误差，区间更宽. 回归关系不自动表示因果关系，远离观测范围的外推也依赖额外模型假设.</p>
+<h2 id="section-选学内容提要">选学内容提要<a class="heading-anchor" href="#section-选学内容提要" aria-label="链接到选学内容提要">#</a></h2>
+<p>教材后部内容按课程要求取用，以下仅保留结构与条件.</p>
+<h3 id="section-非参数方法与-bootstrap">非参数方法与 bootstrap<a class="heading-anchor" href="#section-非参数方法与-bootstrap" aria-label="链接到非参数方法与 bootstrap">#</a></h3>
+<p>非参数检验减弱对具体分布形式的要求，但仍有独立性、连续性、对称性等条件；“非参数”不等于无假设.</p>
+<p>符号检验在连续总体中检验中位数 <span class="math-inline">$m_0$</span> 时，原假设下高于 <span class="math-inline">$m_0$</span> 的样本个数服从 <span class="math-inline">$B(n,1/2)$</span> . 有并列值时需明确处理规则.</p>
+<p>经验 bootstrap 从原样本的经验分布中有放回重抽样，重新计算统计量，以近似其抽样波动. 它重抽样数据，而不是直接随机改变参数；依赖原样本代表性及所用方法的适用条件.</p>
+<h3 id="section-随机过程与泊松过程">随机过程与泊松过程<a class="heading-anchor" href="#section-随机过程与泊松过程" aria-label="链接到随机过程与泊松过程">#</a></h3>
+<p>随机过程 <span class="math-inline">$\{X(t):t\in T\}$</span> 是按时间索引的一族随机变量；固定一次试验结果得到一条样本路径. 联合分布描述不同时刻间的关系，只有各时刻边缘分布通常不够.</p>
+<p>齐次泊松过程 <span class="math-inline">$N(t)$</span> 从 <span class="math-inline">$0$</span> 开始，具有独立、平稳增量，且：</p>
+<div class="math-block">$$N(t)-N(s)\sim P(\lambda(t-s))\quad(0\le s&lt;t).$$</div>
+<p>相邻到达间隔独立服从速率为 <span class="math-inline">$\lambda$</span> 的指数分布；<span class="math-inline">$E N(t)=\operatorname{Var}N(t)=\lambda t$</span> .</p>
+<h3 id="section-马尔可夫链">马尔可夫链<a class="heading-anchor" href="#section-马尔可夫链" aria-label="链接到马尔可夫链">#</a></h3>
+<p>马尔可夫性表示给定当前状态后，未来的条件分布不再依赖更早的历史，不表示相邻状态独立.</p>
+<p>齐次离散链的转移矩阵：</p>
+<div class="math-block">$$p_{ij}=P(X_{n+1}=j\mid X_n=i),\qquad
+P^{(m+n)}=P^{(m)}P^{(n)},\qquad P^{(n)}=P^n.$$</div>
+<p>采用行概率向量时：</p>
+<div class="math-block">$$\boldsymbol\pi_n=\boldsymbol\pi_0P^n,\qquad
+\boldsymbol\pi=\boldsymbol\pi P$$</div>
+<p>后式定义平稳分布. 有平稳分布不自动保证从任意初始分布趋于它；有限状态、不可约且非周期时，有唯一平稳分布并收敛到它.</p>
+<h3 id="section-平稳与各态历经">平稳与各态历经<a class="heading-anchor" href="#section-平稳与各态历经" aria-label="链接到平稳与各态历经">#</a></h3>
+<p>严平稳要求任意有限维联合分布在时间平移后不变. 宽平稳只要求二阶矩有限、均值恒定，协方差只依赖时间差：</p>
+<div class="math-block">$$E X(t)=\mu,\qquad
+\operatorname{Cov}(X(t),X(t+\tau))=C(\tau).$$</div>
+<p>二阶矩存在时，严平稳推出宽平稳；反向一般不成立，高斯过程是例外.</p>
+<p>实宽平稳过程的自相关函数 <span class="math-inline">$R(\tau)=E[X(t)X(t+\tau)]$</span> 满足：</p>
+<div class="math-block">$$R(-\tau)=R(\tau),\qquad |R(\tau)|\le R(0).$$</div>
+<p>在 <span class="math-inline">$R$</span> 可积等条件下，取角频率约定的功率谱密度：</p>
+<div class="math-block">$$S(\omega)=\int_{-\infty}^{\infty}R(\tau)e^{-i\omega\tau}\,d\tau.$$</div>
+<p>它非负；一般过程可能需要谱测度而非普通谱密度. 各态历经进一步要求适当的时间平均能恢复总体平均，平稳性本身不能保证这一点.</p></div></div></article></main><footer class="sub-footer"><span>© 2026 yangjm</span><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">鲁ICP备2026048978号-1 <span aria-hidden="true">↗</span></a></footer></body></html>

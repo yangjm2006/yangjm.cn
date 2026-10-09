@@ -1,13 +1,63 @@
 [
   {
-    "slug": "math-note",
-    "title": "数学笔记",
-    "description": "从多项式与插值出发，整理生成函数、二项式定理、卡特兰数和 Dirichlet 级数等基础内容。",
-    "date": "2026-09-16",
-    "topic": "数学 · 学习笔记",
-    "source": "Math-Note.md",
-    "originalUrl": "https://github.com/yangjm2006/Blog/blob/main/Note/Math-Note.md",
-    "sourceUrl": "https://raw.githubusercontent.com/yangjm2006/Blog/main/Note/Math-Note.md"
+    "slug": "probability-statistics",
+    "title": "概率论与数理统计",
+    "description": "整理条件概率、随机变量、数字特征、极限定理、参数估计与假设检验。",
+    "date": "2026-10-07",
+    "topic": "数学 · 概率与统计",
+    "source": "概率论与数理统计.md",
+    "originalUrl": "https://github.com/yangjm2006/Blog/blob/main/Note/%E6%A6%82%E7%8E%87%E8%AE%BA%E4%B8%8E%E6%95%B0%E7%90%86%E7%BB%9F%E8%AE%A1.md",
+    "sourceUrl": "https://api.github.com/repos/yangjm2006/Blog/contents/Note/%E6%A6%82%E7%8E%87%E8%AE%BA%E4%B8%8E%E6%95%B0%E7%90%86%E7%BB%9F%E8%AE%A1.md?ref=main"
+  },
+  {
+    "slug": "higher-mathematics-1",
+    "title": "高等数学（一）",
+    "description": "整理极限与连续、导数与微分、积分及微分方程的核心概念和计算方法。",
+    "date": "2025-10-02",
+    "topic": "数学 · 高等数学",
+    "source": "高等数学（一）.md",
+    "originalUrl": "https://github.com/yangjm2006/Blog/blob/main/Note/%E9%AB%98%E7%AD%89%E6%95%B0%E5%AD%A6%EF%BC%88%E4%B8%80%EF%BC%89.md",
+    "sourceUrl": "https://api.github.com/repos/yangjm2006/Blog/contents/Note/%E9%AB%98%E7%AD%89%E6%95%B0%E5%AD%A6%EF%BC%88%E4%B8%80%EF%BC%89.md?ref=main"
+  },
+  {
+    "slug": "higher-mathematics-2",
+    "title": "高等数学（二）",
+    "description": "整理空间解析几何、多元函数微分、重积分、曲线曲面积分与无穷级数。",
+    "date": "2026-04-10",
+    "topic": "数学 · 高等数学",
+    "source": "高等数学（二）.md",
+    "originalUrl": "https://github.com/yangjm2006/Blog/blob/main/Note/%E9%AB%98%E7%AD%89%E6%95%B0%E5%AD%A6%EF%BC%88%E4%BA%8C%EF%BC%89.md",
+    "sourceUrl": "https://api.github.com/repos/yangjm2006/Blog/contents/Note/%E9%AB%98%E7%AD%89%E6%95%B0%E5%AD%A6%EF%BC%88%E4%BA%8C%EF%BC%89.md?ref=main"
+  },
+  {
+    "slug": "generating-functions-combinatorics",
+    "title": "生成函数与组合数学",
+    "description": "整理生成函数、卷积、二项式定理、卡特兰数与 Dirichlet 级数。",
+    "date": "2026-10-06",
+    "topic": "数学 · 组合数学",
+    "source": "生成函数与组合数学.md",
+    "originalUrl": "https://github.com/yangjm2006/Blog/blob/main/Note/%E7%94%9F%E6%88%90%E5%87%BD%E6%95%B0%E4%B8%8E%E7%BB%84%E5%90%88%E6%95%B0%E5%AD%A6.md",
+    "sourceUrl": "https://api.github.com/repos/yangjm2006/Blog/contents/Note/%E7%94%9F%E6%88%90%E5%87%BD%E6%95%B0%E4%B8%8E%E7%BB%84%E5%90%88%E6%95%B0%E5%AD%A6.md?ref=main"
+  },
+  {
+    "slug": "polynomials-number-theory-transforms",
+    "title": "多项式与数论变换",
+    "description": "整理插值、FFT、NTT、形式幂级数、线性递推与数论变换。",
+    "date": "2026-10-06",
+    "topic": "数学 · 多项式与数论",
+    "source": "多项式与数论变换.md",
+    "originalUrl": "https://github.com/yangjm2006/Blog/blob/main/Note/%E5%A4%9A%E9%A1%B9%E5%BC%8F%E4%B8%8E%E6%95%B0%E8%AE%BA%E5%8F%98%E6%8D%A2.md",
+    "sourceUrl": "https://api.github.com/repos/yangjm2006/Blog/contents/Note/%E5%A4%9A%E9%A1%B9%E5%BC%8F%E4%B8%8E%E6%95%B0%E8%AE%BA%E5%8F%98%E6%8D%A2.md?ref=main"
+  },
+  {
+    "slug": "linear-algebra",
+    "title": "线性代数",
+    "description": "整理行列式、矩阵、线性空间、特征值、正交投影与二次型。",
+    "date": "2025-11-12",
+    "topic": "数学 · 线性代数",
+    "source": "线性代数.md",
+    "originalUrl": "https://github.com/yangjm2006/Blog/blob/main/Note/%E7%BA%BF%E6%80%A7%E4%BB%A3%E6%95%B0.md",
+    "sourceUrl": "https://api.github.com/repos/yangjm2006/Blog/contents/Note/%E7%BA%BF%E6%80%A7%E4%BB%A3%E6%95%B0.md?ref=main"
   },
   {
     "slug": "2026-2027-season",
@@ -17,6 +67,6 @@
     "topic": "算法竞赛 · 赛季记录",
     "source": "2026-2027赛季.md",
     "originalUrl": "https://github.com/yangjm2006/Blog/blob/main/Blog/2026-2027%E8%B5%9B%E5%AD%A3.md",
-    "sourceUrl": "https://raw.githubusercontent.com/yangjm2006/Blog/main/Blog/2026-2027%E8%B5%9B%E5%AD%A3.md"
+    "sourceUrl": "https://api.github.com/repos/yangjm2006/Blog/contents/Blog/2026-2027%E8%B5%9B%E5%AD%A3.md?ref=main"
   }
 ]

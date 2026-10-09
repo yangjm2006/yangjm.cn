@@ -1,0 +1,308 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f4f1e8"><meta name="description" content="整理行列式、矩阵、线性空间、特征值、正交投影与二次型。"><title>线性代数 · yangjm</title><script>
+    (() => {
+      const key = 'yangjm-theme';
+      const valid = value => value === 'light' || value === 'dark';
+      const readCookie = () => {
+        const item = document.cookie.split('; ').find(row => row.startsWith(`${key}=`));
+        return item ? decodeURIComponent(item.slice(key.length + 1)) : null;
+      };
+      const save = theme => {
+        const sharedDomain = location.hostname === 'yangjm.cn' || location.hostname.endsWith('.yangjm.cn');
+        const domain = sharedDomain ? '; Domain=yangjm.cn' : '';
+        const secure = location.protocol === 'https:' ? '; Secure' : '';
+        document.cookie = `${key}=${theme}; Path=/; Max-Age=31536000; SameSite=Lax${domain}${secure}`;
+        try { localStorage.setItem(key, theme); } catch {}
+      };
+      let legacy;
+      try { legacy = localStorage.getItem(key); } catch {}
+      const cookie = readCookie();
+      const saved = valid(cookie) ? cookie : (valid(legacy) ? legacy : null);
+      if (!valid(cookie) && valid(legacy)) save(legacy);
+      const hour = new Date().getHours();
+      const theme = saved || (hour >= 7 && hour < 19 ? 'light' : 'dark');
+      document.documentElement.dataset.theme = theme;
+      document.documentElement.style.colorScheme = theme;
+      document.querySelector('meta[name="theme-color"]').content = theme === 'dark' ? '#15231d' : '#f4f1e8';
+      window.YANGJM_THEME = { read: readCookie, save, valid };
+    })();
+  </script><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/styles.css?v=20260916"><link rel="stylesheet" href="/subsites.css?v=20260916"><link rel="stylesheet" href="/blog.css?v=20261006b"><script src="/subsites.js?v=20260916" defer></script><script src="/visits.js?v=20260928b" defer></script><script>window.MathJax={tex:{inlineMath:[["$","$"],["\\(","\\)"]],displayMath:[["$$","$$"],["\\[","\\]"]],packages:{"[+]": ["ams"]},tags:"ams"},options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},chtml:{scale:1}};</script><script defer src="/vendor/mathjax/tex-chtml.js"></script><link rel="stylesheet" href="/navigation.css?v=20260921a"></head><body class="subsite blog-article"><a class="skip-link" href="#content">跳到正文</a><header id="site-navigation" class="site-nav-header"><a class="brand" href="https://yangjm.cn/" aria-label="yangjm 个人主页">y<span>.</span></a><nav aria-label="主导航"><a data-section="home" href="https://yangjm.cn/">主页</a><a data-section="blog" aria-current="page" href="https://blog.yangjm.cn/">博客</a><a data-section="oi" href="https://oi.yangjm.cn/">竞赛</a><a data-section="notebook" href="https://banzi.yangjm.cn/">板子</a><a data-section="materials" href="https://materials.yangjm.cn/">资料</a></nav><button class="theme-toggle" id="theme-toggle" type="button" aria-label="切换到夜间模式" aria-pressed="false" title="切换到夜间模式">
+    <svg class="theme-icon moon-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M20.6 15.4A9 9 0 0 1 8.6 3.4 9 9 0 1 0 20.6 15.4Z"/></svg>
+    <svg class="theme-icon sun-icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v2.2M12 19.8V22M4.9 4.9l1.6 1.6m11 11 1.6 1.6M2 12h2.2M19.8 12H22M4.9 19.1l1.6-1.6m11-11 1.6-1.6"/></svg>
+  </button></header><main id="content" class="article-shell"><article class="article-page"><nav class="breadcrumb" aria-label="面包屑"><a href="https://blog.yangjm.cn/">文字与记录</a><span aria-hidden="true">/</span><span>线性代数</span></nav><header class="article-header"><h1>线性代数</h1><p>整理行列式、矩阵、线性空间、特征值、正交投影与二次型。</p><div class="article-meta"><time datetime="2025-11-12">2025年11月12日</time><span>17 分钟阅读</span><span>数学 · 线性代数</span><span data-visit-label>阅读：<span data-visit-current="linear-algebra">…</span></span></div></header><details class="mobile-toc"><summary>文章目录</summary><ol><li class="toc-level-2"><a href="#section-行列式">行列式</a></li><li class="toc-level-3"><a href="#section-定义与展开">定义与展开</a></li><li class="toc-level-3"><a href="#section-计算与结构">计算与结构</a></li><li class="toc-level-3"><a href="#section-范德蒙德行列式">范德蒙德行列式</a></li><li class="toc-level-2"><a href="#section-矩阵与初等变换">矩阵与初等变换</a></li><li class="toc-level-3"><a href="#section-乘法的含义">乘法的含义</a></li><li class="toc-level-3"><a href="#section-初等矩阵与逆矩阵">初等矩阵与逆矩阵</a></li><li class="toc-level-3"><a href="#section-伴随矩阵">伴随矩阵</a></li><li class="toc-level-3"><a href="#section-分块消元">分块消元</a></li><li class="toc-level-2"><a href="#section-秩与线性方程组">秩与线性方程组</a></li><li class="toc-level-3"><a href="#section-矩阵的秩">矩阵的秩</a></li><li class="toc-level-3"><a href="#section-解的判定">解的判定</a></li><li class="toc-level-3"><a href="#section-解的结构">解的结构</a></li><li class="toc-level-3"><a href="#section-可逆的等价条件">可逆的等价条件</a></li><li class="toc-level-2"><a href="#section-向量组与线性空间">向量组与线性空间</a></li><li class="toc-level-3"><a href="#section-线性相关与最大无关组">线性相关与最大无关组</a></li><li class="toc-level-3"><a href="#section-基与维数">基与维数</a></li><li class="toc-level-3"><a href="#section-基变换与坐标变换">基变换与坐标变换</a></li><li class="toc-level-3"><a href="#section-线性映射-核与像">线性映射、核与像</a></li><li class="toc-level-2"><a href="#section-正交与投影">正交与投影</a></li><li class="toc-level-3"><a href="#section-施密特正交化">施密特正交化</a></li><li class="toc-level-3"><a href="#section-正交矩阵">正交矩阵</a></li><li class="toc-level-3"><a href="#section-四个基本子空间">四个基本子空间</a></li><li class="toc-level-3"><a href="#section-最小二乘与投影">最小二乘与投影</a></li><li class="toc-level-2"><a href="#section-特征值与相似对角化">特征值与相似对角化</a></li><li class="toc-level-3"><a href="#section-特征值与特征空间">特征值与特征空间</a></li><li class="toc-level-3"><a href="#section-相似">相似</a></li><li class="toc-level-3"><a href="#section-对角化条件">对角化条件</a></li><li class="toc-level-3"><a href="#section-矩阵幂与多项式">矩阵幂与多项式</a></li><li class="toc-level-2"><a href="#section-实对称矩阵与二次型">实对称矩阵与二次型</a></li><li class="toc-level-3"><a href="#section-实对称矩阵的谱分解">实对称矩阵的谱分解</a></li><li class="toc-level-3"><a href="#section-二次型与合同">二次型与合同</a></li><li class="toc-level-3"><a href="#section-标准形与惯性定理">标准形与惯性定理</a></li><li class="toc-level-3"><a href="#section-正定与半正定">正定与半正定</a></li><li class="toc-level-3"><a href="#section-二次型的范围与最小值">二次型的范围与最小值</a></li><li class="toc-level-2"><a href="#section-三种矩阵关系">三种矩阵关系</a></li></ol></details><div class="article-layout"><aside class="article-toc" aria-label="文章目录"><strong>文章目录</strong><ol><li class="toc-level-2"><a href="#section-行列式">行列式</a></li><li class="toc-level-3"><a href="#section-定义与展开">定义与展开</a></li><li class="toc-level-3"><a href="#section-计算与结构">计算与结构</a></li><li class="toc-level-3"><a href="#section-范德蒙德行列式">范德蒙德行列式</a></li><li class="toc-level-2"><a href="#section-矩阵与初等变换">矩阵与初等变换</a></li><li class="toc-level-3"><a href="#section-乘法的含义">乘法的含义</a></li><li class="toc-level-3"><a href="#section-初等矩阵与逆矩阵">初等矩阵与逆矩阵</a></li><li class="toc-level-3"><a href="#section-伴随矩阵">伴随矩阵</a></li><li class="toc-level-3"><a href="#section-分块消元">分块消元</a></li><li class="toc-level-2"><a href="#section-秩与线性方程组">秩与线性方程组</a></li><li class="toc-level-3"><a href="#section-矩阵的秩">矩阵的秩</a></li><li class="toc-level-3"><a href="#section-解的判定">解的判定</a></li><li class="toc-level-3"><a href="#section-解的结构">解的结构</a></li><li class="toc-level-3"><a href="#section-可逆的等价条件">可逆的等价条件</a></li><li class="toc-level-2"><a href="#section-向量组与线性空间">向量组与线性空间</a></li><li class="toc-level-3"><a href="#section-线性相关与最大无关组">线性相关与最大无关组</a></li><li class="toc-level-3"><a href="#section-基与维数">基与维数</a></li><li class="toc-level-3"><a href="#section-基变换与坐标变换">基变换与坐标变换</a></li><li class="toc-level-3"><a href="#section-线性映射-核与像">线性映射、核与像</a></li><li class="toc-level-2"><a href="#section-正交与投影">正交与投影</a></li><li class="toc-level-3"><a href="#section-施密特正交化">施密特正交化</a></li><li class="toc-level-3"><a href="#section-正交矩阵">正交矩阵</a></li><li class="toc-level-3"><a href="#section-四个基本子空间">四个基本子空间</a></li><li class="toc-level-3"><a href="#section-最小二乘与投影">最小二乘与投影</a></li><li class="toc-level-2"><a href="#section-特征值与相似对角化">特征值与相似对角化</a></li><li class="toc-level-3"><a href="#section-特征值与特征空间">特征值与特征空间</a></li><li class="toc-level-3"><a href="#section-相似">相似</a></li><li class="toc-level-3"><a href="#section-对角化条件">对角化条件</a></li><li class="toc-level-3"><a href="#section-矩阵幂与多项式">矩阵幂与多项式</a></li><li class="toc-level-2"><a href="#section-实对称矩阵与二次型">实对称矩阵与二次型</a></li><li class="toc-level-3"><a href="#section-实对称矩阵的谱分解">实对称矩阵的谱分解</a></li><li class="toc-level-3"><a href="#section-二次型与合同">二次型与合同</a></li><li class="toc-level-3"><a href="#section-标准形与惯性定理">标准形与惯性定理</a></li><li class="toc-level-3"><a href="#section-正定与半正定">正定与半正定</a></li><li class="toc-level-3"><a href="#section-二次型的范围与最小值">二次型的范围与最小值</a></li><li class="toc-level-2"><a href="#section-三种矩阵关系">三种矩阵关系</a></li></ol><a class="source-link" href="https://github.com/yangjm2006/Blog/blob/main/Note/%E7%BA%BF%E6%80%A7%E4%BB%A3%E6%95%B0.md" target="_blank" rel="noopener noreferrer">查看 Markdown 原文 <span aria-hidden="true">↗</span></a></aside><div class="article-body"><h2 id="section-行列式">行列式<a class="heading-anchor" href="#section-行列式" aria-label="链接到行列式">#</a></h2>
+<p>方阵对应的一个数，刻画线性变换对有向体积的伸缩.</p>
+<h3 id="section-定义与展开">定义与展开<a class="heading-anchor" href="#section-定义与展开" aria-label="链接到定义与展开">#</a></h3>
+<p>对 <span class="math-inline">$n$</span> 阶方阵 <span class="math-inline">$A=(a_{ij})$</span> ：</p>
+<div class="math-block">$$\det A=\sum_{\sigma\in S_n}(-1)^{\tau(\sigma)}
+\prod_{i=1}^n a_{i,\sigma(i)},$$</div>
+<p>其中 <span class="math-inline">$\tau(\sigma)$</span> 为排列的逆序数. 每项恰好从每行、每列取一个元素.</p>
+<p>删去第 <span class="math-inline">$i$</span> 行、第 <span class="math-inline">$j$</span> 列得到余子式 <span class="math-inline">$M_{ij}$</span> ，代数余子式为：</p>
+<div class="math-block">$$C_{ij}=(-1)^{i+j}M_{ij}.$$</div>
+<p>沿第 <span class="math-inline">$i$</span> 行展开，并把“异行相乘”合并写作：</p>
+<div class="math-block">$$\sum_{j=1}^n a_{ij}C_{kj}=\delta_{ik}\det A.$$</div>
+<p><span class="math-inline">$i\ne k$</span> 时，相当于把第 <span class="math-inline">$k$</span> 行替换成第 <span class="math-inline">$i$</span> 行后求行列式，两行相同，结果为 <span class="math-inline">$0$</span> .</p>
+<h3 id="section-计算与结构">计算与结构<a class="heading-anchor" href="#section-计算与结构" aria-label="链接到计算与结构">#</a></h3>
+<ul><li>交换两行，行列式变号；一行乘 <span class="math-inline">$k$</span> ，行列式乘 <span class="math-inline">$k$</span> .</li><li>一行加上另一行的倍数，行列式不变. 列变换同理.</li><li>行列式对每一行分别线性，不能把整个矩阵的加法拆成行列式相加.</li></ul>
+<div class="math-block">$$\det(AB)=\det A\det B,\qquad
+\det(A^T)=\det A,\qquad
+\det(kA)=k^n\det A.$$</div>
+<p>计算时优先消元为三角形，再乘对角元，并记录交换、倍乘带来的系数. 含参数时，除以某个式子前先讨论它是否为 <span class="math-inline">$0$</span> .</p>
+<p>若对角块为方阵，则：</p>
+<div class="math-block">$$\det\begin{pmatrix}A&amp;B\\0&amp;D\end{pmatrix}=\det A\det D.$$</div>
+<p>一般分块矩阵不能直接照搬二阶公式 <span class="math-inline">$AD-BC$</span> ，因为矩阵乘法通常不可交换.</p>
+<h3 id="section-范德蒙德行列式">范德蒙德行列式<a class="heading-anchor" href="#section-范德蒙德行列式" aria-label="链接到范德蒙德行列式">#</a></h3>
+<div class="math-block">$$\det\begin{pmatrix}
+1&amp;1&amp;\cdots&amp;1\\
+x_1&amp;x_2&amp;\cdots&amp;x_n\\
+\vdots&amp;\vdots&amp;&amp;\vdots\\
+x_1^{n-1}&amp;x_2^{n-1}&amp;\cdots&amp;x_n^{n-1}
+\end{pmatrix}
+=\prod_{1\le i&lt;j\le n}(x_j-x_i).$$</div>
+<p>令 <span class="math-inline">$x_i=x_j$</span> 时两列相同，故每个 <span class="math-inline">$x_j-x_i$</span> 都是因子. 两侧总次数均为 <span class="math-inline">$n(n-1)/2$</span> ，再比较 <span class="math-inline">$x_2x_3^2\cdots x_n^{n-1}$</span> 的系数即可.</p>
+<p>因此，<span class="math-inline">$n$</span> 个横坐标互异的点唯一确定一个次数不超过 <span class="math-inline">$n-1$</span> 的插值多项式.</p>
+<h2 id="section-矩阵与初等变换">矩阵与初等变换<a class="heading-anchor" href="#section-矩阵与初等变换" aria-label="链接到矩阵与初等变换">#</a></h2>
+<p>矩阵既能记录方程组，也能表示线性映射.</p>
+<h3 id="section-乘法的含义">乘法的含义<a class="heading-anchor" href="#section-乘法的含义" aria-label="链接到乘法的含义">#</a></h3>
+<p>若 <span class="math-inline">$A=(\boldsymbol a_1,\ldots,\boldsymbol a_n)$</span> ，则：</p>
+<div class="math-block">$$A\boldsymbol x=x_1\boldsymbol a_1+\cdots+x_n\boldsymbol a_n.$$</div>
+<p>矩阵乘法 <span class="math-inline">$AB$</span> 表示先作用 <span class="math-inline">$B$</span> ，再作用 <span class="math-inline">$A$</span> . 由此记住次序：</p>
+<div class="math-block">$$(AB)^T=B^TA^T,\qquad
+(AB)^{-1}=B^{-1}A^{-1}.$$</div>
+<p>后式要求两矩阵均可逆. <span class="math-inline">$AB=0$</span> 不能推出某个因子为零；约去矩阵因子也需要相应条件.</p>
+<h3 id="section-初等矩阵与逆矩阵">初等矩阵与逆矩阵<a class="heading-anchor" href="#section-初等矩阵与逆矩阵" aria-label="链接到初等矩阵与逆矩阵">#</a></h3>
+<p>对单位矩阵作一次初等变换得到初等矩阵 <span class="math-inline">$E$</span> .</p>
+<ul><li>左乘 <span class="math-inline">$E$</span> ：对矩阵作对应行变换.</li><li>右乘 <span class="math-inline">$E$</span> ：对矩阵作对应列变换.</li></ul>
+<p>初等矩阵可逆，逆变换仍是初等变换. 可逆矩阵恰好是有限个初等矩阵的乘积.</p>
+<p>用行变换求逆：</p>
+<div class="math-block">$$(A\mid I)\longrightarrow(I\mid A^{-1}).$$</div>
+<p>设总的左乘矩阵为 <span class="math-inline">$P$</span> ，则 <span class="math-inline">$PA=I$</span> ，右半边同时变成 <span class="math-inline">$PI=P=A^{-1}$</span> .</p>
+<h3 id="section-伴随矩阵">伴随矩阵<a class="heading-anchor" href="#section-伴随矩阵" aria-label="链接到伴随矩阵">#</a></h3>
+<p>把代数余子式矩阵转置，得到：</p>
+<div class="math-block">$$\operatorname{adj}(A)=(C_{ji}).$$</div>
+<p>由行列式展开公式：</p>
+<div class="math-block">$$A\operatorname{adj}(A)=\operatorname{adj}(A)A=(\det A)I.$$</div>
+<p>所以 <span class="math-inline">$\det A\ne0$</span> 时：</p>
+<div class="math-block">$$A^{-1}=\frac{\operatorname{adj}(A)}{\det A}.$$</div>
+<p>伴随矩阵不是转置矩阵，也不是直接把 <span class="math-inline">$C_{ij}$</span> 原位排放. 对 <span class="math-inline">$n\ge2$</span> ：</p>
+<div class="math-block">$$r(\operatorname{adj}(A))=
+\begin{cases}
+n,&amp;r(A)=n,\\
+1,&amp;r(A)=n-1,\\
+0,&amp;r(A)\le n-2.
+\end{cases}$$</div>
+<p>中间情形存在非零的 <span class="math-inline">$n-1$</span> 阶子式，所以伴随矩阵非零；而其各列都在一维零空间中，故秩为 <span class="math-inline">$1$</span> .</p>
+<h3 id="section-分块消元">分块消元<a class="heading-anchor" href="#section-分块消元" aria-label="链接到分块消元">#</a></h3>
+<p>若 <span class="math-inline">$A$</span> 可逆，令 <span class="math-inline">$S=D-CA^{-1}B$</span> ，则：</p>
+<div class="math-block">$$\begin{pmatrix}I&amp;0\\-CA^{-1}&amp;I\end{pmatrix}
+\begin{pmatrix}A&amp;B\\C&amp;D\end{pmatrix}
+=\begin{pmatrix}A&amp;B\\0&amp;S\end{pmatrix}.$$</div>
+<p>故：</p>
+<div class="math-block">$$\det\begin{pmatrix}A&amp;B\\C&amp;D\end{pmatrix}
+=\det A\det(D-CA^{-1}B).$$</div>
+<p>本质仍是消元，不能交换 <span class="math-inline">$C,A^{-1},B$</span> 的次序.</p>
+<h2 id="section-秩与线性方程组">秩与线性方程组<a class="heading-anchor" href="#section-秩与线性方程组" aria-label="链接到秩与线性方程组">#</a></h2>
+<p>秩是独立约束的数量，也是线性映射实际保留的维数.</p>
+<h3 id="section-矩阵的秩">矩阵的秩<a class="heading-anchor" href="#section-矩阵的秩" aria-label="链接到矩阵的秩">#</a></h3>
+<p><span class="math-inline">$r(A)$</span> 为非零子式的最高阶数，零矩阵的秩为 <span class="math-inline">$0$</span> . 同时等于：</p>
+<ul><li>行向量组的秩.</li><li>列向量组的秩.</li><li>行阶梯形中主元的个数.</li></ul>
+<p>初等行、列变换均不改变秩；可逆矩阵左右相乘也不改变秩.</p>
+<p>对 <span class="math-inline">$A\in\mathbb R^{m\times n},B\in\mathbb R^{n\times p}$</span> ：</p>
+<div class="math-block">$$r(A)+r(B)-n\le r(AB)\le\min\{r(A),r(B)\}.$$</div>
+<p>左侧可从 <span class="math-inline">$B$</span> 的像空间理解：作用 <span class="math-inline">$A$</span> 后，最多损失 <span class="math-inline">$\dim\ker A=n-r(A)$</span> 个维数.</p>
+<p>特别地：</p>
+<div class="math-block">$$AB=0\Rightarrow r(A)+r(B)\le n.$$</div>
+<p>同型矩阵还有 <span class="math-inline">$r(A+B)\le r(A)+r(B)$</span> .</p>
+<h3 id="section-解的判定">解的判定<a class="heading-anchor" href="#section-解的判定" aria-label="链接到解的判定">#</a></h3>
+<p>设 <span class="math-inline">$A$</span> 为 <span class="math-inline">$m\times n$</span> 矩阵，增广矩阵为 <span class="math-inline">$(A\mid\boldsymbol b)$</span> .</p>
+<div class="math-block">$$A\boldsymbol x=\boldsymbol b\text{ 有解}
+\iff r(A)=r(A\mid\boldsymbol b).$$</div>
+<p>在有解前提下：</p>
+<ul><li><span class="math-inline">$r(A)=n$</span> ：唯一解.</li><li><span class="math-inline">$r(A)&lt;n$</span> ：无穷多解，有 <span class="math-inline">$n-r(A)$</span> 个自由变量.</li></ul>
+<p>齐次方程必有零解，存在非零解当且仅当 <span class="math-inline">$r(A)&lt;n$</span> . 应比较秩与未知数个数，不是与方程个数比较.</p>
+<p>解方程时对整个增广矩阵作行变换. 列变换会改变未知量的对应关系，若使用必须记录并换回.</p>
+<h3 id="section-解的结构">解的结构<a class="heading-anchor" href="#section-解的结构" aria-label="链接到解的结构">#</a></h3>
+<p>设 <span class="math-inline">$r(A)=r&lt;n$</span> ，齐次解空间的一组基为 <span class="math-inline">$\boldsymbol\xi_1,\ldots,\boldsymbol\xi_{n-r}$</span> ，即基础解系，则：</p>
+<div class="math-block">$$\boldsymbol x=c_1\boldsymbol\xi_1+\cdots+c_{n-r}\boldsymbol\xi_{n-r}.$$</div>
+<p>求法：将自由变量依次取成标准单位向量，解出主元变量，得到 <span class="math-inline">$n-r$</span> 个基础解向量.</p>
+<p>若 <span class="math-inline">$\boldsymbol\eta$</span> 是非齐次方程的一个特解，则通解为：</p>
+<div class="math-block">$$\boldsymbol x=\boldsymbol\eta+
+c_1\boldsymbol\xi_1+\cdots+c_{n-r}\boldsymbol\xi_{n-r}.$$</div>
+<p>因为两个特解之差满足齐次方程. 非齐次解集是齐次解空间的平移，<span class="math-inline">$\boldsymbol b\ne0$</span> 时不是线性空间.</p>
+<h3 id="section-可逆的等价条件">可逆的等价条件<a class="heading-anchor" href="#section-可逆的等价条件" aria-label="链接到可逆的等价条件">#</a></h3>
+<p>对 <span class="math-inline">$n$</span> 阶方阵 <span class="math-inline">$A$</span> ：</p>
+<div class="math-block">$$\begin{aligned}
+A\text{ 可逆}
+&amp;\iff\det A\ne0
+\iff r(A)=n\\
+&amp;\iff A\boldsymbol x=0\text{ 只有零解}\\
+&amp;\iff\text{对任意 }\boldsymbol b,\ A\boldsymbol x=\boldsymbol b\text{ 有唯一解}.
+\end{aligned}$$</div>
+<p>这也等价于列向量构成 <span class="math-inline">$\mathbb R^n$</span> 的一组基. 不同表述分别对应行列式、消元、方程组与空间结构.</p>
+<h2 id="section-向量组与线性空间">向量组与线性空间<a class="heading-anchor" href="#section-向量组与线性空间" aria-label="链接到向量组与线性空间">#</a></h2>
+<p>从“如何表示”转向“能表示哪些对象”.</p>
+<h3 id="section-线性相关与最大无关组">线性相关与最大无关组<a class="heading-anchor" href="#section-线性相关与最大无关组" aria-label="链接到线性相关与最大无关组">#</a></h3>
+<p>向量组 <span class="math-inline">$\boldsymbol\alpha_1,\ldots,\boldsymbol\alpha_s$</span> 线性相关，即存在不全为零的系数，使：</p>
+<div class="math-block">$$c_1\boldsymbol\alpha_1+\cdots+c_s\boldsymbol\alpha_s=0.$$</div>
+<p>等价地，至少一个向量可由其余向量表示. 两两不成比例只保证两两无关，不保证整个向量组无关.</p>
+<p>最大无关组是一组线性无关的向量，且原向量组中的每个向量都能由它表示. 向量的选法不唯一，但个数相同，这个数就是秩.</p>
+<p>求列向量的最大无关组时，先行消元找主元列，再选取<strong>原矩阵中对应的列</strong>. 行变换保留列之间的线性关系，但通常改变列空间本身.</p>
+<p>两个向量组等价，当且仅当互相可以线性表示，也即张成同一个空间. 只有秩相同还不够.</p>
+<h3 id="section-基与维数">基与维数<a class="heading-anchor" href="#section-基与维数" aria-label="链接到基与维数">#</a></h3>
+<p>线性空间对加法和数乘封闭. 一组基既线性无关，又张成整个空间，因此每个向量的坐标唯一.</p>
+<p>对有限维子空间 <span class="math-inline">$U,W$</span> ：</p>
+<div class="math-block">$$\dim(U+W)=\dim U+\dim W-\dim(U\cap W).$$</div>
+<p>先取交空间的一组基，分别扩充成 <span class="math-inline">$U,W$</span> 的基；合并时交空间只计一次.</p>
+<p>若 <span class="math-inline">$U\cap W=\{0\}$</span> ，则称 <span class="math-inline">$U+W$</span> 为直和，记作 <span class="math-inline">$U\oplus W$</span> . 此时每个向量分解为 <span class="math-inline">$\boldsymbol u+\boldsymbol w$</span> 的方式唯一.</p>
+<h3 id="section-基变换与坐标变换">基变换与坐标变换<a class="heading-anchor" href="#section-基变换与坐标变换" aria-label="链接到基变换与坐标变换">#</a></h3>
+<p>记两组基为 <span class="math-inline">$\mathcal E=(\boldsymbol e_1,\ldots,\boldsymbol e_n)$</span> 、<span class="math-inline">$\mathcal F=(\boldsymbol f_1,\ldots,\boldsymbol f_n)$</span> ，约定：</p>
+<div class="math-block">$$\mathcal F=\mathcal E P.$$</div>
+<p><span class="math-inline">$P$</span> 的第 <span class="math-inline">$j$</span> 列是新基向量 <span class="math-inline">$\boldsymbol f_j$</span> 在旧基下的坐标. 若同一向量的两套坐标分别为 <span class="math-inline">$\boldsymbol x,\boldsymbol y$</span> ，则：</p>
+<div class="math-block">$$\mathcal E\boldsymbol x=\mathcal F\boldsymbol y=\mathcal E P\boldsymbol y
+\Rightarrow\boldsymbol x=P\boldsymbol y,\qquad
+\boldsymbol y=P^{-1}\boldsymbol x.$$</div>
+<p>基向量与坐标的变换方向相反；先写基之间的关系，再推坐标关系，避免凭记忆猜逆矩阵.</p>
+<h3 id="section-线性映射-核与像">线性映射、核与像<a class="heading-anchor" href="#section-线性映射-核与像" aria-label="链接到线性映射、核与像">#</a></h3>
+<p>线性映射满足：</p>
+<div class="math-block">$$T(a\boldsymbol u+b\boldsymbol v)=aT(\boldsymbol u)+bT(\boldsymbol v).$$</div>
+<p>给出一组基的像，就唯一确定整个线性映射. 矩阵的第 <span class="math-inline">$j$</span> 列，是第 <span class="math-inline">$j$</span> 个基向量的像在目标基下的坐标.</p>
+<div class="math-block">$$\ker T=\{\boldsymbol x:T\boldsymbol x=0\},\qquad
+\operatorname{Im}T=\{T\boldsymbol x:\boldsymbol x\in V\}.$$</div>
+<p>若 <span class="math-inline">$V$</span> 有限维，则秩—零度公式为：</p>
+<div class="math-block">$$\dim\ker T+\dim\operatorname{Im}T=\dim V.$$</div>
+<p>核刻画损失的维数，像刻画保留的维数. 对矩阵即 <span class="math-inline">$\dim\ker A=n-r(A)$</span> .</p>
+<h2 id="section-正交与投影">正交与投影<a class="heading-anchor" href="#section-正交与投影" aria-label="链接到正交与投影">#</a></h2>
+<p>正交把线性表示中的各个分量分离开.</p>
+<h3 id="section-施密特正交化">施密特正交化<a class="heading-anchor" href="#section-施密特正交化" aria-label="链接到施密特正交化">#</a></h3>
+<p>对线性无关组 <span class="math-inline">$\boldsymbol\alpha_1,\ldots,\boldsymbol\alpha_r$</span> ，依次令：</p>
+<div class="math-block">$$\boldsymbol\beta_k=\boldsymbol\alpha_k-
+\sum_{j=1}^{k-1}
+\frac{\boldsymbol\alpha_k^T\boldsymbol\beta_j}
+{\boldsymbol\beta_j^T\boldsymbol\beta_j}\boldsymbol\beta_j,
+\qquad
+\boldsymbol q_k=\frac{\boldsymbol\beta_k}{\|\boldsymbol\beta_k\|}.$$</div>
+<p>每一步减去在已有方向上的投影；得到的标准正交组与原向量组张成相同空间. 若原组相关，某一步可能得到零向量，不能继续归一化.</p>
+<p>对列满秩矩阵，由此可写成 <span class="math-inline">$A=QR$</span> ，其中 <span class="math-inline">$Q^TQ=I$</span> ，<span class="math-inline">$R$</span> 为可逆上三角矩阵.</p>
+<h3 id="section-正交矩阵">正交矩阵<a class="heading-anchor" href="#section-正交矩阵" aria-label="链接到正交矩阵">#</a></h3>
+<p>方阵 <span class="math-inline">$Q$</span> 正交，当且仅当：</p>
+<div class="math-block">$$Q^TQ=I\iff Q^{-1}=Q^T.$$</div>
+<p>其行、列分别构成标准正交基，保持内积与长度，且 <span class="math-inline">$\det Q=\pm1$</span> .</p>
+<p>矩形矩阵也可能满足 <span class="math-inline">$Q^TQ=I$</span> ，但此时不能据此写 <span class="math-inline">$QQ^T=I$</span> 或称其具有普通逆矩阵.</p>
+<h3 id="section-四个基本子空间">四个基本子空间<a class="heading-anchor" href="#section-四个基本子空间" aria-label="链接到四个基本子空间">#</a></h3>
+<p>对 <span class="math-inline">$A\in\mathbb R^{m\times n}$</span> ，秩为 <span class="math-inline">$r$</span> ：</p>
+<div class="math-block">$$\begin{aligned}
+\mathbb R^n&amp;=\operatorname{Im}(A^T)\oplus\ker A,\\
+\mathbb R^m&amp;=\operatorname{Im}A\oplus\ker(A^T).
+\end{aligned}$$</div>
+<p>两式均为正交直和，维数分别为 <span class="math-inline">$r+(n-r)$</span> 与 <span class="math-inline">$r+(m-r)$</span> .</p>
+<p>理由是 <span class="math-inline">$A\boldsymbol x=0$</span> 恰好表示 <span class="math-inline">$\boldsymbol x$</span> 与 <span class="math-inline">$A$</span> 的每一行都正交.</p>
+<p>因此方程有解还可表述为：</p>
+<div class="math-block">$$A\boldsymbol x=\boldsymbol b\text{ 有解}
+\iff\boldsymbol b\perp\ker(A^T).$$</div>
+<h3 id="section-最小二乘与投影">最小二乘与投影<a class="heading-anchor" href="#section-最小二乘与投影" aria-label="链接到最小二乘与投影">#</a></h3>
+<p>无精确解时，考虑最小化 <span class="math-inline">$\|A\boldsymbol x-\boldsymbol b\|^2$</span> . 最优残差应垂直于列空间，因此：</p>
+<div class="math-block">$$A^T(\boldsymbol b-A\widehat{\boldsymbol x})=0
+\Rightarrow A^TA\widehat{\boldsymbol x}=A^T\boldsymbol b.$$</div>
+<p>这称为正规方程. 若 <span class="math-inline">$A$</span> 列满秩，则：</p>
+<div class="math-block">$$\widehat{\boldsymbol x}=(A^TA)^{-1}A^T\boldsymbol b,
+\qquad
+\boldsymbol p=A\widehat{\boldsymbol x}=P\boldsymbol b,$$</div>
+<div class="math-block">$$P=A(A^TA)^{-1}A^T,\qquad P^T=P,\quad P^2=P.$$</div>
+<p>列满秩保证 <span class="math-inline">$A^TA$</span> 可逆，因为：</p>
+<div class="math-block">$$\boldsymbol x^TA^TA\boldsymbol x=\|A\boldsymbol x\|^2.$$</div>
+<p>同一等式还给出 <span class="math-inline">$\ker(A^TA)=\ker A$</span> ，故 <span class="math-inline">$r(A^TA)=r(A)$</span> .</p>
+<p>不满列秩时，最小二乘解仍存在，但系数解不唯一；投影 <span class="math-inline">$\boldsymbol p$</span> 唯一. 任意实对称幂等矩阵都是到其像空间的正交投影，只有幂等而不对称时一般是斜投影.</p>
+<h2 id="section-特征值与相似对角化">特征值与相似对角化<a class="heading-anchor" href="#section-特征值与相似对角化" aria-label="链接到特征值与相似对角化">#</a></h2>
+<p>寻找变换中只发生伸缩的方向.</p>
+<h3 id="section-特征值与特征空间">特征值与特征空间<a class="heading-anchor" href="#section-特征值与特征空间" aria-label="链接到特征值与特征空间">#</a></h3>
+<div class="math-block">$$A\boldsymbol v=\lambda\boldsymbol v,\qquad\boldsymbol v\ne0.$$</div>
+<p>特征值由 <span class="math-inline">$\det(\lambda I-A)=0$</span> 求得. 对应的特征空间为：</p>
+<div class="math-block">$$E_\lambda=\ker(A-\lambda I).$$</div>
+<p>特征空间包含零向量，特征向量不包含零向量.</p>
+<p>特征值可为复数；下面按代数重数统计全部特征值时，允许在复数域中计算. 若要求实对角化，则特征值与所选特征向量都须为实数.</p>
+<div class="math-block">$$\sum_{i=1}^n\lambda_i=\operatorname{tr}A,\qquad
+\prod_{i=1}^n\lambda_i=\det A.$$</div>
+<p>若 <span class="math-inline">$A\boldsymbol v=\lambda\boldsymbol v$</span> ，对多项式 <span class="math-inline">$p$</span> 有：</p>
+<div class="math-block">$$p(A)\boldsymbol v=p(\lambda)\boldsymbol v.$$</div>
+<p>可逆时 <span class="math-inline">$A^{-1}$</span> 对应特征值为 <span class="math-inline">$1/\lambda$</span> . 但 <span class="math-inline">$p(A)$</span> 可能出现更多特征向量，不能反推其每个特征向量也是 <span class="math-inline">$A$</span> 的特征向量.</p>
+<h3 id="section-相似">相似<a class="heading-anchor" href="#section-相似" aria-label="链接到相似">#</a></h3>
+<div class="math-block">$$B=P^{-1}AP,\qquad P\text{ 可逆}.$$</div>
+<p>相似表示同一个线性变换在不同基下的矩阵. 由 <span class="math-inline">$\boldsymbol x=P\boldsymbol y$</span> ：</p>
+<div class="math-block">$$\boldsymbol x'=A\boldsymbol x
+\Rightarrow\boldsymbol y'=P^{-1}AP\boldsymbol y.$$</div>
+<p>相似保持特征多项式、特征值及其重数、秩、迹、行列式. 这些量相同一般不足以反推相似.</p>
+<h3 id="section-对角化条件">对角化条件<a class="heading-anchor" href="#section-对角化条件" aria-label="链接到对角化条件">#</a></h3>
+<p>若 <span class="math-inline">$P=(\boldsymbol v_1,\ldots,\boldsymbol v_n)$</span> 的各列是线性无关的特征向量，则：</p>
+<div class="math-block">$$AP=P\Lambda,\qquad
+P^{-1}AP=\Lambda=\operatorname{diag}(\lambda_1,\ldots,\lambda_n).$$</div>
+<p>因此：</p>
+<div class="math-block">$$A\text{ 可对角化}\iff A\text{ 有 }n\text{ 个线性无关的特征向量}.$$</div>
+<p>不同特征值的特征向量线性无关，所以 <span class="math-inline">$n$</span> 个互异特征值是充分条件，不是必要条件.</p>
+<p>记 <span class="math-inline">$\lambda$</span> 的代数重数为 <span class="math-inline">$m_\lambda$</span> ，几何重数为 <span class="math-inline">$g_\lambda=\dim E_\lambda$</span> ，则：</p>
+<div class="math-block">$$1\le g_\lambda\le m_\lambda.$$</div>
+<p>当特征多项式在所讨论的数域上完全分裂时，可对角化当且仅当每个特征值都满足 <span class="math-inline">$g_\lambda=m_\lambda$</span> . 重根不一定阻碍对角化，缺少独立特征向量才会.</p>
+<p><span class="math-inline">$P$</span> 的列与 <span class="math-inline">$\Lambda$</span> 的对角元必须一一对应. 一般矩阵不同特征值对应的向量只保证无关，不保证正交.</p>
+<h3 id="section-矩阵幂与多项式">矩阵幂与多项式<a class="heading-anchor" href="#section-矩阵幂与多项式" aria-label="链接到矩阵幂与多项式">#</a></h3>
+<p>若 <span class="math-inline">$A=P\Lambda P^{-1}$</span> ：</p>
+<div class="math-block">$$A^k=P\Lambda^kP^{-1},\qquad
+p(A)=Pp(\Lambda)P^{-1}.$$</div>
+<p>对不能对角化的矩阵，可利用凯莱—哈密顿定理：</p>
+<div class="math-block">$$\chi_A(t)=\det(tI-A)\quad\Rightarrow\quad\chi_A(A)=0.$$</div>
+<p>由此把高次幂化为 <span class="math-inline">$I,A,\ldots,A^{n-1}$</span> 的线性组合. 这是对特征多项式作矩阵代入，不能直接把含矩阵的行列式表达式当作标量式随意代入.</p>
+<h2 id="section-实对称矩阵与二次型">实对称矩阵与二次型<a class="heading-anchor" href="#section-实对称矩阵与二次型" aria-label="链接到实对称矩阵与二次型">#</a></h2>
+<p>相似研究线性变换，合同研究二次型的变量替换.</p>
+<h3 id="section-实对称矩阵的谱分解">实对称矩阵的谱分解<a class="heading-anchor" href="#section-实对称矩阵的谱分解" aria-label="链接到实对称矩阵的谱分解">#</a></h3>
+<p>若 <span class="math-inline">$A=A^T$</span> ，则所有特征值为实数，不同特征值对应的特征向量正交.</p>
+<p>对 <span class="math-inline">$A\boldsymbol u=\lambda\boldsymbol u$</span> 、<span class="math-inline">$A\boldsymbol v=\mu\boldsymbol v$</span> ：</p>
+<div class="math-block">$$\lambda\boldsymbol u^T\boldsymbol v
+=(A\boldsymbol u)^T\boldsymbol v
+=\boldsymbol u^TA\boldsymbol v
+=\mu\boldsymbol u^T\boldsymbol v.$$</div>
+<p><span class="math-inline">$\lambda\ne\mu$</span> 时即得正交. 同一特征空间内可作施密特正交化；所有特征空间合起来可取成完整的标准正交基.</p>
+<p>于是存在正交矩阵 <span class="math-inline">$Q$</span> ，使：</p>
+<div class="math-block">$$Q^TAQ=\Lambda,\qquad
+A=Q\Lambda Q^T=\sum_{i=1}^n\lambda_i\boldsymbol q_i\boldsymbol q_i^T.$$</div>
+<p>反过来，实矩阵能被实正交矩阵对角化，也必为实对称矩阵.</p>
+<h3 id="section-二次型与合同">二次型与合同<a class="heading-anchor" href="#section-二次型与合同" aria-label="链接到二次型与合同">#</a></h3>
+<p>实二次型写成：</p>
+<div class="math-block">$$f(\boldsymbol x)=\boldsymbol x^TA\boldsymbol x
+=\sum_i a_{ii}x_i^2+2\sum_{i&lt;j}a_{ij}x_ix_j,\qquad A=A^T.$$</div>
+<p>交叉项的系数是矩阵相应非对角元的两倍. 任意矩阵定义的二次表达式只由对称部分决定：</p>
+<div class="math-block">$$\boldsymbol x^TA\boldsymbol x
+=\boldsymbol x^T\frac{A+A^T}{2}\boldsymbol x.$$</div>
+<p>作可逆变量替换 <span class="math-inline">$\boldsymbol x=C\boldsymbol y$</span> ，则：</p>
+<div class="math-block">$$f=\boldsymbol y^T(C^TAC)\boldsymbol y.$$</div>
+<p><span class="math-inline">$B=C^TAC$</span> 称为合同. 它与相似式 <span class="math-inline">$P^{-1}AP$</span> 不同；正交变换时二者才采用同一个公式.</p>
+<h3 id="section-标准形与惯性定理">标准形与惯性定理<a class="heading-anchor" href="#section-标准形与惯性定理" aria-label="链接到标准形与惯性定理">#</a></h3>
+<p>取正交变换 <span class="math-inline">$\boldsymbol x=Q\boldsymbol y$</span> ：</p>
+<div class="math-block">$$f=\lambda_1y_1^2+\cdots+\lambda_ny_n^2.$$</div>
+<p>这就是标准形. 再对非零系数作伸缩，得到规范形：</p>
+<div class="math-block">$$f=z_1^2+\cdots+z_p^2-z_{p+1}^2-\cdots-z_{p+q}^2.$$</div>
+<p>惯性定理：任意可逆实变量替换下，正、负平方项数 <span class="math-inline">$p,q$</span> 不变，零平方项数为 <span class="math-inline">$n-p-q$</span> .</p>
+<p>因此：</p>
+<ul><li>二次型的秩为 <span class="math-inline">$p+q=r(A)$</span> .</li><li>两个同阶实对称矩阵合同，当且仅当正、负惯性指数分别相同.</li><li>合同通常不保持具体特征值，只保持正负零的个数.</li></ul>
+<p>配方法也可化标准形：有非零平方项时先配方消去相关交叉项；只有交叉项时可先用和差换元产生平方项. 每一步都应保持换元可逆.</p>
+<h3 id="section-正定与半正定">正定与半正定<a class="heading-anchor" href="#section-正定与半正定" aria-label="链接到正定与半正定">#</a></h3>
+<p>以下均要求 <span class="math-inline">$A$</span> 为实对称矩阵.</p>
+<div class="math-block">$$A\text{ 正定}\iff\forall\boldsymbol x\ne0,\quad\boldsymbol x^TA\boldsymbol x&gt;0.$$</div>
+<p>等价判定：</p>
+<ul><li>所有特征值为正.</li><li>所有顺序主子式 <span class="math-inline">$\Delta_k=\det A_{1:k,1:k}$</span> 为正.</li><li>存在可逆实矩阵 <span class="math-inline">$B$</span> ，使 <span class="math-inline">$A=B^TB$</span> .</li></ul>
+<p>顺序主子式指左上角逐阶扩大的子式. 只看对角元为正或行列式为正均不够.</p>
+<p>负定等价于 <span class="math-inline">$-A$</span> 正定，故顺序主子式满足：</p>
+<div class="math-block">$$(-1)^k\Delta_k&gt;0.$$</div>
+<p>半正定将定义中的 <span class="math-inline">$&gt;0$</span> 换为 <span class="math-inline">$\ge0$</span> ，等价于所有特征值非负，也等价于<strong>所有主子式</strong>非负. 主子式使用同一组行、列指标；不能只检查顺序主子式非负.</p>
+<h3 id="section-二次型的范围与最小值">二次型的范围与最小值<a class="heading-anchor" href="#section-二次型的范围与最小值" aria-label="链接到二次型的范围与最小值">#</a></h3>
+<p>设实对称矩阵的最小、最大特征值为 <span class="math-inline">$\lambda_{\min},\lambda_{\max}$</span> ，则：</p>
+<div class="math-block">$$\lambda_{\min}\|\boldsymbol x\|^2
+\le\boldsymbol x^TA\boldsymbol x
+\le\lambda_{\max}\|\boldsymbol x\|^2.$$</div>
+<p>因为在正交特征基下，二次型为 <span class="math-inline">$\sum_i\lambda_i y_i^2$</span> ，而 <span class="math-inline">$\sum_i y_i^2=\|\boldsymbol x\|^2$</span> . 单位球面上最值分别为两个极端特征值.</p>
+<p>若 <span class="math-inline">$A$</span> 正定，则：</p>
+<div class="math-block">$$\begin{aligned}
+\boldsymbol x^TA\boldsymbol x-2\boldsymbol b^T\boldsymbol x+c
+&amp;=(\boldsymbol x-A^{-1}\boldsymbol b)^TA
+(\boldsymbol x-A^{-1}\boldsymbol b)\\
+&amp;\quad+c-\boldsymbol b^TA^{-1}\boldsymbol b.
+\end{aligned}$$</div>
+<p>故唯一最小点为 <span class="math-inline">$\boldsymbol x=A^{-1}\boldsymbol b$</span> ，最小值为 <span class="math-inline">$c-\boldsymbol b^TA^{-1}\boldsymbol b$</span> . 正定性保证驻点确实为全局最小点.</p>
+<h2 id="section-三种矩阵关系">三种矩阵关系<a class="heading-anchor" href="#section-三种矩阵关系" aria-label="链接到三种矩阵关系">#</a></h2>
+<div class="table-scroll"><table><thead><tr><th scope="col">关系</th><th scope="col">形式</th><th scope="col">含义与完整判据</th></tr></thead><tbody><tr><td>等价</td><td><span class="math-inline">$B=PAQ$</span> ，<span class="math-inline">$P,Q$</span> 可逆</td><td>分别改变输入、输出基；同型矩阵等价当且仅当秩相同</td></tr><tr><td>相似</td><td><span class="math-inline">$B=P^{-1}AP$</span></td><td>同一线性变换换基；保持特征结构，只有特征值相同不足以判定</td></tr><tr><td>合同</td><td><span class="math-inline">$B=C^TAC$</span></td><td>二次型作可逆变量替换；同阶实对称矩阵由正、负惯性指数分类</td></tr></tbody></table></div>
+<p>行列式非零、满秩、列向量无关、齐次方程只有零解，最终都在描述同一件事：方阵所表示的线性变换没有丢失维数.</p></div></div></article></main><footer class="sub-footer"><span>© 2026 yangjm</span><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">鲁ICP备2026048978号-1 <span aria-hidden="true">↗</span></a></footer></body></html>
