@@ -7,7 +7,7 @@
     const label = nextTheme === 'dark' ? '切换到日间模式' : '切换到夜间模式';
     toggle.setAttribute('aria-label', label); toggle.title = label;
     toggle.setAttribute('aria-pressed', String(nextTheme === 'dark'));
-    document.querySelector('meta[name="theme-color"]').content = nextTheme === 'dark' ? '#15231d' : '#f4f1e8';
+    document.querySelector('meta[name="theme-color"]').content = nextTheme === 'dark' ? '#0f1b26' : '#f7fbfc';
     if (persist) window.YANGJM_THEME?.save(nextTheme);
   }
   apply(document.documentElement.dataset.theme);

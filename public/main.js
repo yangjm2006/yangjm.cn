@@ -11,7 +11,7 @@ function applyTheme(theme, { persist = false } = {}) {
   themeToggle.setAttribute('aria-pressed', String(dark));
   themeToggle.setAttribute('aria-label', dark ? '切换到日间模式' : '切换到夜间模式');
   themeToggle.title = dark ? '切换到日间模式' : '切换到夜间模式';
-  themeColor.content = dark ? '#15231d' : '#f4f1e8';
+  themeColor.content = dark ? '#0f1b26' : '#f7fbfc';
   if (persist) {
     window.YANGJM_THEME?.save(nextTheme);
   }
@@ -39,7 +39,7 @@ if (profile.school && profile.major) {
 if (profile.email) {
   const link = document.getElementById('email-link');
   link.href = `mailto:${profile.email}`;
-  link.textContent = `${profile.email} ↗`;
+  link.textContent = profile.email;
 }
 if (profile.name) {
   for (const id of ['profile-name', 'card-name', 'footer-name']) {

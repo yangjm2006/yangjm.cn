@@ -1,18 +1,19 @@
+/* Hallmark · nav: shared five-site bar, wordmark left, links centred, theme toggle right, hairline under · tokens from styles.css, loaded after each page's own styles · v2.0.0 */
 /* Shared across all five sites. Page-specific styles must not move this header. */
 html { scrollbar-gutter: stable; }
-body { background: var(--canvas); }
+body { background: var(--color-paper); }
 body::before { display: none; }
 #site-navigation {
-  width: min(1080px, calc(100% - 80px));
-  height: 104px;
+  width: min(1080px, calc(100% - 2 * var(--space-xl)));
+  height: 96px;
   margin: 0 auto;
   padding: 0;
   display: grid;
   grid-template-columns: 44px minmax(0, 1fr) 44px;
   align-items: center;
-  gap: 24px;
-  border-bottom: 1px solid var(--line);
-  font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  gap: var(--space-lg);
+  border-bottom: 1px solid var(--color-rule);
+  font-family: var(--font-body);
   line-height: 1.6;
 }
 #site-navigation .brand {
@@ -23,57 +24,50 @@ body::before { display: none; }
   height: 52px;
   margin: 0;
   padding: 0;
-  font: 700 40px/1 Georgia, "Times New Roman", serif;
+  font: 700 40px/1 var(--font-serif);
   letter-spacing: -.04em;
-  color: var(--ink);
+  color: var(--color-ink);
 }
+#site-navigation .brand span { color: var(--color-accent); }
 #site-navigation nav {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 28px;
+  gap: var(--space-xs);
   min-width: 0;
   margin: 0;
   padding: 0;
 }
 #site-navigation nav a {
-  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;
+  min-height: 40px;
   margin: 0;
-  padding: 0 4px;
+  padding: 0 var(--space-md);
   border: 0;
-  color: var(--muted);
-  font: 400 14px/1.6 "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  border-radius: 999px;
+  color: var(--color-muted);
+  font: 400 var(--text-sm)/1.6 var(--font-body);
   white-space: nowrap;
   text-decoration: none;
+  transition: background-color var(--dur-short) var(--ease-out), color var(--dur-short) var(--ease-out);
 }
-#site-navigation nav a::after {
-  content: "";
-  position: absolute;
-  inset: auto 4px 3px;
-  height: 2px;
-  background: var(--moss);
-  transform: scaleX(0);
-  transform-origin: center;
-  transition: transform .18s ease-out;
-}
-#site-navigation nav a:hover, #site-navigation nav a[aria-current="page"] { color: var(--ink); }
-#site-navigation nav a:hover::after, #site-navigation nav a[aria-current="page"]::after { transform: scaleX(1); }
+#site-navigation nav a:hover { color: var(--color-ink); background: var(--color-paper-2); }
+#site-navigation nav a:active { background: var(--color-paper-3); }
+#site-navigation nav a[aria-current="page"] { color: var(--color-ink); background: var(--color-paper-3); font-weight: 700; }
 #site-navigation .theme-toggle { width: 44px; height: 44px; margin: 0; padding: 0; }
-#site-navigation a:focus-visible, #site-navigation button:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+#site-navigation a:focus-visible, #site-navigation button:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3px; }
 @media (max-width: 700px) {
-  #site-navigation { width: calc(100% - 40px); height: 88px; gap: 12px; }
+  #site-navigation { width: calc(100% - 2 * var(--space-md)); height: 80px; gap: var(--space-xs); }
   #site-navigation .brand { font-size: 32px; }
-  #site-navigation nav { gap: 12px; }
-  #site-navigation nav a { font-size: 13px; padding-inline: 2px; }
-  #site-navigation nav a::after { inset-inline: 2px; }
+  #site-navigation nav { gap: var(--space-3xs); }
+  #site-navigation nav a { font-size: var(--text-xs); padding-inline: var(--space-xs); }
 }
 @media (max-width: 370px) {
-  #site-navigation { width: calc(100% - 24px); gap: 6px; grid-template-columns: 36px minmax(0, 1fr) 44px; }
+  #site-navigation { width: calc(100% - 2 * var(--space-sm)); gap: var(--space-2xs); grid-template-columns: 36px minmax(0, 1fr) 44px; }
   #site-navigation .brand { min-width: 36px; width: 36px; }
-  #site-navigation nav { gap: 5px; }
+  #site-navigation nav { gap: 0; }
+  #site-navigation nav a { padding-inline: var(--space-2xs); }
 }
-@media (prefers-reduced-motion: reduce) { #site-navigation nav a::after { transition: none; } }
+@media (prefers-reduced-motion: reduce) { #site-navigation nav a { transition: none; } }
