@@ -1,0 +1,30 @@
+[
+ {
+  "mode": "redesign",
+  "depth": "full",
+  "scope": "site",
+  "shape": "sky disc and tape shelf",
+  "theme": "custom",
+  "axes": "light/grotesk-heavy/chromatic-cyan",
+  "hero": "avatar in a sky disc bleeding right, headline left",
+  "nav": "shared bar, wordmark left, links centred, toggle right",
+  "footer": "one line: name, motto, visits, ICP",
+  "imagery": "owner avatar",
+  "photos": [],
+  "entry": "none",
+  "fingerprint": "disc-hero/tiles-2x2/quote-well/sky-contact",
+  "sections": [
+   "hero",
+   "explore tiles",
+   "work note and hitokoto",
+   "contact band",
+   "footer"
+  ],
+  "signature": "sky disc behind the avatar",
+  "waived": [
+   "1"
+  ],
+  "prompt": "personal blog and study hub for a CS student and competitive programmer",
+  "date": "2026-11-11"
+ }
+]
