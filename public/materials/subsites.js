@@ -1,5 +1,21 @@
 (() => {
   const toggle = document.querySelector('#theme-toggle');
+  // The new theme grows as a circle from the toggle; plain switch where unsupported or reduced motion.
+  function wipeTheme(change) {
+    const root = document.documentElement;
+    const button = document.getElementById('theme-toggle');
+    if (!document.startViewTransition || !button || matchMedia('(prefers-reduced-motion: reduce)').matches) { change(); return; }
+    const box = button.getBoundingClientRect();
+    const x = box.left + box.width / 2;
+    const y = box.top + box.height / 2;
+    const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+    root.classList.add('theme-switching');
+    const transition = document.startViewTransition(change);
+    transition.ready.then(() => {
+      root.animate({ clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] }, { duration: 620, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', pseudoElement: '::view-transition-new(root)' });
+    }).catch(() => {});
+    transition.finished.finally(() => root.classList.remove('theme-switching'));
+  }
   function apply(theme, {persist = false} = {}) {
     const nextTheme = theme === 'dark' ? 'dark' : 'light';
     document.documentElement.dataset.theme = nextTheme;
@@ -13,7 +29,7 @@
   apply(document.documentElement.dataset.theme);
   toggle.addEventListener('click', () => {
     const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-    apply(theme, {persist: true});
+    wipeTheme(() => apply(theme, {persist: true}));
   });
   function syncSharedTheme() {
     const sharedTheme = window.YANGJM_THEME?.read();

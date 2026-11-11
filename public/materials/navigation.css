@@ -70,4 +70,13 @@ body::before { display: none; }
   #site-navigation nav { gap: 0; }
   #site-navigation nav a { padding-inline: var(--space-2xs); }
 }
+/* Pages on the same site crossfade while the bar holds still. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+  #site-navigation { view-transition-name: site-nav; }
+  ::view-transition-old(root) { animation: 180ms cubic-bezier(0.7, 0, 0.84, 0) both page-out; }
+  ::view-transition-new(root) { animation: 360ms cubic-bezier(0.16, 1, 0.3, 1) 60ms both page-in; }
+}
+@keyframes page-out { to { opacity: 0; } }
+@keyframes page-in { from { opacity: 0; transform: translateY(10px); } }
 @media (prefers-reduced-motion: reduce) { #site-navigation nav a { transition: none; } }

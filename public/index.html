@@ -35,10 +35,10 @@
   </script>
   <title>yangjm · 个人主页</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/styles.css?v=20261111a">
-  <link rel="stylesheet" href="/navigation.css?v=20261111a">
+  <link rel="stylesheet" href="/styles.css?v=20261111b">
+  <link rel="stylesheet" href="/navigation.css?v=20261111b">
   <script src="/profile.js" defer></script>
-  <script src="/main.js?v=20261111a" defer></script>
+  <script src="/main.js?v=20261111b" defer></script>
   <script src="/visits.js?v=20260928a" defer></script>
 </head>
 <body class="home">
@@ -50,7 +50,7 @@
   <main class="wrap">
     <section class="hero" id="about" aria-labelledby="intro-title">
       <div class="intro">
-        <h1 id="intro-title">你好，<br>我是 <span id="profile-name">yangjm</span><span class="title-dot">.</span></h1>
+        <h1 id="intro-title"><span class="line">你好，</span><span class="line">我是 <span id="profile-name">yangjm</span><span class="title-dot">.</span></span></h1>
         <p class="intro-text" id="profile-intro">就读于山东大学软件工程专业。这里是我的个人空间，用来分享学习中的思考，和一点点做出来的小项目。</p>
         <div class="hero-actions"><a class="button" href="#explore-title">看看我在做什么 <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14m-6-6 6 6 6-6"/></svg></a><a class="text-link github-link" href="https://github.com/yangjm2006" target="_blank" rel="noopener noreferrer">GitHub <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></svg></a></div>
       </div>
@@ -62,15 +62,15 @@
     </section>
     <section class="explore" aria-labelledby="explore-title">
       <div class="section-heading"><h2 id="explore-title">从这里开始</h2><p>写下所学，也整理走过的路。</p></div>
-      <div class="explore-grid">
-        <a class="tile tile--blog" href="https://blog.yangjm.cn/">
+      <div class="explore-grid" id="explore-grid">
+        <a class="tile tile--blog" style="--i: 0" href="https://blog.yangjm.cn/">
           <strong class="tile-title">文字与记录</strong>
           <span class="tile-text">从数学笔记到赛季复盘，把学习中的推导、问题与想法认真写下来。</span>
           <span class="tile-foot"><span class="feature-count" id="blog-count">7 篇文章</span><span class="tile-action">前往博客 <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></span>
         </a>
-        <a class="tile tile--oi" href="https://oi.yangjm.cn/"><strong class="tile-title">算法竞赛</strong><span class="tile-text">训练平台、队伍经历与比赛记录</span><svg class="tile-arrow" aria-hidden="true" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
-        <a class="tile tile--notebook" href="https://banzi.yangjm.cn/"><strong class="tile-title">算法板子</strong><span class="tile-text">搜索并复制常用算法模板</span><svg class="tile-arrow" aria-hidden="true" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
-        <a class="tile tile--materials" href="https://materials.yangjm.cn/"><strong class="tile-title">学习资料</strong><span class="tile-text">整理算法竞赛相关内容</span><svg class="tile-arrow" aria-hidden="true" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+        <a class="tile tile--oi" style="--i: 1" href="https://oi.yangjm.cn/"><strong class="tile-title">算法竞赛</strong><span class="tile-text">训练平台、队伍经历与比赛记录</span><svg class="tile-arrow" aria-hidden="true" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+        <a class="tile tile--notebook" style="--i: 2" href="https://banzi.yangjm.cn/"><strong class="tile-title">算法板子</strong><span class="tile-text">搜索并复制常用算法模板</span><svg class="tile-arrow" aria-hidden="true" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+        <a class="tile tile--materials" style="--i: 3" href="https://materials.yangjm.cn/"><strong class="tile-title">学习资料</strong><span class="tile-text">整理算法竞赛相关内容</span><svg class="tile-arrow" aria-hidden="true" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
       </div>
     </section>
     <section class="lower" aria-label="更多关于我">

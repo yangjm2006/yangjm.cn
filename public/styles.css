@@ -113,6 +113,9 @@ h1, h2, h3 { overflow-wrap: break-word; min-width: 0; text-wrap: balance; }
 :root[data-theme="light"] .sun-icon, :root[data-theme="dark"] .moon-icon { display: none; }
 .skip-link { position: absolute; z-index: var(--z-skip); top: -100px; left: var(--space-lg); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-chip); background: var(--color-ink); color: var(--color-paper); }
 .skip-link:focus { top: var(--space-sm); }
+/* Day and night: the new theme grows as a circle from the toggle (main.js, subsites.js). */
+:root.theme-switching::view-transition-old(root), :root.theme-switching::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+:root.theme-switching #site-navigation { view-transition-name: none; }
 
 /* Homepage */
 .home .button { min-height: 52px; display: inline-flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-lg); border-radius: var(--radius-control); background: var(--color-sun); color: var(--color-sun-ink); font-weight: 700; white-space: nowrap; transition: transform var(--dur-micro) var(--ease-out); }
@@ -125,6 +128,7 @@ h1, h2, h3 { overflow-wrap: break-word; min-width: 0; text-wrap: balance; }
 
 .hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 440px); gap: var(--space-2xl); align-items: center; padding-block: var(--space-2xl) var(--space-3xl); }
 .hero h1 { margin: 0 0 var(--space-lg); font: 700 var(--text-display)/1.04 var(--font-display); letter-spacing: -0.035em; max-width: 12ch; }
+.hero h1 .line { display: block; }
 #profile-name { white-space: nowrap; }
 .intro-text { max-width: 30em; margin-bottom: var(--space-xl); color: var(--color-ink-2); font-size: var(--text-lg); line-height: 1.85; white-space: pre-line; }
 .hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-sm) var(--space-lg); }
@@ -158,6 +162,9 @@ h1, h2, h3 { overflow-wrap: break-word; min-width: 0; text-wrap: balance; }
 .tile-foot { display: flex; justify-content: space-between; align-items: center; gap: var(--space-md); padding-top: var(--space-md); border-top: 1px solid color-mix(in oklab, var(--tile) 70%, var(--color-ink)); }
 .feature-count { color: var(--color-ink-2); font-size: var(--text-sm); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .tile-action { display: inline-flex; align-items: center; gap: var(--space-xs); font-weight: 700; white-space: nowrap; }
+.tile-arrow, .home .tile-action svg { transition: transform var(--dur-short) var(--ease-out); }
+.tile:hover .tile-arrow { transform: translate(3px, -3px); }
+.tile:hover .tile-action svg { transform: translateX(4px); }
 .tile-arrow { position: absolute; top: var(--space-xl); right: var(--space-xl); width: 28px; height: 28px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 .tile--oi .tile-title, .tile--notebook .tile-title, .tile--materials .tile-title { padding-right: var(--space-xl); }
 
@@ -172,7 +179,8 @@ h1, h2, h3 { overflow-wrap: break-word; min-width: 0; text-wrap: balance; }
 #hitokoto-refresh:active { transform: rotate(120deg); }
 #hitokoto-refresh:disabled { cursor: not-allowed; opacity: .55; }
 #hitokoto-refresh svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-.hitokoto-content[aria-busy="true"] { opacity: .6; }
+.hitokoto-content { transition: opacity var(--dur-short) var(--ease-out), transform var(--dur-short) var(--ease-out); }
+.hitokoto-content[aria-busy="true"] { opacity: .35; transform: translateY(4px); }
 .hitokoto-content blockquote { margin: var(--space-lg) 0 var(--space-md); font: 700 var(--text-quote)/1.6 var(--font-display); letter-spacing: -0.01em; }
 #hitokoto-text { overflow-wrap: anywhere; text-decoration: underline; text-decoration-color: transparent; text-decoration-thickness: 2px; transition: text-decoration-color var(--dur-short) var(--ease-out); }
 #hitokoto-text:hover { text-decoration-color: var(--color-accent); }
@@ -189,6 +197,21 @@ h1, h2, h3 { overflow-wrap: break-word; min-width: 0; text-wrap: balance; }
 .footer-visits { font-variant-numeric: tabular-nums; }
 #icp-link { margin-left: auto; }
 #icp-link:hover { color: var(--color-ink); text-decoration: underline; }
+
+/* Motion: one settle for the hero, one reveal for the tiles; both skipped under reduced motion. */
+@keyframes settle { from { opacity: 0; transform: translateY(12px); } }
+@keyframes disc-in { from { opacity: 0; transform: scale(.88); } }
+@media (prefers-reduced-motion: no-preference) {
+  .sky-disc { animation: disc-in 760ms var(--ease-out) both; }
+  .portrait-frame { animation: settle 640ms var(--ease-out) 90ms both; }
+  .portrait-caption { animation: settle 560ms var(--ease-out) 220ms both; }
+  .hero h1 .line { animation: settle 600ms var(--ease-out) both; }
+  .hero h1 .line + .line { animation-delay: 70ms; }
+  .intro-text { animation: settle 600ms var(--ease-out) 140ms both; }
+  .hero-actions { animation: settle 600ms var(--ease-out) 210ms both; }
+  .js .explore-grid .tile { opacity: 0; transform: translateY(28px); }
+  .js .explore-grid.is-in .tile { opacity: 1; transform: none; transition: opacity 560ms var(--ease-out) calc(var(--i, 0) * 80ms), transform 680ms var(--ease-out) calc(var(--i, 0) * 80ms), background-color var(--dur-short) var(--ease-out); }
+}
 
 @media (max-width: 900px) {
   .hero { grid-template-columns: minmax(0, 1fr) minmax(0, 300px); }

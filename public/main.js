@@ -18,8 +18,26 @@ function applyTheme(theme, { persist = false } = {}) {
 }
 
 applyTheme(themeRoot.dataset.theme);
+// The new theme grows as a circle from the toggle; plain switch where unsupported or reduced motion.
+function wipeTheme(change) {
+  const root = document.documentElement;
+  const button = document.getElementById('theme-toggle');
+  if (!document.startViewTransition || !button || matchMedia('(prefers-reduced-motion: reduce)').matches) { change(); return; }
+  const box = button.getBoundingClientRect();
+  const x = box.left + box.width / 2;
+  const y = box.top + box.height / 2;
+  const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+  root.classList.add('theme-switching');
+  const transition = document.startViewTransition(change);
+  transition.ready.then(() => {
+    root.animate({ clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] }, { duration: 620, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', pseudoElement: '::view-transition-new(root)' });
+  }).catch(() => {});
+  transition.finished.finally(() => root.classList.remove('theme-switching'));
+}
+
 themeToggle.addEventListener('click', () => {
-  applyTheme(themeRoot.dataset.theme === 'dark' ? 'light' : 'dark', { persist: true });
+  const next = themeRoot.dataset.theme === 'dark' ? 'light' : 'dark';
+  wipeTheme(() => applyTheme(next, { persist: true }));
 });
 function syncSharedTheme() {
   const sharedTheme = window.YANGJM_THEME?.read();
@@ -148,3 +166,16 @@ async function loadHitokoto({ refresh = false } = {}) {
 
 hitokotoRefresh.addEventListener('click', () => loadHitokoto({ refresh: true }));
 loadHitokoto();
+
+// The four tiles rise into place once, the first time the grid scrolls into view.
+const exploreGrid = document.getElementById('explore-grid');
+if (exploreGrid && 'IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  document.documentElement.classList.add('js');
+  const revealObserver = new IntersectionObserver(entries => {
+    if (entries.some(entry => entry.isIntersecting)) {
+      exploreGrid.classList.add('is-in');
+      revealObserver.disconnect();
+    }
+  }, { rootMargin: '0px 0px -12% 0px' });
+  revealObserver.observe(exploreGrid);
+}
