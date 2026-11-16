@@ -213,6 +213,93 @@ h1, h2, h3 { overflow-wrap: break-word; min-width: 0; text-wrap: balance; }
   .js .explore-grid.is-in .tile { opacity: 1; transform: none; transition: opacity 560ms var(--ease-out) calc(var(--i, 0) * 80ms), transform 680ms var(--ease-out) calc(var(--i, 0) * 80ms), background-color var(--dur-short) var(--ease-out); }
 }
 
+/* Ambient layer (homepage only): film grain over the page, a sky glow breathing along the window edges
+   with a sun highlight travelling round it, engraved rays turning behind the sky disc, a print grain on
+   the tiles, a light sweep across the sun button, and a soft blur-in for the lower sections. All slow;
+   the grain and the rays stay as still texture under reduced motion, everything else switches off. */
+.home {
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .08 0 0 0 0 .16 0 0 0 0 .24 2.8 0 0 0 -1.15'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  --grain-page: 0.07;
+  --grain-print: 0.22;
+  --glow: var(--color-sky);
+  --glow-hot: var(--color-sun);
+  --ray: color-mix(in oklab, var(--color-sky) 62%, var(--color-ink));
+  --ray-strength: 0.36;
+}
+:root[data-theme="dark"] .home {
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .86 0 0 0 0 .95 0 0 0 0 1 2.8 0 0 0 -1.15'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  --grain-page: 0.05;
+  --grain-print: 0.16;
+  --glow: var(--color-accent);
+  --ray: color-mix(in oklab, var(--color-sky) 55%, var(--color-accent));
+  --ray-strength: 0.5;
+}
+
+.page-grain { position: fixed; z-index: 500; inset: -50%; pointer-events: none; background: var(--grain); opacity: var(--grain-page); }
+
+.ambient-frame { position: fixed; z-index: 450; inset: 0; pointer-events: none; opacity: 0.6; transition: opacity 900ms var(--ease-out); }
+.ambient-frame.is-stirred { opacity: 1; transition-duration: 240ms; }
+.ambient-edge { position: absolute; overflow: hidden; }
+.ambient-edge::before { content: ""; position: absolute; inset: 0; }
+.ambient-edge.top { inset: 0 0 auto; height: 42px; }
+.ambient-edge.bottom { inset: auto 0 0; height: 42px; }
+.ambient-edge.left { inset: 0 auto 0 0; width: 42px; }
+.ambient-edge.right { inset: 0 0 0 auto; width: 42px; }
+.ambient-edge.top::before { background: linear-gradient(to bottom, color-mix(in oklab, var(--glow) 55%, transparent), transparent 70%); }
+.ambient-edge.bottom::before { background: linear-gradient(to top, color-mix(in oklab, var(--glow) 55%, transparent), transparent 70%); }
+.ambient-edge.left::before { background: linear-gradient(to right, color-mix(in oklab, var(--glow) 55%, transparent), transparent 70%); }
+.ambient-edge.right::before { background: linear-gradient(to left, color-mix(in oklab, var(--glow) 55%, transparent), transparent 70%); }
+.ambient-spark { position: absolute; opacity: 0; background: radial-gradient(closest-side, color-mix(in oklab, var(--glow-hot) 85%, transparent), color-mix(in oklab, var(--glow) 40%, transparent) 55%, transparent); }
+.top .ambient-spark, .bottom .ambient-spark { width: 38vw; height: 64px; }
+.top .ambient-spark { top: -32px; left: 0; }
+.bottom .ambient-spark { bottom: -32px; right: 0; }
+.left .ambient-spark, .right .ambient-spark { width: 64px; height: 38vh; }
+.right .ambient-spark { right: -32px; top: 0; }
+.left .ambient-spark { left: -32px; bottom: 0; }
+.ambient-flash { position: absolute; inset: 0; opacity: 0; box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--glow) 70%, transparent), inset 0 0 56px color-mix(in oklab, var(--glow) 60%, transparent); }
+.ambient-frame.is-pulsed .ambient-flash { animation: frame-flash 900ms var(--ease-out); }
+
+.sky-disc::before { content: ""; position: absolute; z-index: -1; inset: -26%; border-radius: 50%; background: repeating-conic-gradient(from 0deg, var(--ray) 0deg 0.45deg, transparent 0.45deg 3.6deg); -webkit-mask: radial-gradient(closest-side, transparent 52%, #000 60%, #000 72%, transparent 100%); mask: radial-gradient(closest-side, transparent 52%, #000 60%, #000 72%, transparent 100%); opacity: var(--ray-strength); }
+.sky-disc::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--grain); opacity: var(--grain-print); }
+.sky-disc { isolation: isolate; }
+
+.tile, .contact { isolation: isolate; }
+.tile::after, .contact::after { content: ""; position: absolute; z-index: -1; inset: 0; border-radius: inherit; pointer-events: none; background: var(--grain); opacity: var(--grain-print); }
+.contact { position: relative; }
+
+.home .button { position: relative; isolation: isolate; overflow: hidden; }
+.home .button::after { content: ""; position: absolute; z-index: -1; inset: 0; translate: -110% 0; background: linear-gradient(100deg, transparent 20%, oklch(100% 0 0 / 0.65) 50%, transparent 80%); pointer-events: none; }
+
+@keyframes grain-shift { 0% { transform: translate(0, 0); } 20% { transform: translate(-7%, 4%); } 40% { transform: translate(5%, -6%); } 60% { transform: translate(-4%, -3%); } 80% { transform: translate(6%, 7%); } }
+@keyframes edge-breathe { 0%, 62%, 100% { opacity: 0.45; } 76% { opacity: 1; } 88% { opacity: 0.6; } }
+@keyframes spark-x { 0% { opacity: 0; transform: translateX(-38vw); } 3% { opacity: 1; } 22% { opacity: 1; } 25% { opacity: 0; transform: translateX(100vw); } 100% { opacity: 0; transform: translateX(100vw); } }
+@keyframes spark-x-back { 0% { opacity: 0; transform: translateX(38vw); } 3% { opacity: 1; } 22% { opacity: 1; } 25% { opacity: 0; transform: translateX(-100vw); } 100% { opacity: 0; transform: translateX(-100vw); } }
+@keyframes spark-y { 0% { opacity: 0; transform: translateY(-38vh); } 3% { opacity: 1; } 22% { opacity: 1; } 25% { opacity: 0; transform: translateY(100vh); } 100% { opacity: 0; transform: translateY(100vh); } }
+@keyframes spark-y-back { 0% { opacity: 0; transform: translateY(38vh); } 3% { opacity: 1; } 22% { opacity: 1; } 25% { opacity: 0; transform: translateY(-100vh); } 100% { opacity: 0; transform: translateY(-100vh); } }
+@keyframes frame-flash { 0% { opacity: 0; } 18% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes rays-turn { to { transform: rotate(360deg); } }
+@keyframes sweep { 0% { translate: -110% 0; } 24%, 100% { translate: 110% 0; } }
+
+@media (prefers-reduced-motion: no-preference) {
+  .page-grain { animation: grain-shift 900ms steps(1) infinite; }
+  .ambient-edge::before { animation: edge-breathe 36s var(--ease-in-out) infinite; }
+  .ambient-edge.right::before { animation-delay: -9s; }
+  .ambient-edge.bottom::before { animation-delay: -18s; }
+  .ambient-edge.left::before { animation-delay: -27s; }
+  .top .ambient-spark { animation: spark-x 18s linear infinite; }
+  .right .ambient-spark { animation: spark-y 18s linear -13.5s infinite; }
+  .bottom .ambient-spark { animation: spark-x-back 18s linear -9s infinite; }
+  .left .ambient-spark { animation: spark-y-back 18s linear -4.5s infinite; }
+  .sky-disc::before { animation: rays-turn 240s linear infinite; }
+  .portrait .sky-disc { translate: 0 calc(var(--hero-shift, 0) * 0.22px); }
+  .portrait-frame { translate: 0 calc(var(--hero-shift, 0) * 0.08px); }
+  .home .button::after { animation: sweep 5.5s var(--ease-in-out) 1.6s infinite; }
+  .home .button:hover::after { animation-duration: 1.4s; animation-delay: 0s; }
+  .js .soft-in { opacity: 0; filter: blur(10px); translate: 0 18px; }
+  .js .soft-in.is-in { opacity: 1; filter: none; translate: 0 0; transition: opacity 900ms var(--ease-out), filter 1100ms var(--ease-out), translate 1000ms var(--ease-out); }
+}
+@media (prefers-reduced-motion: reduce) { .ambient-frame { display: none; } }
+
 @media (max-width: 900px) {
   .hero { grid-template-columns: minmax(0, 1fr) minmax(0, 300px); }
   .portrait { --disc: 300px; }
@@ -237,6 +324,7 @@ h1, h2, h3 { overflow-wrap: break-word; min-width: 0; text-wrap: balance; }
   .tile--blog { min-height: 300px; }
   .tile-arrow { top: var(--space-lg); right: var(--space-lg); }
   .lower { padding-block: var(--space-xl) var(--space-3xl); }
+  .ambient-frame { display: none; }
   .hitokoto-panel { padding: var(--space-lg); border-radius: 22px; }
   .contact { grid-template-columns: minmax(0, 1fr); gap: var(--space-lg); padding: var(--space-xl) var(--space-lg); border-radius: 22px; }
   .site-footer { gap: var(--space-xs) var(--space-lg); }

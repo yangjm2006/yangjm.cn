@@ -178,4 +178,47 @@ if (exploreGrid && 'IntersectionObserver' in window && !matchMedia('(prefers-red
     }
   }, { rootMargin: '0px 0px -12% 0px' });
   revealObserver.observe(exploreGrid);
+
+  // The lower sections come into focus from a soft blur as they scroll in.
+  const softObserver = new IntersectionObserver(entries => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      entry.target.classList.add('is-in');
+      softObserver.unobserve(entry.target);
+    }
+  }, { rootMargin: '0px 0px -10% 0px' });
+  document.querySelectorAll('.soft-in').forEach(section => softObserver.observe(section));
+}
+
+// Ambient layer: the hero drifts slower than the page, and the edge glow brightens while the page
+// scrolls and flashes once on a click. Nothing runs under reduced motion.
+if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const hero = document.querySelector('.hero');
+  const frame = document.getElementById('ambient-frame');
+  let ticking = false;
+  let settleTimer;
+  const onScroll = () => {
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+        const y = window.scrollY;
+        if (hero && y < hero.offsetTop + hero.offsetHeight) hero.style.setProperty('--hero-shift', y.toFixed(1));
+      });
+    }
+    if (frame) {
+      frame.classList.add('is-stirred');
+      clearTimeout(settleTimer);
+      settleTimer = setTimeout(() => frame.classList.remove('is-stirred'), 420);
+    }
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  if (frame) {
+    frame.addEventListener('animationend', () => frame.classList.remove('is-pulsed'));
+    document.addEventListener('pointerdown', () => {
+      frame.classList.remove('is-pulsed');
+      void frame.offsetWidth;
+      frame.classList.add('is-pulsed');
+    }, { passive: true });
+  }
 }
