@@ -14,6 +14,14 @@
     document.querySelector('.notebook-sidebar').classList.toggle('directory-open', open);
   }
   directory.addEventListener('click', () => setDirectory(directory.getAttribute('aria-expanded') !== 'true'));
+  const tree = document.querySelector('.template-nav');
+  // Scrolls only the category tree, never the page, so the current entry stays visible.
+  function reveal(link) {
+    if (!link.offsetParent) return;
+    const box = tree.getBoundingClientRect(), row = link.getBoundingClientRect();
+    if (row.top < box.top) tree.scrollTop -= box.top - row.top + 8;
+    else if (row.bottom > box.bottom) tree.scrollTop += row.bottom - box.bottom + 8;
+  }
   function show(id, focus = false) {
     active = matches.find(el => el.id === id) || matches[0];
     entries.forEach(el => { el.hidden = el !== active; });
@@ -21,7 +29,7 @@
     links.forEach(link => {
       const selected = active && link.hash === '#' + active.id;
       if (selected) link.setAttribute('aria-current', 'true'); else link.removeAttribute('aria-current');
-      if (selected) link.closest('.nav-group').open = true;
+      if (selected) { link.closest('.nav-group').open = true; reveal(link); }
     });
     const pos = matches.indexOf(active);
     for (const [selector, offset, label] of [['#previous-template', -1, '← 上一篇'], ['#next-template', 1, '下一篇 →']]) {
@@ -48,6 +56,18 @@
   }
   search.addEventListener('input', filter);
   document.querySelector('#clear-search').addEventListener('click', () => { search.value = ''; filter(); search.focus(); });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && event.target === search) {
+      if (search.value) { search.value = ''; filter(); } else search.blur();
+      event.preventDefault();
+      return;
+    }
+    if (event.key !== '/' || event.ctrlKey || event.metaKey || event.altKey) return;
+    if (event.target.closest('input, textarea, select, [contenteditable]')) return;
+    event.preventDefault();
+    setDirectory(true);
+    search.focus(); search.select();
+  });
   function navigate(id) {
     if (!matches.some(el => el.id === id)) { search.value = ''; filter(); }
     setDirectory(false); show(id, true);

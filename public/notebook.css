@@ -8,3 +8,10 @@
 .notebook-page code{font-family:var(--font-mono)}
 /* Hallmark restyle · tokens from styles.css */
 .notebook-layout{border-radius:24px}.code-box{border-radius:14px}.nav-group a[aria-current]{border-radius:10px}.notebook-page .copy-status:not(:empty){border-radius:999px}
+
+/* Sidebar: search stays put, only the category tree scrolls; "/" focuses search */
+.search-key{align-self:center;flex:none;margin-right:10px;min-width:22px;padding:2px 6px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--muted);font:11px/1.5 var(--font-mono);text-align:center}
+.search-field input:not(:placeholder-shown)~.search-key,.search-field:focus-within .search-key{display:none}
+.search-field input:placeholder-shown~#clear-search{display:none}
+@media(min-width:621px){.notebook-sidebar{display:flex;flex-direction:column;overflow:hidden}#directory-body{display:flex;flex-direction:column;flex:1;min-height:0}.notebook-sidebar #search-status{margin-bottom:14px}.template-nav{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;margin-inline:-6px;padding:4px 6px}.sidebar-note{margin-top:14px}}
+@media(max-width:620px),(hover:none){.search-key{display:none}}
