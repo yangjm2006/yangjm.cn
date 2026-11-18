@@ -1,0 +1,266 @@
+{
+  "source": "https://yangjm.cn",
+  "palette": [
+    {
+      "name": "paper",
+      "group": "底色",
+      "role": "页面底色",
+      "light": {
+        "oklch": "oklch(98.7% 0.006 215)",
+        "hex": "#f6fcfd"
+      },
+      "dark": {
+        "oklch": "oklch(17% 0.028 240)",
+        "hex": "#04111a"
+      }
+    },
+    {
+      "name": "paper-2",
+      "group": "底色",
+      "role": "次级底色、悬停",
+      "light": {
+        "oklch": "oklch(96% 0.017 215)",
+        "hex": "#e6f5f9"
+      },
+      "dark": {
+        "oklch": "oklch(21% 0.032 238)",
+        "hex": "#091a25"
+      }
+    },
+    {
+      "name": "paper-3",
+      "group": "底色",
+      "role": "第三层底色、选中、文字选区",
+      "light": {
+        "oklch": "oklch(92.8% 0.027 215)",
+        "hex": "#d4ecf3"
+      },
+      "dark": {
+        "oklch": "oklch(25.5% 0.036 236)",
+        "hex": "#102532"
+      }
+    },
+    {
+      "name": "surface",
+      "group": "底色",
+      "role": "卡片和输入框表面",
+      "light": {
+        "oklch": "oklch(99.6% 0.003 215)",
+        "hex": "#fcfeff"
+      },
+      "dark": {
+        "oklch": "oklch(20.5% 0.03 238)",
+        "hex": "#091923"
+      }
+    },
+    {
+      "name": "ink",
+      "group": "文字",
+      "role": "正文和标题",
+      "light": {
+        "oklch": "oklch(25% 0.05 240)",
+        "hex": "#062437"
+      },
+      "dark": {
+        "oklch": "oklch(95% 0.012 210)",
+        "hex": "#e6f1f3"
+      }
+    },
+    {
+      "name": "ink-2",
+      "group": "文字",
+      "role": "次要文字",
+      "light": {
+        "oklch": "oklch(37% 0.045 238)",
+        "hex": "#284355"
+      },
+      "dark": {
+        "oklch": "oklch(86% 0.022 215)",
+        "hex": "#c2d5da"
+      }
+    },
+    {
+      "name": "muted",
+      "group": "文字",
+      "role": "日期、说明等辅助文字",
+      "light": {
+        "oklch": "oklch(49% 0.035 232)",
+        "hex": "#4d6471"
+      },
+      "dark": {
+        "oklch": "oklch(74% 0.03 222)",
+        "hex": "#97b0b9"
+      }
+    },
+    {
+      "name": "rule",
+      "group": "文字",
+      "role": "分隔线和边框",
+      "light": {
+        "oklch": "oklch(88.5% 0.022 220)",
+        "hex": "#cadde3"
+      },
+      "dark": {
+        "oklch": "oklch(32% 0.035 235)",
+        "hex": "#213642"
+      }
+    },
+    {
+      "name": "accent",
+      "group": "强调",
+      "role": "链接、强调、当前项",
+      "light": {
+        "oklch": "oklch(49% 0.12 228)",
+        "hex": "#006c95"
+      },
+      "dark": {
+        "oklch": "oklch(81% 0.11 208)",
+        "hex": "#5bd5e6"
+      }
+    },
+    {
+      "name": "accent-ink",
+      "group": "强调",
+      "role": "强调色底上的文字",
+      "light": {
+        "oklch": "oklch(98.7% 0.006 215)",
+        "hex": "#f6fcfd"
+      },
+      "dark": {
+        "oklch": "oklch(17% 0.028 240)",
+        "hex": "#04111a"
+      }
+    },
+    {
+      "name": "focus",
+      "group": "强调",
+      "role": "键盘焦点环",
+      "light": {
+        "oklch": "oklch(50% 0.16 232)",
+        "hex": "#006ead"
+      },
+      "dark": {
+        "oklch": "oklch(82% 0.13 205)",
+        "hex": "#36dcec"
+      }
+    },
+    {
+      "name": "sky",
+      "group": "品牌",
+      "role": "头像后的天空圆盘、引用竖线",
+      "light": {
+        "oklch": "oklch(80% 0.11 210)",
+        "hex": "#58d1e5"
+      },
+      "dark": {
+        "oklch": "oklch(41% 0.085 222)",
+        "hex": "#00546b"
+      }
+    },
+    {
+      "name": "sun",
+      "group": "品牌",
+      "role": "主按钮（向日葵）",
+      "light": {
+        "oklch": "oklch(87% 0.16 92)",
+        "hex": "#fad03e"
+      },
+      "dark": {
+        "oklch": "oklch(85% 0.15 90)",
+        "hex": "#f4c947"
+      }
+    },
+    {
+      "name": "sun-ink",
+      "group": "品牌",
+      "role": "主按钮上的文字",
+      "light": {
+        "oklch": "oklch(24% 0.05 75)",
+        "hex": "#2d1b00"
+      },
+      "dark": {
+        "oklch": "oklch(24% 0.05 75)",
+        "hex": "#2d1b00"
+      }
+    },
+    {
+      "name": "tile-oi",
+      "group": "磁贴",
+      "role": "「算法竞赛」磁贴",
+      "light": {
+        "oklch": "oklch(91% 0.115 96)",
+        "hex": "#f8e186"
+      },
+      "dark": {
+        "oklch": "oklch(39% 0.065 82)",
+        "hex": "#564117"
+      }
+    },
+    {
+      "name": "tile-notebook",
+      "group": "磁贴",
+      "role": "「算法板子」磁贴",
+      "light": {
+        "oklch": "oklch(88% 0.06 292)",
+        "hex": "#d8d1fd"
+      },
+      "dark": {
+        "oklch": "oklch(36% 0.075 292)",
+        "hex": "#3e3561"
+      }
+    },
+    {
+      "name": "tile-materials",
+      "group": "磁贴",
+      "role": "「学习资料」磁贴",
+      "light": {
+        "oklch": "oklch(90% 0.055 355)",
+        "hex": "#fdd0e0"
+      },
+      "dark": {
+        "oklch": "oklch(37% 0.07 355)",
+        "hex": "#5c2f42"
+      }
+    },
+    {
+      "name": "ring",
+      "group": "品牌",
+      "role": "头像描边",
+      "light": {
+        "oklch": "oklch(98.7% 0.006 215)",
+        "hex": "#f6fcfd"
+      },
+      "dark": {
+        "oklch": "oklch(17% 0.028 240)",
+        "hex": "#04111a"
+      }
+    }
+  ],
+  "syntax": [
+    {
+      "name": "syntax-keyword",
+      "light": "#8150a0",
+      "dark": "#c4a4de"
+    },
+    {
+      "name": "syntax-number",
+      "light": "#a36125",
+      "dark": "#dbb17e"
+    },
+    {
+      "name": "syntax-string",
+      "light": "#347350",
+      "dark": "#a0caa7"
+    },
+    {
+      "name": "syntax-comment",
+      "light": "#708077",
+      "dark": "#8d9d92"
+    },
+    {
+      "name": "syntax-directive",
+      "light": "#426b94",
+      "dark": "#97b9d4"
+    }
+  ]
+}
